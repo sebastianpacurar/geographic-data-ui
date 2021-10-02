@@ -10,6 +10,7 @@ import (
 	"gioui.org/unit"
 	"gioui.org/widget"
 	"gioui.org/widget/material"
+	"image/color"
 	"log"
 	"os"
 	"strconv"
@@ -24,7 +25,7 @@ func main() {
 	ui := NewUI()
 	go func() {
 		w := app.NewWindow(
-			app.Title("Title of the app"),
+			app.Title("Multi Option Counter"),
 			app.Size(unit.Dp(400), unit.Dp(600)),
 		)
 		if err := ui.Run(w); err != nil {
@@ -39,6 +40,7 @@ type counter struct {
 	count    int
 	increase widget.Clickable
 	decrease widget.Clickable
+	reset    widget.Clickable
 }
 
 type UI struct {
@@ -83,27 +85,49 @@ func (c *counter) Layout(th *material.Theme, gtx C) D {
 				material.H2(th, strconv.Itoa(c.count)).Layout,
 			)
 		}),
+
 		layout.Rigid(
 			layout.Spacer{
 				Height: defaultMargin,
 			}.Layout,
 		),
+
 		layout.Flexed(2, func(gtx C) D {
 			for range c.increase.Clicks() {
 				c.count++
 			}
-			return material.Button(th, &c.increase, "Increase").Layout(gtx)
+			btn := material.Button(th, &c.increase, "Increase")
+			btn.Background = color.NRGBA{G: 255, A: 255}
+			return btn.Layout(gtx)
 		}),
+
 		layout.Rigid(
 			layout.Spacer{
 				Height: defaultMargin,
 			}.Layout,
 		),
+
 		layout.Flexed(2, func(gtx C) D {
 			for range c.decrease.Clicks() {
 				c.count--
 			}
-			return material.Button(th, &c.decrease, "Decrease").Layout(gtx)
+			btn := material.Button(th, &c.decrease, "Decrease")
+			btn.Background = color.NRGBA{R: 255, A: 255}
+			return btn.Layout(gtx)
+		}),
+
+		layout.Rigid(
+			layout.Spacer{
+				Height: defaultMargin,
+			}.Layout,
+		),
+
+		layout.Flexed(2, func(gtx C) D {
+			btn := material.Button(th, &c.reset, "Reset")
+			for range c.reset.Clicks() {
+				c.count = 0
+			}
+			return btn.Layout(gtx)
 		}),
 	)
 }
