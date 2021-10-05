@@ -19,13 +19,15 @@ import (
 )
 
 var (
+	count         = 0
 	defaultMargin = unit.Dp(10)
 	colours       = map[string]color.NRGBA{
-		"red":   {R: 255, A: 255},
-		"blue":  {B: 255, A: 255},
-		"green": {G: 255, A: 255},
-		"grey":  {R: 128, G: 128, B: 128, A: 255},
-		"black": {A: 255},
+		"red":           {R: 255, A: 255},
+		"blue":          {B: 255, A: 255},
+		"green":         {G: 255, A: 255},
+		"grey":          {R: 128, G: 128, B: 128, A: 255},
+		"black":         {A: 255},
+		"antique-white": {R: 250, G: 235, B: 215, A: 255},
 	}
 )
 
@@ -49,16 +51,32 @@ func main() {
 	app.Main()
 }
 
+type valueInput struct {
+	widget.Editor
+	Invalid bool
+	oldVal  string
+}
+
+func (vi valueInput) Updated() bool {
+	newVal := vi.Editor.Text()
+	updated := newVal != vi.oldVal
+	vi.oldVal = newVal
+	return updated
+}
+
+type valueChanger struct {
+	inpVal    valueInput
+	changeVal widget.Clickable
+}
+
 type counter struct {
-	count                     int
 	increase, decrease, reset widget.Clickable
-	changeVal                 widget.Clickable
-	valueInput                widget.Editor
 }
 
 type UI struct {
-	theme   *material.Theme
-	counter counter
+	theme        *material.Theme
+	counter      counter
+	valueChanger valueChanger
 }
 
 func (ui *UI) Run(w *app.Window) error {
@@ -87,16 +105,16 @@ func NewUI() *UI {
 	return ui
 }
 
-func (c *counter) incrementersLayout(th *material.Theme, gtx C) D {
+func (c *counter) Layout(th *material.Theme, gtx C) D {
 	return layout.Flex{
 		Axis: layout.Vertical,
 	}.Layout(
 		gtx,
 		layout.Flexed(1, func(gtx C) D {
-			currVal := material.H2(th, strconv.Itoa(c.count))
-			if c.count < 0 {
+			currVal := material.H2(th, strconv.Itoa(count))
+			if count < 0 {
 				currVal.Color = colours["red"]
-			} else if c.count > 0 {
+			} else if count > 0 {
 				currVal.Color = colours["green"]
 			} else {
 				currVal.Color = colours["grey"]
@@ -115,7 +133,7 @@ func (c *counter) incrementersLayout(th *material.Theme, gtx C) D {
 
 		layout.Flexed(0.1, func(gtx C) D {
 			for range c.increase.Clicks() {
-				c.count++
+				count++
 			}
 			btn := material.Button(th, &c.increase, "Increase")
 			btn.Background = colours["green"]
@@ -131,7 +149,7 @@ func (c *counter) incrementersLayout(th *material.Theme, gtx C) D {
 
 		layout.Flexed(0.1, func(gtx C) D {
 			for range c.decrease.Clicks() {
-				c.count--
+				count--
 			}
 			btn := material.Button(th, &c.decrease, "Decrease")
 			btn.Background = colours["red"]
@@ -146,7 +164,7 @@ func (c *counter) incrementersLayout(th *material.Theme, gtx C) D {
 
 		layout.Flexed(0.1, func(gtx C) D {
 			for range c.reset.Clicks() {
-				c.count = 0
+				count = 0
 			}
 			btn := material.Button(th, &c.reset, "Reset")
 			btn.Background = colours["blue"]
@@ -155,17 +173,29 @@ func (c *counter) incrementersLayout(th *material.Theme, gtx C) D {
 	)
 }
 
-func (c counter) changeIncValueLayout(th *material.Theme, gtx C) D {
-	editor := material.Editor(th, &c.valueInput, "Input incr/decr value")
+func (vc *valueChanger) Layout(th *material.Theme, gtx C) D {
+	editor := material.Editor(th, &vc.inpVal.Editor, "Input incr/decr value")
 
 	return layout.Flex{
 		Axis: layout.Horizontal,
 	}.Layout(
 		gtx,
 		layout.Flexed(1, func(gtx C) D {
-			c.valueInput.SingleLine = true
-			c.valueInput.Alignment = text.Middle
-			return editor.Layout(gtx)
+			vc.inpVal.Editor.SingleLine = true
+			vc.inpVal.Editor.Alignment = text.Middle
+			editor.Font.Weight = text.Bold
+			editor.TextSize = unit.Sp(20)
+			border := widget.Border{
+				Color:        colours["grey"],
+				CornerRadius: unit.Dp(5),
+				Width:        unit.Px(3),
+			}
+			return border.Layout(gtx, func(gtx C) D {
+				return layout.UniformInset(unit.Sp(8)).Layout(
+					gtx,
+					editor.Layout,
+				)
+			})
 		}),
 
 		layout.Rigid(
@@ -175,13 +205,13 @@ func (c counter) changeIncValueLayout(th *material.Theme, gtx C) D {
 		),
 
 		layout.Flexed(1, func(gtx C) D {
-			btn := material.Button(th, &c.changeVal, "Change val to incr/decr")
+			btn := material.Button(th, &vc.changeVal, "Change val to incr/decr")
 			btn.Background = colours["blue"]
-			if c.changeVal.Clicked() {
-				inpVal := c.valueInput.Text()
+			if vc.changeVal.Clicked() {
+				inpVal := vc.inpVal.Text()
 				inpVal = strings.TrimSpace(inpVal)
 				intVal, _ := strconv.ParseInt(inpVal, 10, 8)
-				c.count = int(intVal)
+				count = int(intVal)
 			}
 			return btn.Layout(gtx)
 		}),
@@ -196,12 +226,12 @@ func (ui *UI) Layout(gtx C) D {
 		gtx,
 		layout.Flexed(0.1, func(gtx C) D {
 			return inset.Layout(gtx, func(gtx C) D {
-				return ui.counter.changeIncValueLayout(ui.theme, gtx)
+				return ui.valueChanger.Layout(ui.theme, gtx)
 			})
 		}),
 		layout.Flexed(1, func(gtx C) D {
 			return inset.Layout(gtx, func(gtx C) D {
-				return ui.counter.incrementersLayout(ui.theme, gtx)
+				return ui.counter.Layout(ui.theme, gtx)
 			})
 		}),
 	)
