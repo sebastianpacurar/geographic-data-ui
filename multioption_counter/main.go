@@ -12,13 +12,9 @@ import (
 	"gioui.org/op"
 	"gioui.org/unit"
 	"gioui.org/widget/material"
+
 	"log"
 	"os"
-)
-
-type (
-	C = layout.Context
-	D = layout.Dimensions
 )
 
 func main() {
@@ -36,12 +32,27 @@ func main() {
 	app.Main()
 }
 
+// UI holds the entire states of the app.
 type UI struct {
 	theme      *material.Theme
 	counter    comp.Counter
 	startValue comp.StartValue
 }
 
+// NewUI returns a new UI which uses the Go Fonts.
+func NewUI() *UI {
+	ui := &UI{}
+	ui.theme = material.NewTheme(gofont.Collection())
+	return ui
+}
+
+// Run renders the application and responds to different events.
+// ops are the operations passed to the graphics context (gtx)
+// system.FrameEvent - this is sent when the application receives a re-render event:
+// it sets the context with the operations and the event. this is used to pass
+// around event information.
+// key.NameEscape - returning null means shut down the application.
+// system.DestroyEvent - this is sent when the application closes.
 func (ui *UI) Run(w *app.Window) error {
 	var ops op.Ops
 	for event := range w.Events() {
@@ -62,25 +73,21 @@ func (ui *UI) Run(w *app.Window) error {
 	return nil
 }
 
-func NewUI() *UI {
-	ui := &UI{}
-	ui.theme = material.NewTheme(gofont.Collection())
-	return ui
-}
-
-func (ui *UI) Layout(gtx C) D {
-	inset := layout.UniformInset(globals.DefaultMargin)
+// Layout - displays the startValue and counter components vertically.
+// Inset refers to the margins of the components, so there can be
+// a small margin around the entire contents of the app.
+func (ui *UI) Layout(gtx globals.C) globals.D {
 	return layout.Flex{
 		Axis: layout.Vertical,
 	}.Layout(
 		gtx,
-		layout.Flexed(0.112, func(gtx C) D {
-			return inset.Layout(gtx, func(gtx C) D {
+		layout.Rigid(func(gtx globals.C) globals.D {
+			return globals.Inset.Layout(gtx, func(gtx globals.C) globals.D {
 				return ui.startValue.Layout(ui.theme, gtx)
 			})
 		}),
-		layout.Flexed(1, func(gtx C) D {
-			return inset.Layout(gtx, func(gtx C) D {
+		layout.Rigid(func(gtx globals.C) globals.D {
+			return globals.Inset.Layout(gtx, func(gtx globals.C) globals.D {
 				return ui.counter.Layout(ui.theme, gtx)
 			})
 		}),
