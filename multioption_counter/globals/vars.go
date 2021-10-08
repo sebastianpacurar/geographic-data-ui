@@ -1,8 +1,15 @@
 package globals
 
 import (
+	"gioui.org/layout"
 	"gioui.org/unit"
+
 	"image/color"
+)
+
+type (
+	C = layout.Context
+	D = layout.Dimensions
 )
 
 var (
@@ -18,4 +25,15 @@ var (
 		"black":         {A: 255},
 		"antique-white": {R: 250, G: 235, B: 215, A: 255},
 	}
+	Inset   = layout.UniformInset(DefaultMargin)
+	SpacerX = layout.Rigid(
+		layout.Spacer{
+			Width: DefaultMargin,
+		}.Layout,
+	)
+	SpacerY = layout.Rigid(
+		layout.Spacer{
+			Height: DefaultMargin,
+		}.Layout,
+	)
 )
