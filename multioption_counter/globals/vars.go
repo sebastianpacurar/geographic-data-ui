@@ -6,9 +6,10 @@ import (
 )
 
 var (
-	Count, ResetVal = int64(0), int64(0)
-	DefaultMargin   = unit.Dp(10)
-	Colours         = map[string]color.NRGBA{
+	Count         = int64(0)
+	ResetVal      = int64(0)
+	DefaultMargin = unit.Dp(10)
+	Colours       = map[string]color.NRGBA{
 		"red":           {R: 255, A: 255},
 		"blue":          {B: 255, A: 255},
 		"green":         {G: 255, A: 255},
