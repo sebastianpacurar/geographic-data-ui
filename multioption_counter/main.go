@@ -19,14 +19,21 @@ import (
 
 func main() {
 	ui := NewUI()
+
+	// Starts a goroutine which executes an anonymous function.
+	// Starts the app and initializes the UI.
 	go func() {
 		w := app.NewWindow(
 			app.Title("Multi Option Counter"),
 			app.Size(unit.Dp(400), unit.Dp(600)),
 		)
+
+		// if err -> os.Exit(1), quits the goroutine
 		if err := ui.Run(w); err != nil {
 			log.Fatal(err)
 		}
+
+		// returning 0 continues the goroutine
 		os.Exit(0)
 	}()
 	app.Main()
