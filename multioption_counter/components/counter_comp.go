@@ -97,6 +97,11 @@ func (c *Counter) Layout(th *material.Theme, gtx globals.C) globals.D {
 
 				// Reset Button
 				layout.Rigid(func(gtx globals.C) globals.D {
+					// if count == reset, disable Reset button
+					if globals.Count == globals.ResetVal {
+						gtx = gtx.Disabled()
+					}
+
 					for range c.resetBtn.Clicks() {
 						globals.Count = globals.ResetVal
 					}

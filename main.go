@@ -25,7 +25,7 @@ func main() {
 	go func() {
 		w := app.NewWindow(
 			app.Title("Multi Option Counter"),
-			app.Size(unit.Dp(400), unit.Dp(600)),
+			app.Size(unit.Dp(1000), unit.Dp(800)),
 		)
 
 		// if err -> os.Exit(1), quits the goroutine
