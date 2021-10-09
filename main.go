@@ -2,8 +2,10 @@ package main
 
 import (
 	"gioui-experiment/app_layout"
-	counter "gioui-experiment/counters/components"
+	counters "gioui-experiment/apps/counters/components"
+	formatters "gioui-experiment/apps/formatters/components"
 	"gioui-experiment/globals"
+
 	"gioui.org/app"
 	"gioui.org/font/gofont"
 	"gioui.org/io/key"
@@ -15,6 +17,11 @@ import (
 
 	"log"
 	"os"
+)
+
+type (
+	C = layout.Context
+	D = layout.Dimensions
 )
 
 func main() {
@@ -41,15 +48,17 @@ func main() {
 
 // UI holds the entire states of the app.
 type UI struct {
-	theme      *material.Theme
-	counter    counter.Counter
-	startValue counter.StartValue
-	appBar     app_layout.AppBar
+	theme         *material.Theme
+	counter       counters.Counter
+	startValue    counters.StartValue
+	jsonFormatter formatters.JsonFormatter
+	appBar        app_layout.AppBar
 }
 
-// NewUI returns a new UI which uses the Go Fonts.
+// NewUI returns a new UI which uses the Go Fonts, and initializes the formatter fields
 func NewUI() *UI {
 	ui := &UI{}
+	ui.jsonFormatter.InitTextFields()
 	ui.theme = material.NewTheme(gofont.Collection())
 	return ui
 }
@@ -66,7 +75,7 @@ func (ui *UI) Run(w *app.Window) error {
 	for event := range w.Events() {
 		switch event := event.(type) {
 		case system.FrameEvent:
-			// Reset the layout.Context for a new frame.
+			// Reset the layout Context for a new frame.
 			gtx := layout.NewContext(&ops, event)
 			ui.Layout(gtx)
 			event.Frame(gtx.Ops)
@@ -85,21 +94,29 @@ func (ui *UI) Run(w *app.Window) error {
 // Layout - displays the content of the application.
 // Inset refers to the margins of the components, so there can be
 // a small margin around the entire contents of the app.
-func (ui *UI) Layout(gtx globals.C) globals.D {
+func (ui *UI) Layout(gtx C) D {
 	return layout.Flex{
 		Axis: layout.Vertical,
 	}.Layout(
 		gtx,
-		layout.Rigid(func(gtx globals.C) globals.D {
+		layout.Rigid(func(gtx C) D {
 			return ui.appBar.Layout(gtx)
 		}),
-		layout.Rigid(func(gtx globals.C) globals.D {
-			return globals.Inset.Layout(gtx, func(gtx globals.C) globals.D {
+
+		// Temporarily disabled
+		//layout.Rigid(func(gtx C) D {
+		//	return globals.Inset.Layout(gtx, func(gtx C) D {
+		//		return ui.jsonFormatter.Layout(ui.theme, gtx)
+		//	})
+		//}),
+
+		layout.Rigid(func(gtx C) D {
+			return globals.Inset.Layout(gtx, func(gtx C) D {
 				return ui.startValue.Layout(ui.theme, gtx)
 			})
 		}),
-		layout.Rigid(func(gtx globals.C) globals.D {
-			return globals.Inset.Layout(gtx, func(gtx globals.C) globals.D {
+		layout.Rigid(func(gtx C) D {
+			return globals.Inset.Layout(gtx, func(gtx C) D {
 				return ui.counter.Layout(ui.theme, gtx)
 			})
 		}),

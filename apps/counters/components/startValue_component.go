@@ -28,7 +28,7 @@ type StartValue struct {
 
 // Layout - displays the Start From button and text input horizontally.
 // The editor is flexed, so it can enlarge/shrink while resizing on the X-Axis.
-func (sv *StartValue) Layout(th *material.Theme, gtx globals.C) globals.D {
+func (sv *StartValue) Layout(th *material.Theme, gtx C) D {
 	editor := material.Editor(th, &sv.Editor, "0")
 
 	return layout.Flex{
@@ -37,7 +37,7 @@ func (sv *StartValue) Layout(th *material.Theme, gtx globals.C) globals.D {
 		gtx,
 
 		// "Start From" button - to enable the changed start value
-		layout.Rigid(func(gtx globals.C) globals.D {
+		layout.Rigid(func(gtx C) D {
 			btn := material.Button(th, &sv.changeVal, "Start From")
 			btn.Background = globals.Colours["blue"]
 			if sv.changeVal.Clicked() {
@@ -54,7 +54,7 @@ func (sv *StartValue) Layout(th *material.Theme, gtx globals.C) globals.D {
 		globals.SpacerX,
 
 		// Input widget - to change start value
-		layout.Flexed(1, func(gtx globals.C) globals.D {
+		layout.Flexed(1, func(gtx C) D {
 			sv.valueInput.SingleLine = true
 			sv.valueInput.Alignment = layout.Alignment(text.Start)
 			editor.TextSize = unit.Sp(20)
@@ -63,8 +63,8 @@ func (sv *StartValue) Layout(th *material.Theme, gtx globals.C) globals.D {
 				CornerRadius: unit.Dp(5),
 				Width:        unit.Px(3),
 			}
-			return border.Layout(gtx, func(gtx globals.C) globals.D {
-				return layout.UniformInset(unit.Sp(8)).Layout(
+			return border.Layout(gtx, func(gtx C) D {
+				return layout.UniformInset(unit.Dp(8)).Layout(
 					gtx,
 					editor.Layout,
 				)

@@ -2,7 +2,6 @@ package components
 
 import (
 	"gioui-experiment/globals"
-
 	"gioui.org/layout"
 	"gioui.org/widget"
 	"gioui.org/widget/material"
@@ -10,6 +9,11 @@ import (
 
 	"fmt"
 	"strconv"
+)
+
+type (
+	C = layout.Context
+	D = layout.Dimensions
 )
 
 // Counter - component which controls the displayed data. It displays itself as:
@@ -23,14 +27,14 @@ type Counter struct {
 // Layout - returns the Dimensions for the Counter design structure:
 // plusBtn, minusBtn = 2 rounded SimpleIconButtons
 // resetBtn is below them and fills the whole width
-func (c *Counter) Layout(th *material.Theme, gtx globals.C) globals.D {
+func (c *Counter) Layout(th *material.Theme, gtx C) D {
 	return layout.Flex{
 		Axis: layout.Vertical,
 	}.Layout(
 		gtx,
 
 		// Display the Counter number
-		layout.Flexed(1, func(gtx globals.C) globals.D {
+		layout.Flexed(1, func(gtx C) D {
 			currVal := material.H2(th, strconv.FormatInt(globals.Count, 10))
 			if globals.Count < 0 {
 				currVal.Color = globals.Colours["red"]
@@ -50,12 +54,12 @@ func (c *Counter) Layout(th *material.Theme, gtx globals.C) globals.D {
 		// Using flex-box on Y-Axis, which contains the 3 buttons
 		// The first child of the Flex layout contains a Rigid layout, in which the 2 buttons are flexed horizontally.
 		// The second child is the reset Button, returned as a layout.Rigid
-		layout.Rigid(func(gtx globals.C) globals.D {
+		layout.Rigid(func(gtx C) D {
 			return layout.Flex{
 				Axis: layout.Vertical,
 			}.Layout(
 				gtx,
-				layout.Rigid(func(gtx globals.C) globals.D {
+				layout.Rigid(func(gtx C) D {
 					return layout.Flex{
 						Axis:    layout.Horizontal,
 						Spacing: layout.SpaceEvenly,
@@ -63,7 +67,7 @@ func (c *Counter) Layout(th *material.Theme, gtx globals.C) globals.D {
 						gtx,
 
 						// Minus Button
-						layout.Flexed(0.1, func(gtx globals.C) globals.D {
+						layout.Flexed(0.1, func(gtx C) D {
 							for range c.minusBtn.Clicks() {
 								globals.Count--
 							}
@@ -79,7 +83,7 @@ func (c *Counter) Layout(th *material.Theme, gtx globals.C) globals.D {
 						globals.SpacerX,
 
 						// Plus Button
-						layout.Flexed(0.1, func(gtx globals.C) globals.D {
+						layout.Flexed(0.1, func(gtx C) D {
 							for range c.plusBtn.Clicks() {
 								globals.Count++
 							}
@@ -97,7 +101,7 @@ func (c *Counter) Layout(th *material.Theme, gtx globals.C) globals.D {
 				globals.SpacerY,
 
 				// Reset Button
-				layout.Rigid(func(gtx globals.C) globals.D {
+				layout.Rigid(func(gtx C) D {
 					// if count == reset, disable Reset button
 					if globals.Count == globals.ResetVal {
 						gtx = gtx.Disabled()

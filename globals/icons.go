@@ -17,6 +17,7 @@ var MinusIcon = func() *widget.Icon {
 	return icon
 }()
 
+// MenuIcon - used for the menuBtn
 var MenuIcon = func() *widget.Icon {
 	icon, _ := widget.NewIcon(icons.NavigationMenu)
 	return icon
