@@ -1,7 +1,6 @@
 package app_layout
 
 import (
-	"fmt"
 	"gioui-experiment/globals"
 	"gioui.org/layout"
 	"gioui.org/unit"
@@ -18,15 +17,21 @@ type (
 type AppBar struct {
 	menuBtn widget.Clickable
 	title   string
+	Apps    []string
 }
 
 // Layout - is composed of a Stack layout which returns the first dimension as
 // the fullWidth of the X-Axis, and 120 pixels on Y-Axis
 func (ab *AppBar) Layout(gtx C) D {
+	if len(ab.Apps) == 0 {
+		ab.Apps = globals.GetAppsNames()
+	}
 	fullWidth := gtx.Constraints.Max.X
 	return layout.Stack{}.Layout(gtx,
 		// Expand the colored area, allowing for child Stacked widgets to overlap its dimensions
 		layout.Expanded(func(gtx C) D {
+
+			// TODO: Fix issue with image.PT for Y-Axis. If moving the app on a bigger monitor, the AppBar grows
 			return globals.ColoredArea(gtx, image.Pt(fullWidth, 120), globals.Colours["dark-cyan"])
 		}),
 		// This returns a Stacked layout which returns a custom Inset, which will eventually
@@ -43,9 +48,6 @@ func (ab *AppBar) Layout(gtx C) D {
 					&ab.menuBtn,
 					globals.MenuIcon,
 				)
-				if ab.menuBtn.Clicked() {
-					fmt.Println("test")
-				}
 				return btn.Layout(gtx)
 			})
 		}),

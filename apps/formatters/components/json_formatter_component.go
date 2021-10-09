@@ -83,7 +83,7 @@ func (jf *JsonFormatter) Layout(th *material.Theme, gtx C) D {
 			border := widget.Border{
 				Color:        globals.Colours["grey"],
 				CornerRadius: unit.Dp(5),
-				Width:        unit.Px(3),
+				Width:        unit.Px(2),
 			}
 			switch {
 			case jf.in.Editor.Focused():
