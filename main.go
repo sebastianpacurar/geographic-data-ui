@@ -1,9 +1,9 @@
 package main
 
 import (
-	comp "gioui-experiment/multioption_counter/components"
-	"gioui-experiment/multioption_counter/globals"
-
+	"gioui-experiment/app_layout"
+	counter "gioui-experiment/counters/components"
+	"gioui-experiment/globals"
 	"gioui.org/app"
 	"gioui.org/font/gofont"
 	"gioui.org/io/key"
@@ -33,7 +33,7 @@ func main() {
 			log.Fatal(err)
 		}
 
-		// returning 0 continues the goroutine
+		// 0 is fine so the goroutine continues
 		os.Exit(0)
 	}()
 	app.Main()
@@ -42,8 +42,9 @@ func main() {
 // UI holds the entire states of the app.
 type UI struct {
 	theme      *material.Theme
-	counter    comp.Counter
-	startValue comp.StartValue
+	counter    counter.Counter
+	startValue counter.StartValue
+	appBar     app_layout.AppBar
 }
 
 // NewUI returns a new UI which uses the Go Fonts.
@@ -65,6 +66,7 @@ func (ui *UI) Run(w *app.Window) error {
 	for event := range w.Events() {
 		switch event := event.(type) {
 		case system.FrameEvent:
+			// Reset the layout.Context for a new frame.
 			gtx := layout.NewContext(&ops, event)
 			ui.Layout(gtx)
 			event.Frame(gtx.Ops)
@@ -80,7 +82,7 @@ func (ui *UI) Run(w *app.Window) error {
 	return nil
 }
 
-// Layout - displays the startValue and counter components vertically.
+// Layout - displays the content of the application.
 // Inset refers to the margins of the components, so there can be
 // a small margin around the entire contents of the app.
 func (ui *UI) Layout(gtx globals.C) globals.D {
@@ -88,6 +90,9 @@ func (ui *UI) Layout(gtx globals.C) globals.D {
 		Axis: layout.Vertical,
 	}.Layout(
 		gtx,
+		layout.Rigid(func(gtx globals.C) globals.D {
+			return ui.appBar.Layout(gtx)
+		}),
 		layout.Rigid(func(gtx globals.C) globals.D {
 			return globals.Inset.Layout(gtx, func(gtx globals.C) globals.D {
 				return ui.startValue.Layout(ui.theme, gtx)
