@@ -5,7 +5,6 @@ import (
 	counters "gioui-experiment/apps/counters/components"
 	formatters "gioui-experiment/apps/formatters/components"
 	"gioui-experiment/globals"
-
 	"gioui.org/app"
 	"gioui.org/font/gofont"
 	"gioui.org/io/key"
@@ -31,7 +30,7 @@ func main() {
 	// Starts the app and initializes the UI.
 	go func() {
 		w := app.NewWindow(
-			app.Title("Multi Option Counter"),
+			app.Title("Gio UI Experiment"),
 			app.Size(unit.Dp(1000), unit.Dp(800)),
 		)
 
@@ -55,10 +54,11 @@ type UI struct {
 	appBar        app_layout.AppBar
 }
 
-// NewUI returns a new UI which uses the Go Fonts, and initializes the formatter fields
+// NewUI returns a new UI which uses the Go Fonts, and initializes the Text Fields states
 func NewUI() *UI {
 	ui := &UI{}
 	ui.jsonFormatter.InitTextFields()
+	ui.startValue.InitTextField()
 	ui.theme = material.NewTheme(gofont.Collection())
 	return ui
 }
