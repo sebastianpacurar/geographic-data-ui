@@ -1,7 +1,8 @@
 package components
 
 import (
-	"gioui-experiment/multioption_counter/globals"
+	"gioui-experiment/globals"
+
 	"gioui.org/layout"
 	"gioui.org/widget"
 	"gioui.org/widget/material"
