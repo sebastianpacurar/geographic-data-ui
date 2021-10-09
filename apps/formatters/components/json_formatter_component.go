@@ -32,6 +32,7 @@ type textOutput struct {
 	component.TextField
 	isDisabled bool
 	border     widget.Border
+	result     string
 }
 
 // InitTextFields - this sets the initial state of the fields
@@ -45,6 +46,7 @@ func (jf *JsonFormatter) InitTextFields() {
 	jf.out.isDisabled = true
 }
 
+// Layout - Still in progress!
 func (jf *JsonFormatter) Layout(th *material.Theme, gtx C) D {
 	input := material.Editor(th, &jf.in.Editor, "Paste json here...")
 	output := material.Editor(th, &jf.out.Editor, "Click GO! button and see magic...")
@@ -52,6 +54,28 @@ func (jf *JsonFormatter) Layout(th *material.Theme, gtx C) D {
 		Axis: layout.Vertical,
 	}.Layout(
 		gtx,
+
+		// Format JSON Button
+		// TODO: currently broken. To be fixed in the future!
+		layout.Rigid(func(gtx C) D {
+			//var jsonData map[string]interface{}
+			data := jf.in.Text()
+			if !jf.isInJsonString([]byte(data)) || !jf.isInJson([]byte(data)) {
+				gtx = gtx.Disabled()
+			}
+			//if err, _ := json.Indent(&jsonData, "", "\t"); err != nil {
+			//
+			//}
+
+			btn := material.Button(th, &jf.formatBtn, "Format JSON")
+			btn.Background = globals.Colours["blue"]
+			if jf.formatBtn.Clicked() {
+				// TODO: severly broken. Take action immediately!
+				//jf.out.SetText(jsonData)
+			}
+			return btn.Layout(gtx)
+		}),
+
 		// Input Text
 		layout.Flexed(1, func(gtx C) D {
 			input.TextSize = unit.Sp(20)
@@ -109,9 +133,9 @@ func (jf *JsonFormatter) Layout(th *material.Theme, gtx C) D {
 }
 
 // isInJsonString - checks to see if the provided Input is a JSON string
-func (jf *JsonFormatter) isInJsonString(str string) bool {
+func (jf *JsonFormatter) isInJsonString(data []byte) bool {
 	var jsonMessage json.RawMessage
-	err := json.Unmarshal([]byte(str), &jsonMessage)
+	err := json.Unmarshal(data, &jsonMessage)
 	if err != nil {
 		return false
 	}
@@ -119,9 +143,9 @@ func (jf *JsonFormatter) isInJsonString(str string) bool {
 }
 
 // isInJson - checks to see if the provided input is a JSON (interface)
-func (jf *JsonFormatter) isInJson(str string) bool {
+func (jf *JsonFormatter) isInJson(data []byte) bool {
 	var jsonMessage map[string]interface{}
-	err := json.Unmarshal([]byte(str), &jsonMessage)
+	err := json.Unmarshal(data, &jsonMessage)
 	if err != nil {
 		return false
 	}

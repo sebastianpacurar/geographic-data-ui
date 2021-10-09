@@ -102,22 +102,23 @@ func (ui *UI) Layout(gtx C) D {
 		layout.Rigid(func(gtx C) D {
 			return ui.appBar.Layout(gtx)
 		}),
+
+		// Temporarily disabled
+		//layout.Rigid(func(gtx C) D {
+		//	return globals.Inset.Layout(gtx, func(gtx C) D {
+		//		return ui.jsonFormatter.Layout(ui.theme, gtx)
+		//	})
+		//}),
+
 		layout.Rigid(func(gtx C) D {
 			return globals.Inset.Layout(gtx, func(gtx C) D {
-				return ui.jsonFormatter.Layout(ui.theme, gtx)
+				return ui.startValue.Layout(ui.theme, gtx)
 			})
 		}),
-
-		//TODO: currently commented until updating the json formatter for a bit
-		//layout.Rigid(func(gtx C) D {
-		//	return globals.Inset.Layout(gtx, func(gtx C) D {
-		//		return ui.startValue.Layout(ui.theme, gtx)
-		//	})
-		//}),
-		//layout.Rigid(func(gtx C) D {
-		//	return globals.Inset.Layout(gtx, func(gtx C) D {
-		//		return ui.counter.Layout(ui.theme, gtx)
-		//	})
-		//}),
+		layout.Rigid(func(gtx C) D {
+			return globals.Inset.Layout(gtx, func(gtx C) D {
+				return ui.counter.Layout(ui.theme, gtx)
+			})
+		}),
 	)
 }
