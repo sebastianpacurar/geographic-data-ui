@@ -45,6 +45,7 @@ func (sv *StartValue) Layout(th *material.Theme, gtx globals.C) globals.D {
 				inpVal := sv.Text()
 				inpVal = strings.TrimSpace(inpVal)
 				intVal, _ := strconv.ParseInt(inpVal, 10, 64)
+				sv.valueInput.Clear()
 				globals.Count = intVal
 				globals.ResetVal = intVal
 			}
@@ -55,9 +56,8 @@ func (sv *StartValue) Layout(th *material.Theme, gtx globals.C) globals.D {
 
 		// Input widget - to change start value
 		layout.Flexed(1, func(gtx globals.C) globals.D {
-			sv.Editor.SingleLine = true
-			sv.Editor.Alignment = text.Middle
-			editor.Font.Weight = text.Bold
+			sv.valueInput.SingleLine = true
+			sv.valueInput.Alignment = layout.Alignment(text.Start)
 			editor.TextSize = unit.Sp(20)
 			border := widget.Border{
 				Color:        globals.Colours["grey"],
