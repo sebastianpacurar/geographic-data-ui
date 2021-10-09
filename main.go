@@ -1,7 +1,7 @@
 package main
 
 import (
-	"gioui-experiment/counters/app_layout"
+	"gioui-experiment/app_layout"
 	counter "gioui-experiment/counters/components"
 	"gioui-experiment/globals"
 	"gioui.org/app"
