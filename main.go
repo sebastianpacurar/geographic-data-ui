@@ -50,6 +50,7 @@ type UI struct {
 	theme         *material.Theme
 	counter       counters.Counter
 	startValue    counters.StartValue
+	unitVal       counters.UnitVal
 	jsonFormatter formatters.JsonFormatter
 	appBar        app_layout.AppBar
 }
@@ -59,6 +60,7 @@ func NewUI() *UI {
 	ui := &UI{}
 	ui.jsonFormatter.InitTextFields()
 	ui.startValue.InitTextField()
+	ui.unitVal.InitTextField()
 	ui.theme = material.NewTheme(gofont.Collection())
 	return ui
 }
@@ -103,6 +105,25 @@ func (ui *UI) Layout(gtx C) D {
 			return ui.appBar.Layout(gtx)
 		}),
 
+		layout.Rigid(func(gtx C) D {
+			return layout.Flex{
+				Axis:    layout.Horizontal,
+				Spacing: layout.SpaceEvenly,
+			}.Layout(
+				gtx,
+				layout.Rigid(func(gtx C) D {
+					return globals.Inset.Layout(gtx, func(gtx C) D {
+						return ui.startValue.Layout(ui.theme, gtx)
+					})
+				}),
+				layout.Rigid(func(gtx C) D {
+					return globals.Inset.Layout(gtx, func(gtx C) D {
+						return ui.unitVal.Layout(ui.theme, gtx)
+					})
+				}),
+			)
+		}),
+
 		// Temporarily disabled
 		//layout.Rigid(func(gtx C) D {
 		//	return globals.Inset.Layout(gtx, func(gtx C) D {
@@ -110,11 +131,11 @@ func (ui *UI) Layout(gtx C) D {
 		//	})
 		//}),
 
-		layout.Rigid(func(gtx C) D {
-			return globals.Inset.Layout(gtx, func(gtx C) D {
-				return ui.startValue.Layout(ui.theme, gtx)
-			})
-		}),
+		//layout.Rigid(func(gtx C) D {
+		//	return globals.Inset.Layout(gtx, func(gtx C) D {
+		//		return ui.startValue.Layout(ui.theme, gtx)
+		//	})
+		//}),
 		layout.Rigid(func(gtx C) D {
 			return globals.Inset.Layout(gtx, func(gtx C) D {
 				return ui.counter.Layout(ui.theme, gtx)

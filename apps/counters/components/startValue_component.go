@@ -69,6 +69,7 @@ func (sv *StartValue) Layout(th *material.Theme, gtx C) D {
 		layout.Rigid(func(gtx C) D {
 			btn := material.Button(th, &sv.changeVal, "Start From")
 			btn.Background = globals.Colours["blue"]
+			btn.Color = globals.Colours["white"]
 
 			switch {
 			case !sv.isFieldNumeric():
@@ -87,14 +88,10 @@ func (sv *StartValue) Layout(th *material.Theme, gtx C) D {
 		globals.SpacerX,
 
 		// TextField Widget - to change start value
-		layout.Flexed(1, func(gtx C) D {
+		layout.Rigid(func(gtx C) D {
 			editor.TextSize = unit.Sp(20)
 			editor.HintColor = globals.Colours["dark-slate-grey"]
-			border := widget.Border{
-				Color:        globals.Colours["grey"],
-				CornerRadius: unit.Dp(3),
-				Width:        unit.Px(2),
-			}
+			border := globals.DefaultBorder
 
 			// 1) In case the length of the input is >= 18, then keep trimming chars
 			// until the length is back to 17

@@ -3,15 +3,22 @@ package globals
 import (
 	"gioui.org/layout"
 	"gioui.org/unit"
+	"gioui.org/widget"
 
 	"image/color"
 )
 
 var (
 	Count         = int64(0)
+	CountUnit     = int64(1)
 	ResetVal      = int64(0)
 	DefaultMargin = unit.Dp(10)
-	Colours       = map[string]color.NRGBA{
+	DefaultBorder = widget.Border{
+		Color:        Colours["grey"],
+		CornerRadius: unit.Dp(3),
+		Width:        unit.Px(2),
+	}
+	Colours = map[string]color.NRGBA{
 		"red":             {R: 255, A: 255},
 		"dark-red":        {R: 139, A: 255},
 		"blue":            {B: 255, A: 255},
