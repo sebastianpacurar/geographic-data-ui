@@ -24,7 +24,11 @@ type LabeledIconBtn struct {
 	Label               string
 }
 
+// Layout - currently returns a button-like widget, which contains:
+// an icon on the left side and a text label n the right side.
+// These 2 are separated by 5 device pixels
 func (lib LabeledIconBtn) Layout(gtx C) D {
+
 	// Set custom colours for Icon and Label
 	// Set the TextSize for the Label
 	lib.Theme.Palette.ContrastBg = lib.BgColor

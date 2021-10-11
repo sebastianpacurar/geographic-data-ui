@@ -52,7 +52,7 @@ type UI struct {
 	startValue    counters.StartValue
 	unitVal       counters.UnitVal
 	jsonFormatter formatters.JsonFormatter
-	appBar        app_layout.AppBar
+	topBar        app_layout.TopBar
 }
 
 // NewUI returns a new UI which uses the Go Fonts, and initializes the Text Fields states
@@ -102,7 +102,7 @@ func (ui *UI) Layout(gtx C) D {
 	}.Layout(
 		gtx,
 		layout.Rigid(func(gtx C) D {
-			return ui.appBar.Layout(gtx)
+			return ui.topBar.Layout(gtx)
 		}),
 
 		layout.Rigid(func(gtx C) D {

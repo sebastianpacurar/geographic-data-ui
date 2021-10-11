@@ -14,25 +14,33 @@ type (
 	D = layout.Dimensions
 )
 
-type AppBar struct {
+type TopBar struct {
 	menuBtn widget.Clickable
 	title   string
+	height  int
 	Apps    []string
 }
 
 // Layout - is composed of a Stack layout which returns the first dimension as
 // the fullWidth of the X-Axis, and 120 pixels on Y-Axis
-func (ab *AppBar) Layout(gtx C) D {
+func (ab *TopBar) Layout(gtx C) D {
 	if len(ab.Apps) == 0 {
 		ab.Apps = globals.GetAppsNames()
 	}
-	fullWidth := gtx.Constraints.Max.X
+
 	return layout.Stack{}.Layout(gtx,
 		// Expand the colored area, allowing for child Stacked widgets to overlap its dimensions
 		layout.Expanded(func(gtx C) D {
+			bar := globals.ColoredArea(
+				gtx,
+				// a bit hackish - X = full width; Y = the smallest Stacked sibling + defaultMargin/2
+				// otherwise, moving the app window on a larger monitor, causes the Y size to grow,
+				// and the other way around.
+				image.Pt(gtx.Constraints.Max.X, ab.height),
+				globals.Colours["dark-cyan"],
+			)
 
-			// TODO: Fix issue with image.PT for Y-Axis. If moving the app on a bigger monitor, the AppBar grows
-			return globals.ColoredArea(gtx, image.Pt(fullWidth, 120), globals.Colours["dark-cyan"])
+			return bar
 		}),
 		// This returns a Stacked layout which returns a custom Inset, which will eventually
 		// return the Menu Button as a SimpleIconButton
