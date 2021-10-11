@@ -1,14 +1,17 @@
 package components
 
 import (
+	"fmt"
+	"gioui-experiment/custom_widgets"
 	"gioui-experiment/globals"
 	"gioui.org/layout"
 	"gioui.org/widget"
 	"gioui.org/widget/material"
-	"gioui.org/x/component"
-
-	"fmt"
 	"strconv"
+)
+
+var (
+//plusBtn = new(widget.Clickable)
 )
 
 type (
@@ -67,33 +70,43 @@ func (c *Counter) Layout(th *material.Theme, gtx C) D {
 						gtx,
 
 						// Minus Button
-						layout.Flexed(0.1, func(gtx C) D {
+						layout.Rigid(func(gtx C) D {
 							for range c.minusBtn.Clicks() {
-								globals.Count--
+								globals.Count -= globals.CountUnit
 							}
-							btn := component.SimpleIconButton(
-								globals.Colours["red"],
-								globals.Colours["white"],
-								&c.minusBtn,
-								globals.MinusIcon,
-							)
-							return btn.Layout(gtx)
+
+							return globals.Inset.Layout(
+								gtx,
+								custom_widgets.LabeledIconBtn{
+									Theme:      th,
+									BgColor:    globals.Colours["red"],
+									LabelColor: globals.Colours["white"],
+									Button:     &c.minusBtn,
+									Icon:       globals.MinusIcon,
+									Label:      strconv.FormatInt(globals.CountUnit, 10),
+								}.Layout)
+
 						}),
 
 						globals.SpacerX,
 
 						// Plus Button
-						layout.Flexed(0.1, func(gtx C) D {
+						layout.Rigid(func(gtx C) D {
 							for range c.plusBtn.Clicks() {
-								globals.Count++
+								globals.Count += globals.CountUnit
 							}
-							btn := component.SimpleIconButton(
-								globals.Colours["green"],
-								globals.Colours["black"],
-								&c.plusBtn,
-								globals.PlusIcon,
-							)
-							return btn.Layout(gtx)
+
+							return globals.Inset.Layout(
+								gtx,
+								custom_widgets.LabeledIconBtn{
+									Theme:      th,
+									BgColor:    globals.Colours["green"],
+									LabelColor: globals.Colours["black"],
+									Button:     &c.plusBtn,
+									Icon:       globals.PlusIcon,
+									Label:      strconv.FormatInt(globals.CountUnit, 10),
+								}.Layout)
+
 						}),
 					)
 				}),
