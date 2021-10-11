@@ -31,12 +31,13 @@ func (ab *TopBar) Layout(gtx C) D {
 	return layout.Stack{}.Layout(gtx,
 		// Expand the colored area, allowing for child Stacked widgets to overlap its dimensions
 		layout.Expanded(func(gtx C) D {
+			// size is a bit hackish - X = full width; Y = the smallest Stacked sibling + defaultMargin/2
+			// otherwise, moving the app window on a larger monitor, causes the Y size to grow,
+			// and the other way around.
+			size := image.Pt(gtx.Constraints.Max.X, gtx.Constraints.Min.Y+10/2)
 			bar := globals.ColoredArea(
 				gtx,
-				// a bit hackish - X = full width; Y = the smallest Stacked sibling + defaultMargin/2
-				// otherwise, moving the app window on a larger monitor, causes the Y size to grow,
-				// and the other way around.
-				image.Pt(gtx.Constraints.Max.X, ab.height),
+				gtx.Constraints.Constrain(size),
 				globals.Colours["dark-cyan"],
 			)
 
