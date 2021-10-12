@@ -1,10 +1,13 @@
 package globals
 
+import "C"
 import (
 	"gioui.org/layout"
 	"gioui.org/op"
 	"gioui.org/op/clip"
 	"gioui.org/op/paint"
+	"math/rand"
+	"time"
 
 	"image"
 	"image/color"
@@ -49,4 +52,16 @@ func GetAppsNames() []string {
 		}
 	}
 	return apps
+}
+
+func GenerateRandomColor() color.NRGBA {
+	rand.Seed(time.Now().UnixNano())
+	min := 1
+	max := 255
+	return color.NRGBA{
+		R: uint8(rand.Intn(max-min) + min),
+		G: uint8(rand.Intn(max-min) + min),
+		B: uint8(rand.Intn(max-min) + min),
+		A: 255,
+	}
 }

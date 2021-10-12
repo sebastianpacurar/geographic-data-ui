@@ -4,6 +4,7 @@ import (
 	"gioui-experiment/app_layout"
 	counters "gioui-experiment/apps/counters/components"
 	formatters "gioui-experiment/apps/formatters/components"
+	"gioui-experiment/apps/geometry"
 	"gioui-experiment/globals"
 	"gioui.org/app"
 	"gioui.org/font/gofont"
@@ -13,7 +14,6 @@ import (
 	"gioui.org/op"
 	"gioui.org/unit"
 	"gioui.org/widget/material"
-
 	"log"
 	"os"
 )
@@ -51,6 +51,7 @@ type UI struct {
 	counter       counters.Counter
 	startValue    counters.StartValue
 	unitVal       counters.UnitVal
+	geometry      geometry.Geometry
 	jsonFormatter formatters.JsonFormatter
 	topBar        app_layout.TopBar
 }
@@ -97,6 +98,7 @@ func (ui *UI) Run(w *app.Window) error {
 // Inset refers to the margins of the components, so there can be
 // a small margin around the entire contents of the app.
 func (ui *UI) Layout(gtx C) D {
+
 	return layout.Flex{
 		Axis: layout.Vertical,
 	}.Layout(
@@ -133,13 +135,8 @@ func (ui *UI) Layout(gtx C) D {
 
 		//layout.Rigid(func(gtx C) D {
 		//	return globals.Inset.Layout(gtx, func(gtx C) D {
-		//		return ui.startValue.Layout(ui.theme, gtx)
+		//		return ui.geometry.Layout(gtx)
 		//	})
 		//}),
-		layout.Rigid(func(gtx C) D {
-			return globals.Inset.Layout(gtx, func(gtx C) D {
-				return ui.counter.Layout(ui.theme, gtx)
-			})
-		}),
 	)
 }
