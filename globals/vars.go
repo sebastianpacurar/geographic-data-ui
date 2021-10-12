@@ -4,11 +4,12 @@ import (
 	"gioui.org/layout"
 	"gioui.org/unit"
 	"gioui.org/widget"
-
 	"image/color"
+	"math"
 )
 
 var (
+	CM            = int(math.Floor(37.795275591))
 	Count         = int64(0)
 	CountUnit     = int64(1)
 	ResetVal      = int64(0)
