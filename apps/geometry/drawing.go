@@ -16,11 +16,16 @@ type (
 	D = layout.Dimensions
 )
 
+type Draw func()
+
 type Geometry struct {
-	color color.NRGBA
+	Color  color.NRGBA
+	coords []float32
+	Draw   func(C, []float32, color.NRGBA) D
+	drawer Draw
 }
 
-func (g Geometry) FRect(gtx C, geom []float32, color color.NRGBA) D {
+func (G Geometry) FRect(gtx C, geom []float32, color color.NRGBA) D {
 	defer op.Save(gtx.Ops).Load()
 	coords := f32.Rect(geom[0], geom[1], geom[2], geom[3])
 	clip.RRect{Rect: coords}.Add(gtx.Ops)
@@ -31,7 +36,7 @@ func (g Geometry) FRect(gtx C, geom []float32, color color.NRGBA) D {
 	}
 }
 
-func (g Geometry) Rect(gtx C, size image.Point, color color.NRGBA) D {
+func (G Geometry) Rect(gtx C, size image.Point, color color.NRGBA) D {
 	defer op.Save(gtx.Ops).Load()
 	clip.Rect{Max: size}.Add(gtx.Ops)
 	paint.ColorOp{Color: color}.Add(gtx.Ops)
@@ -41,16 +46,16 @@ func (g Geometry) Rect(gtx C, size image.Point, color color.NRGBA) D {
 	}
 }
 
-func (g *Geometry) Layout(gtx C) D {
-	geometry := []float32{float32(gtx.Constraints.Max.X), float32(gtx.Constraints.Max.Y), 0, 0}
+func (G *Geometry) Layout(gtx C) D {
+	coords := []float32{float32(gtx.Constraints.Max.X), float32(gtx.Constraints.Max.Y), 0, 0}
 	return layout.Stack{}.Layout(
 		gtx,
 		layout.Expanded(func(gtx C) D {
-			screen := g.FRect(gtx, geometry, globals.Colours["antique-white"])
+			screen := G.FRect(gtx, coords, globals.Colours["antique-white"])
 			return screen
 		}),
 		layout.Stacked(func(gtx C) D {
-			return g.FRect(gtx, []float32{500, 500, 100, 100}, globals.Colours["black"])
+			return G.FRect(gtx, []float32{500, 500, 100, 100}, globals.Colours["black"])
 		}),
 	)
 }

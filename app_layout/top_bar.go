@@ -40,7 +40,6 @@ func (ab *TopBar) Layout(gtx C) D {
 				gtx.Constraints.Constrain(size),
 				globals.Colours["dark-cyan"],
 			)
-
 			return bar
 		}),
 		// This returns a Stacked layout which returns a custom Inset, which will eventually

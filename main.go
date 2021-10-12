@@ -51,6 +51,7 @@ type UI struct {
 	counter       counters.Counter
 	startValue    counters.StartValue
 	unitVal       counters.UnitVal
+	viewer        counters.View
 	geometry      geometry.Geometry
 	jsonFormatter formatters.JsonFormatter
 	topBar        app_layout.TopBar
@@ -125,18 +126,12 @@ func (ui *UI) Layout(gtx C) D {
 				}),
 			)
 		}),
-
-		// Temporarily disabled
-		//layout.Rigid(func(gtx C) D {
-		//	return globals.Inset.Layout(gtx, func(gtx C) D {
-		//		return ui.jsonFormatter.Layout(ui.theme, gtx)
-		//	})
-		//}),
-
-		//layout.Rigid(func(gtx C) D {
-		//	return globals.Inset.Layout(gtx, func(gtx C) D {
-		//		return ui.geometry.Layout(gtx)
-		//	})
-		//}),
-	)
+		layout.Flexed(1, func(gtx C) D {
+			return ui.viewer.Layout(ui.theme, gtx)
+		}),
+		layout.Rigid(func(gtx C) D {
+			return globals.Inset.Layout(gtx, func(gtx C) D {
+				return ui.counter.Layout(ui.theme, gtx)
+			})
+		}))
 }
