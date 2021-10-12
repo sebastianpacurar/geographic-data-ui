@@ -1,7 +1,6 @@
 package components
 
 import (
-	"fmt"
 	"gioui-experiment/custom_widgets"
 	"gioui-experiment/globals"
 	"gioui.org/layout"
@@ -36,24 +35,6 @@ func (c *Counter) Layout(th *material.Theme, gtx C) D {
 	}.Layout(
 		gtx,
 
-		// Display the Counter number
-		layout.Flexed(1, func(gtx C) D {
-			currVal := material.H2(th, strconv.FormatInt(globals.Count, 10))
-			if globals.Count < 0 {
-				currVal.Color = globals.Colours["red"]
-			} else if globals.Count > 0 {
-				currVal.Color = globals.Colours["dark-green"]
-			} else {
-				currVal.Color = globals.Colours["grey"]
-			}
-			return layout.Center.Layout(
-				gtx,
-				currVal.Layout,
-			)
-		}),
-
-		globals.SpacerY,
-
 		// Using flex-box on Y-Axis, which contains the 3 buttons
 		// The first child of the Flex layout contains a Rigid layout, in which the 2 buttons are flexed horizontally.
 		// The second child is the reset Button, returned as a layout.Rigid
@@ -87,6 +68,29 @@ func (c *Counter) Layout(th *material.Theme, gtx C) D {
 								}.Layout)
 
 						}),
+						globals.SpacerX,
+
+						// Reset Button
+						layout.Rigid(func(gtx C) D {
+							// if count == reset, disable Reset button
+							if globals.Count == globals.ResetVal {
+								gtx = gtx.Disabled()
+							}
+
+							for range c.resetBtn.Clicks() {
+								globals.Count = globals.ResetVal
+							}
+							return globals.Inset.Layout(
+								gtx,
+								custom_widgets.LabeledIconBtn{
+									Theme:      th,
+									BgColor:    globals.Colours["red"],
+									LabelColor: globals.Colours["white"],
+									Button:     &c.minusBtn,
+									Icon:       globals.MinusIcon,
+									Label:      strconv.FormatInt(globals.CountUnit, 10),
+								}.Layout)
+						}),
 
 						globals.SpacerX,
 
@@ -105,27 +109,10 @@ func (c *Counter) Layout(th *material.Theme, gtx C) D {
 									Button:     &c.plusBtn,
 									Icon:       globals.PlusIcon,
 									Label:      strconv.FormatInt(globals.CountUnit, 10),
-								}.Layout)
-
+								}.Layout,
+							)
 						}),
 					)
-				}),
-
-				globals.SpacerY,
-
-				// Reset Button
-				layout.Rigid(func(gtx C) D {
-					// if count == reset, disable Reset button
-					if globals.Count == globals.ResetVal {
-						gtx = gtx.Disabled()
-					}
-
-					for range c.resetBtn.Clicks() {
-						globals.Count = globals.ResetVal
-					}
-					btn := material.Button(th, &c.resetBtn, fmt.Sprintf("Reset to %d", globals.ResetVal))
-					btn.Background = globals.Colours["blue"]
-					return btn.Layout(gtx)
 				}),
 			)
 		}),
