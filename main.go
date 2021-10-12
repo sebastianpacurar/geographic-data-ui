@@ -98,38 +98,33 @@ func (ui *UI) Run(w *app.Window) error {
 // Inset refers to the margins of the components, so there can be
 // a small margin around the entire contents of the app.
 func (ui *UI) Layout(gtx C) D {
+
 	return layout.Flex{
 		Axis: layout.Vertical,
 	}.Layout(
 		gtx,
-		//layout.Rigid(func(gtx C) D {
-		//	return ui.topBar.Layout(gtx)
-		//}),
-
 		layout.Rigid(func(gtx C) D {
-			return globals.Inset.Layout(gtx, func(gtx C) D {
-				return ui.geometry.Layout(gtx)
-			})
+			return ui.topBar.Layout(gtx)
 		}),
 
-		//layout.Rigid(func(gtx C) D {
-		//	return layout.Flex{
-		//		Axis:    layout.Horizontal,
-		//		Spacing: layout.SpaceEvenly,
-		//	}.Layout(
-		//		gtx,
-		//		layout.Rigid(func(gtx C) D {
-		//			return globals.Inset.Layout(gtx, func(gtx C) D {
-		//				return ui.startValue.Layout(ui.theme, gtx)
-		//			})
-		//		}),
-		//		layout.Rigid(func(gtx C) D {
-		//			return globals.Inset.Layout(gtx, func(gtx C) D {
-		//				return ui.unitVal.Layout(ui.theme, gtx)
-		//			})
-		//		}),
-		//	)
-		//}),
+		layout.Rigid(func(gtx C) D {
+			return layout.Flex{
+				Axis:    layout.Horizontal,
+				Spacing: layout.SpaceEvenly,
+			}.Layout(
+				gtx,
+				layout.Rigid(func(gtx C) D {
+					return globals.Inset.Layout(gtx, func(gtx C) D {
+						return ui.startValue.Layout(ui.theme, gtx)
+					})
+				}),
+				layout.Rigid(func(gtx C) D {
+					return globals.Inset.Layout(gtx, func(gtx C) D {
+						return ui.unitVal.Layout(ui.theme, gtx)
+					})
+				}),
+			)
+		}),
 
 		// Temporarily disabled
 		//layout.Rigid(func(gtx C) D {
@@ -140,12 +135,7 @@ func (ui *UI) Layout(gtx C) D {
 
 		//layout.Rigid(func(gtx C) D {
 		//	return globals.Inset.Layout(gtx, func(gtx C) D {
-		//		return ui.startValue.Layout(ui.theme, gtx)
-		//	})
-		//}),
-		//layout.Rigid(func(gtx C) D {
-		//	return globals.Inset.Layout(gtx, func(gtx C) D {
-		//		return ui.counter.Layout(ui.theme, gtx)
+		//		return ui.geometry.Layout(gtx)
 		//	})
 		//}),
 	)
