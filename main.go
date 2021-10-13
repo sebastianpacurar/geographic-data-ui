@@ -48,21 +48,19 @@ func main() {
 // UI holds the entire states of the app.
 type UI struct {
 	theme         *material.Theme
-	counter       counters.Counter
-	startValue    counters.StartValue
-	unitVal       counters.UnitVal
+	topBar        app_layout.TopBar
+	topController counters.ValueHandler
 	viewer        counters.View
+	counter       counters.Counter
 	geometry      geometry.Geometry
 	jsonFormatter formatters.JsonFormatter
-	topBar        app_layout.TopBar
 }
 
 // NewUI returns a new UI which uses the Go Fonts, and initializes the Text Fields states
 func NewUI() *UI {
 	ui := &UI{}
 	ui.jsonFormatter.InitTextFields()
-	ui.startValue.InitTextField()
-	ui.unitVal.InitTextField()
+	ui.topController.InitTextFields()
 	ui.theme = material.NewTheme(gofont.Collection())
 	return ui
 }
@@ -107,24 +105,10 @@ func (ui *UI) Layout(gtx C) D {
 		layout.Rigid(func(gtx C) D {
 			return ui.topBar.Layout(gtx)
 		}),
-
 		layout.Rigid(func(gtx C) D {
-			return layout.Flex{
-				Axis:    layout.Horizontal,
-				Spacing: layout.SpaceEvenly,
-			}.Layout(
-				gtx,
-				layout.Rigid(func(gtx C) D {
-					return globals.Inset.Layout(gtx, func(gtx C) D {
-						return ui.startValue.Layout(ui.theme, gtx)
-					})
-				}),
-				layout.Rigid(func(gtx C) D {
-					return globals.Inset.Layout(gtx, func(gtx C) D {
-						return ui.unitVal.Layout(ui.theme, gtx)
-					})
-				}),
-			)
+			return globals.Inset.Layout(gtx, func(gtx C) D {
+				return ui.topController.Layout(ui.theme, gtx)
+			})
 		}),
 		layout.Flexed(1, func(gtx C) D {
 			return ui.viewer.Layout(ui.theme, gtx)

@@ -22,3 +22,8 @@ var MenuIcon = func() *widget.Icon {
 	icon, _ := widget.NewIcon(icons.NavigationMenu)
 	return icon
 }()
+
+var RefreshIcon = func() *widget.Icon {
+	icon, _ := widget.NewIcon(icons.NavigationRefresh)
+	return icon
+}()

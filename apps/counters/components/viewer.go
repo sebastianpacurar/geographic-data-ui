@@ -35,10 +35,10 @@ func (v *View) Layout(th *material.Theme, gtx C) D {
 			}
 
 			return layout.Inset{
-				Top:    unit.Dp(2),
-				Right:  unit.Dp(5),
-				Bottom: unit.Dp(2),
-				Left:   unit.Dp(5),
+				Top:    unit.Dp(20),
+				Right:  unit.Dp(50),
+				Bottom: unit.Dp(20),
+				Left:   unit.Dp(50),
 			}.Layout(gtx, func(gtx C) D {
 				return mainVal.Layout(gtx)
 			})
