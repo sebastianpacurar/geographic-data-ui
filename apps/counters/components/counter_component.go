@@ -84,11 +84,11 @@ func (c *Counter) Layout(th *material.Theme, gtx C) D {
 								gtx,
 								custom_widgets.LabeledIconBtn{
 									Theme:      th,
-									BgColor:    globals.Colours["red"],
+									BgColor:    globals.Colours["blue"],
 									LabelColor: globals.Colours["white"],
-									Button:     &c.minusBtn,
-									Icon:       globals.MinusIcon,
-									Label:      strconv.FormatInt(globals.CountUnit, 10),
+									Button:     &c.resetBtn,
+									Icon:       globals.RefreshIcon,
+									Label:      strconv.FormatInt(globals.ResetVal, 10),
 								}.Layout)
 						}),
 
