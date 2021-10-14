@@ -16,6 +16,7 @@ import (
 type ValueHandler struct {
 	startVal, unitVal       component.TextField
 	changeStart, changeUnit widget.Clickable
+	context                 string
 }
 
 // InitTextFields - initializes the state for the TextFields
@@ -41,21 +42,11 @@ func (vh *ValueHandler) Layout(th *material.Theme, gtx C) D {
 
 		/////
 		layout.Rigid(func(gtx C) D {
+			vh.context = "start"
 			btn := material.Button(th, &vh.changeStart, "Start From")
 			btn.Background = globals.Colours["blue"]
 			btn.Color = globals.Colours["white"]
-
-			switch {
-			case isFieldNumeric(vh.startVal):
-				gtx = gtx.Disabled()
-			case vh.changeStart.Clicked():
-				inpVal := vh.startVal.Text()
-				inpVal = strings.TrimSpace(inpVal)
-				intVal, _ := strconv.ParseInt(inpVal, 10, 64)
-				vh.startVal.Clear()
-				globals.Count = intVal
-				globals.ResetVal = intVal
-			}
+			handleBtnEvents(gtx, vh.context, vh.unitVal, vh.changeUnit)
 			return btn.Layout(gtx)
 		}),
 
@@ -67,7 +58,6 @@ func (vh *ValueHandler) Layout(th *material.Theme, gtx C) D {
 			eStart.HintColor = globals.Colours["dark-slate-grey"]
 			border := globals.DefaultBorder
 			validateTextField(th, vh.startVal, eStart, &border)
-
 			return border.Layout(gtx, func(gtx C) D {
 				return layout.UniformInset(unit.Dp(8)).Layout(
 					gtx,
@@ -79,14 +69,10 @@ func (vh *ValueHandler) Layout(th *material.Theme, gtx C) D {
 		///////
 
 		layout.Rigid(func(gtx C) D {
-			if vh.changeUnit.Clicked() {
-				inpVal := vh.unitVal.Text()
-				inpVal = strings.TrimSpace(inpVal)
-				intVal, _ := strconv.ParseInt(inpVal, 10, 64)
-				globals.CountUnit = intVal
-			}
+			vh.context = "unit"
 			btn := material.Button(th, &vh.changeUnit, "Set Unit To")
 			btn.Background = globals.Colours["blue"]
+			handleBtnEvents(gtx, vh.context, vh.unitVal, vh.changeUnit)
 			return btn.Layout(gtx)
 		}),
 
@@ -97,7 +83,6 @@ func (vh *ValueHandler) Layout(th *material.Theme, gtx C) D {
 			eUnit.HintColor = globals.Colours["dark-slate-grey"]
 			border := globals.DefaultBorder
 			validateTextField(th, vh.startVal, eStart, &border)
-
 			return border.Layout(gtx, func(gtx C) D {
 				return layout.UniformInset(unit.Dp(8)).Layout(
 					gtx,
@@ -114,21 +99,19 @@ func (vh *ValueHandler) Layout(th *material.Theme, gtx C) D {
 func isFieldNumeric(e component.TextField) bool {
 	if e.Len() > 0 {
 		for i := range e.Text() {
-			if i == 0 && e.Text()[0] == '-' {
-				continue
-			}
-			_, err := strconv.Atoi(string(e.Text()[i]))
-			if err != nil {
-				return false
+			if i != 0 && e.Text()[0] != '-' {
+				_, err := strconv.Atoi(string(e.Text()[i]))
+				if err != nil {
+					return false
+				}
 			}
 		}
 	}
 	return true
 }
 
-// trimInput - removes the last rune from the string iteratively. Useful in case
-// the input char count passes 17 chars, and mostly In case the system breaks and
-// more than 18 characters can be provided.
+// trimInput - removes the last rune from the string iteratively. Used in case
+// the input char count passes 17 chars
 func trimInput(e component.TextField, count int) {
 	str := e.Text()
 	for i := 0; i < count; i++ {
@@ -152,5 +135,22 @@ func validateTextField(th *material.Theme, e component.TextField, eStyle materia
 	case e.Focused():
 		b.Color = th.Palette.ContrastBg
 		b.Width = unit.Px(3)
+	}
+}
+
+func handleBtnEvents(gtx layout.Context, context string, e component.TextField, btn widget.Clickable) {
+	switch {
+	case isFieldNumeric(e):
+		gtx = gtx.Disabled()
+	case btn.Clicked():
+		inpVal := e.Text()
+		inpVal = strings.TrimSpace(inpVal)
+		intVal, _ := strconv.ParseInt(inpVal, 10, 64)
+		e.Clear()
+		globals.CountUnit = intVal
+		if context == "unit" {
+			globals.ResetVal = intVal
+
+		}
 	}
 }
