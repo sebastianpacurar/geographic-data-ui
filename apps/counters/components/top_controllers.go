@@ -31,33 +31,34 @@ func (vh *ValueHandler) InitTextFields() {
 // The editor is flexed, so it can enlarge/shrink while resizing on the X-Axis.
 func (vh *ValueHandler) Layout(th *material.Theme, gtx C) D {
 	eStart := material.Editor(th, &vh.startVal.Editor, "0")
-	eUnit := material.Editor(th, &vh.unitVal.Editor, "0")
+	eUnit := material.Editor(th, &vh.unitVal.Editor, "1")
 
 	return layout.Flex{
 		Axis: layout.Horizontal,
 	}.Layout(
 		gtx,
 
-		// "Start From" button - to enable the changed start value
-
-		/////
 		layout.Rigid(func(gtx C) D {
+			if !isFieldNumeric(vh.startVal) {
+				gtx = gtx.Disabled()
+			}
 			vh.context = "start"
 			btn := material.Button(th, &vh.changeStart, "Start From")
 			btn.Background = globals.Colours["blue"]
 			btn.Color = globals.Colours["white"]
-			handleBtnEvents(gtx, vh.context, vh.unitVal, vh.changeUnit)
+
+			handleBtnEvents(vh.context, vh.unitVal, vh.changeUnit)
 			return btn.Layout(gtx)
 		}),
 
 		globals.SpacerX,
 
 		// TextField Widget - to change start value
-		layout.Rigid(func(gtx C) D {
-			eStart.TextSize = unit.Sp(20)
+		layout.Flexed(1, func(gtx C) D {
+			eStart.TextSize = unit.Sp(18)
 			eStart.HintColor = globals.Colours["dark-slate-grey"]
 			border := globals.DefaultBorder
-			validateTextField(th, vh.startVal, eStart, &border)
+			vh.validateTextField(th, vh.startVal, eStart, &border)
 			return border.Layout(gtx, func(gtx C) D {
 				return layout.UniformInset(unit.Dp(8)).Layout(
 					gtx,
@@ -72,17 +73,20 @@ func (vh *ValueHandler) Layout(th *material.Theme, gtx C) D {
 			vh.context = "unit"
 			btn := material.Button(th, &vh.changeUnit, "Set Unit To")
 			btn.Background = globals.Colours["blue"]
-			handleBtnEvents(gtx, vh.context, vh.unitVal, vh.changeUnit)
+			if !isFieldNumeric(vh.unitVal) {
+				gtx = gtx.Disabled()
+			}
+			handleBtnEvents(vh.context, vh.unitVal, vh.changeUnit)
 			return btn.Layout(gtx)
 		}),
 
 		globals.SpacerX,
 
-		layout.Rigid(func(gtx C) D {
-			eUnit.TextSize = unit.Sp(20)
+		layout.Flexed(1, func(gtx C) D {
+			eUnit.TextSize = unit.Sp(18)
 			eUnit.HintColor = globals.Colours["dark-slate-grey"]
 			border := globals.DefaultBorder
-			validateTextField(th, vh.startVal, eStart, &border)
+			vh.validateTextField(th, vh.unitVal, eUnit, &border)
 			return border.Layout(gtx, func(gtx C) D {
 				return layout.UniformInset(unit.Dp(8)).Layout(
 					gtx,
@@ -99,11 +103,12 @@ func (vh *ValueHandler) Layout(th *material.Theme, gtx C) D {
 func isFieldNumeric(e component.TextField) bool {
 	if e.Len() > 0 {
 		for i := range e.Text() {
-			if i != 0 && e.Text()[0] != '-' {
-				_, err := strconv.Atoi(string(e.Text()[i]))
-				if err != nil {
-					return false
-				}
+			if i == 0 && e.Text()[0] == '-' {
+				continue
+			}
+			_, err := strconv.Atoi(string(e.Text()[i]))
+			if err != nil {
+				return false
 			}
 		}
 	}
@@ -124,11 +129,11 @@ func trimInput(e component.TextField, count int) {
 // until the length is back to 17
 // 2) If there are non-numeric characters, change colors to red
 // 3) When Focused change border color a bit
-func validateTextField(th *material.Theme, e component.TextField, eStyle material.EditorStyle, b *widget.Border) {
+func (vh *ValueHandler) validateTextField(th *material.Theme, e component.TextField, eStyle material.EditorStyle, b *widget.Border) {
 	switch {
 	case e.Len() >= 18:
 		trimInput(e, e.Len()-18)
-	case isFieldNumeric(e):
+	case !isFieldNumeric(e):
 		b.Color = globals.Colours["red"]
 		b.Width = unit.Px(5)
 		eStyle.Color = globals.Colours["dark-red"]
@@ -138,10 +143,8 @@ func validateTextField(th *material.Theme, e component.TextField, eStyle materia
 	}
 }
 
-func handleBtnEvents(gtx layout.Context, context string, e component.TextField, btn widget.Clickable) {
+func handleBtnEvents(context string, e component.TextField, btn widget.Clickable) {
 	switch {
-	case isFieldNumeric(e):
-		gtx = gtx.Disabled()
 	case btn.Clicked():
 		inpVal := e.Text()
 		inpVal = strings.TrimSpace(inpVal)
@@ -150,7 +153,6 @@ func handleBtnEvents(gtx layout.Context, context string, e component.TextField, 
 		globals.CountUnit = intVal
 		if context == "unit" {
 			globals.ResetVal = intVal
-
 		}
 	}
 }
