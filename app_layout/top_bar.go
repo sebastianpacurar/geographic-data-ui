@@ -17,17 +17,11 @@ type (
 type TopBar struct {
 	menuBtn widget.Clickable
 	title   string
-	height  int
-	Apps    []string
 }
 
 // Layout - is composed of a Stack layout which returns the first dimension as
 // the fullWidth of the X-Axis, and 120 pixels on Y-Axis
 func (ab *TopBar) Layout(gtx C) D {
-	if len(ab.Apps) == 0 {
-		ab.Apps = globals.GetAppsNames()
-	}
-
 	return layout.Stack{}.Layout(gtx,
 		// Expand the colored area, allowing for child Stacked widgets to overlap its dimensions
 		layout.Expanded(func(gtx C) D {

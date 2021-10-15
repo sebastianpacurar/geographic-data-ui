@@ -13,7 +13,9 @@ import (
 	"gioui.org/layout"
 	"gioui.org/op"
 	"gioui.org/unit"
+	"gioui.org/widget"
 	"gioui.org/widget/material"
+	"image"
 	"log"
 	"os"
 )
@@ -98,41 +100,54 @@ func (ui *UI) Run(w *app.Window) error {
 // Inset refers to the margins of the components, so there can be
 // a small margin around the entire contents of the app.
 func (ui *UI) Layout(gtx C) D {
-	return layout.Flex{
-		Axis: layout.Vertical,
-	}.Layout(
-		gtx,
-		layout.Rigid(func(gtx C) D {
-			return ui.topBar.Layout(gtx)
-		}),
-		layout.Rigid(func(gtx C) D {
-			return layout.Flex{
-				Axis: layout.Horizontal,
-			}.Layout(
-				gtx,
-				layout.Flexed(1, func(gtx C) D {
-					return ui.menu.Layout(ui.theme, gtx)
-				}),
-				layout.Flexed(3, func(gtx C) D {
-					return layout.Flex{
-						Axis: layout.Vertical,
-					}.Layout(
-						gtx,
-						layout.Rigid(func(gtx C) D {
-							return globals.Inset.Layout(gtx, func(gtx C) D {
-								return ui.topController.Layout(ui.theme, gtx)
-							})
-						}),
-						layout.Flexed(1, func(gtx C) D {
-							return ui.viewer.Layout(ui.theme, gtx)
-						}),
-						layout.Rigid(func(gtx C) D {
-							return globals.Inset.Layout(gtx, func(gtx C) D {
-								return ui.counter.Layout(ui.theme, gtx)
-							})
-						}))
-				}),
-			)
-		}),
+	windowBorder := widget.Border{
+		Color:        globals.Colours["dark-cyan"],
+		CornerRadius: unit.Dp(0),
+		Width:        unit.Dp(3),
+	}
+	return windowBorder.Layout(gtx, func(gtx C) D {
+		return layout.Flex{
+			Axis: layout.Vertical,
+		}.Layout(
+			gtx,
+			layout.Rigid(func(gtx C) D {
+				return ui.topBar.Layout(gtx)
+			}),
+			layout.Rigid(func(gtx C) D {
+				return layout.Flex{
+					Axis: layout.Horizontal,
+				}.Layout(
+					gtx,
+
+					// set a rigid of 225 width and fullheight
+					layout.Rigid(func(gtx C) D {
+						width := gtx.Px(globals.MenuWidth)
+						size := image.Pt(width, gtx.Constraints.Max.Y)
+						gtx.Constraints = layout.Exact(gtx.Constraints.Constrain(size))
+						return ui.menu.Layout(ui.theme, gtx)
+					}),
+					layout.Rigid(func(gtx C) D {
+						return layout.Flex{
+							Axis: layout.Vertical,
+						}.Layout(
+							gtx,
+							layout.Rigid(func(gtx C) D {
+								return globals.Inset.Layout(gtx, func(gtx C) D {
+									return ui.topController.Layout(ui.theme, gtx)
+								})
+							}),
+							layout.Flexed(1, func(gtx C) D {
+								return ui.viewer.Layout(ui.theme, gtx)
+							}),
+							layout.Rigid(func(gtx C) D {
+								return globals.Inset.Layout(gtx, func(gtx C) D {
+									return ui.counter.Layout(ui.theme, gtx)
+								})
+							}))
+					}),
+				)
+			}),
+		)
+	},
 	)
 }
