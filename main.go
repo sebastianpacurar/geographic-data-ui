@@ -49,6 +49,7 @@ func main() {
 type UI struct {
 	theme         *material.Theme
 	topBar        app_layout.TopBar
+	menu          app_layout.Menu
 	topController counters.ValueHandler
 	viewer        counters.View
 	counter       counters.Counter
@@ -97,7 +98,6 @@ func (ui *UI) Run(w *app.Window) error {
 // Inset refers to the margins of the components, so there can be
 // a small margin around the entire contents of the app.
 func (ui *UI) Layout(gtx C) D {
-
 	return layout.Flex{
 		Axis: layout.Vertical,
 	}.Layout(
@@ -106,16 +106,33 @@ func (ui *UI) Layout(gtx C) D {
 			return ui.topBar.Layout(gtx)
 		}),
 		layout.Rigid(func(gtx C) D {
-			return globals.Inset.Layout(gtx, func(gtx C) D {
-				return ui.topController.Layout(ui.theme, gtx)
-			})
+			return layout.Flex{
+				Axis: layout.Horizontal,
+			}.Layout(
+				gtx,
+				layout.Flexed(1, func(gtx C) D {
+					return ui.menu.Layout(ui.theme, gtx)
+				}),
+				layout.Flexed(3, func(gtx C) D {
+					return layout.Flex{
+						Axis: layout.Vertical,
+					}.Layout(
+						gtx,
+						layout.Rigid(func(gtx C) D {
+							return globals.Inset.Layout(gtx, func(gtx C) D {
+								return ui.topController.Layout(ui.theme, gtx)
+							})
+						}),
+						layout.Flexed(1, func(gtx C) D {
+							return ui.viewer.Layout(ui.theme, gtx)
+						}),
+						layout.Rigid(func(gtx C) D {
+							return globals.Inset.Layout(gtx, func(gtx C) D {
+								return ui.counter.Layout(ui.theme, gtx)
+							})
+						}))
+				}),
+			)
 		}),
-		layout.Flexed(1, func(gtx C) D {
-			return ui.viewer.Layout(ui.theme, gtx)
-		}),
-		layout.Rigid(func(gtx C) D {
-			return globals.Inset.Layout(gtx, func(gtx C) D {
-				return ui.counter.Layout(ui.theme, gtx)
-			})
-		}))
+	)
 }
