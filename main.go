@@ -2,7 +2,7 @@ package main
 
 import (
 	"gioui-experiment/app_layout"
-	counters "gioui-experiment/apps/counters/components"
+	counters "gioui-experiment/apps/counters"
 	formatters "gioui-experiment/apps/formatters/components"
 	"gioui-experiment/apps/geometry"
 	"gioui-experiment/globals"
@@ -15,7 +15,6 @@ import (
 	"gioui.org/unit"
 	"gioui.org/widget"
 	"gioui.org/widget/material"
-	"image"
 	"log"
 	"os"
 )
@@ -26,7 +25,7 @@ type (
 )
 
 func main() {
-	ui := NewUI()
+	ui := newUI()
 
 	// Starts a goroutine which executes an anonymous function.
 	// Starts the app and initializes the UI.
@@ -51,19 +50,26 @@ func main() {
 type UI struct {
 	theme         *material.Theme
 	topBar        app_layout.TopBar
-	menu          app_layout.Menu
-	topController counters.ValueHandler
-	viewer        counters.View
-	counter       counters.Counter
+	navMenu       app_layout.Menu
+	counters      counters.Page
 	geometry      geometry.Geometry
 	jsonFormatter formatters.JsonFormatter
 }
 
-// NewUI returns a new UI which uses the Go Fonts, and initializes the Text Fields states
-func NewUI() *UI {
-	ui := &UI{}
+// newUI returns a new UI which uses the Go Fonts, and initializes the Text Fields states
+func newUI() *UI {
+	ui := &UI{
+		theme: material.NewTheme(gofont.Collection()),
+	}
+	//ui.menu.Items = append(ui.menu.Items,
+	//	Menu{
+	//		name: "Counters",
+	//		w: func(item *menuItem, gtx C) D {
+	//			return outl
+	//		},
+	//	})
 	ui.jsonFormatter.InitTextFields()
-	ui.topController.InitTextFields()
+	ui.counters.TopController.InitTextFields()
 	ui.theme = material.NewTheme(gofont.Collection())
 	return ui
 }
@@ -118,33 +124,11 @@ func (ui *UI) Layout(gtx C) D {
 					Axis: layout.Horizontal,
 				}.Layout(
 					gtx,
-
-					// set a rigid of 225 width and fullheight
 					layout.Rigid(func(gtx C) D {
-						width := gtx.Px(globals.MenuWidth)
-						size := image.Pt(width, gtx.Constraints.Max.Y)
-						gtx.Constraints = layout.Exact(gtx.Constraints.Constrain(size))
-						return ui.menu.Layout(ui.theme, gtx)
+						return ui.navMenu.Layout(ui.theme, gtx)
 					}),
-					layout.Rigid(func(gtx C) D {
-						return layout.Flex{
-							Axis: layout.Vertical,
-						}.Layout(
-							gtx,
-							layout.Rigid(func(gtx C) D {
-								return globals.Inset.Layout(gtx, func(gtx C) D {
-									return ui.topController.Layout(ui.theme, gtx)
-								})
-							}),
-							layout.Flexed(1, func(gtx C) D {
-								return ui.viewer.Layout(ui.theme, gtx)
-							}),
-							layout.Rigid(func(gtx C) D {
-								return globals.Inset.Layout(gtx, func(gtx C) D {
-									return ui.counter.Layout(ui.theme, gtx)
-								})
-							}),
-						)
+					layout.Rigid(func(gtx layout.Context) layout.Dimensions {
+						return ui.counters.Layout(ui.theme, gtx)
 					}),
 				)
 			}),

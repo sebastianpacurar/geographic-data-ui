@@ -9,13 +9,28 @@ import (
 )
 
 type Menu struct {
-	Apps []string
+	Active int
+	Items  []MenuItem
+}
+
+type MenuItem struct {
+	Name  string
+	Click widget.Clickable
+	W     func(item *MenuItem, gtx C) D
+	Num   int
 }
 
 func (m Menu) Layout(th *material.Theme, gtx C) D {
-	//if len(m.Apps) == 0 {
-	//	m.Apps = globals.GetAppsNames()
-	//}
+	width := gtx.Px(globals.MenuWidth)
+	containerSize := image.Pt(width, gtx.Constraints.Max.Y)
+	gtx.Constraints = layout.Exact(gtx.Constraints.Constrain(containerSize))
+
+	for i := range m.Items {
+		for m.Items[i].Click.Clicked() {
+			m.Active = i
+		}
+	}
+
 	return layout.Stack{
 		Alignment: layout.NW,
 	}.Layout(
