@@ -143,7 +143,8 @@ func (ui *UI) Layout(gtx C) D {
 								return globals.Inset.Layout(gtx, func(gtx C) D {
 									return ui.counter.Layout(ui.theme, gtx)
 								})
-							}))
+							}),
+						)
 					}),
 				)
 			}),
