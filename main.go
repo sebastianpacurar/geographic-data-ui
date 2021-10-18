@@ -2,7 +2,7 @@ package main
 
 import (
 	"gioui-experiment/app_layout"
-	counters "gioui-experiment/apps/counters"
+	"gioui-experiment/apps/counters"
 	formatters "gioui-experiment/apps/formatters/components"
 	"gioui-experiment/apps/geometry"
 	"gioui-experiment/globals"
@@ -15,6 +15,8 @@ import (
 	"gioui.org/unit"
 	"gioui.org/widget"
 	"gioui.org/widget/material"
+	"gioui.org/x/component"
+	"image"
 	"log"
 	"os"
 )
@@ -22,6 +24,10 @@ import (
 type (
 	C = layout.Context
 	D = layout.Dimensions
+)
+
+var (
+	menuBtn = new(widget.Clickable)
 )
 
 func main() {
@@ -50,10 +56,23 @@ func main() {
 type UI struct {
 	theme         *material.Theme
 	topBar        app_layout.TopBar
-	navMenu       app_layout.Menu
+	navMenu       Menu
+	menuItem      MenuItem
 	counters      counters.Page
 	geometry      geometry.Geometry
 	jsonFormatter formatters.JsonFormatter
+}
+
+type Menu struct {
+	Active int
+	Items  []MenuItem
+}
+
+type MenuItem struct {
+	Name       string
+	Click      widget.Clickable
+	layContent func(gtx C) D
+	Num        int
 }
 
 // newUI returns a new UI which uses the Go Fonts, and initializes the Text Fields states
@@ -61,13 +80,20 @@ func newUI() *UI {
 	ui := &UI{
 		theme: material.NewTheme(gofont.Collection()),
 	}
-	//ui.menu.Items = append(ui.menu.Items,
-	//	Menu{
-	//		name: "Counters",
-	//		w: func(item *menuItem, gtx C) D {
-	//			return outl
-	//		},
-	//	})
+	ui.navMenu.Items = append(ui.navMenu.Items,
+		MenuItem{
+			Name: "Counters",
+			layContent: func(gtx C) D {
+				return ui.counters.Layout(ui.theme, gtx)
+			},
+		},
+		MenuItem{
+			Name: "Formatters",
+			layContent: func(gtx C) D {
+				return ui.jsonFormatter.Layout(ui.theme, gtx)
+			},
+		},
+	)
 	ui.jsonFormatter.InitTextFields()
 	ui.counters.TopController.InitTextFields()
 	ui.theme = material.NewTheme(gofont.Collection())
@@ -116,23 +142,100 @@ func (ui *UI) Layout(gtx C) D {
 			Axis: layout.Vertical,
 		}.Layout(
 			gtx,
+
+			/// TOP BAR SECTION
 			layout.Rigid(func(gtx C) D {
-				return ui.topBar.Layout(gtx)
+				return layout.Stack{}.Layout(gtx,
+					layout.Expanded(func(gtx C) D {
+						size := image.Pt(gtx.Constraints.Max.X, gtx.Constraints.Min.Y+10/2)
+						bar := globals.ColoredArea(
+							gtx,
+							gtx.Constraints.Constrain(size),
+							globals.Colours["dark-cyan"],
+						)
+						return bar
+					}),
+					layout.Stacked(func(gtx C) D {
+						return layout.Inset{
+							Left: unit.Dp(10),
+							Top:  unit.Dp(5),
+						}.Layout(gtx, func(gtx C) D {
+							btn := component.SimpleIconButton(
+								globals.Colours["dark-cyan"],
+								globals.Colours["white"],
+								menuBtn,
+								globals.MenuIcon,
+							)
+							return btn.Layout(gtx)
+						})
+					}),
+				)
 			}),
+
+			// NAVIGATION MENU SECTION
 			layout.Rigid(func(gtx C) D {
+				for i := range ui.navMenu.Items {
+					for ui.navMenu.Items[i].Click.Clicked() {
+						ui.navMenu.Active = i
+					}
+				}
+				activeApp := &ui.navMenu.Items[ui.navMenu.Active]
+
 				return layout.Flex{
 					Axis: layout.Horizontal,
 				}.Layout(
 					gtx,
 					layout.Rigid(func(gtx C) D {
-						return ui.navMenu.Layout(ui.theme, gtx)
+						width := gtx.Px(globals.MenuWidth)
+						containerSize := image.Pt(width, gtx.Constraints.Max.Y)
+						gtx.Constraints = layout.Exact(gtx.Constraints.Constrain(containerSize))
+
+						for i := range ui.navMenu.Items {
+							for ui.navMenu.Items[i].Click.Clicked() {
+								ui.navMenu.Active = i
+							}
+						}
+
+						return layout.Stack{
+							Alignment: layout.NW,
+						}.Layout(
+							gtx,
+							layout.Expanded(func(gtx C) D {
+								size := image.Pt(gtx.Constraints.Max.X, gtx.Constraints.Max.Y)
+								bar := globals.ColoredArea(
+									gtx,
+									gtx.Constraints.Constrain(size),
+									globals.Colours["sea-green"],
+								)
+								return bar
+							}),
+
+							layout.Stacked(func(gtx C) D {
+								var appsList = &widget.List{
+									List: layout.List{
+										Axis: layout.Vertical,
+									},
+								}
+
+								widgets := []layout.Widget{
+									material.H4(ui.theme, "Menu").Layout,
+									material.H6(ui.theme, "Counters").Layout,
+									material.H6(ui.theme, "Geography").Layout,
+								}
+
+								return material.List(ui.theme, appsList).Layout(gtx, len(widgets), func(gtx C, i int) D {
+									return layout.UniformInset(globals.DefaultMargin).Layout(gtx, widgets[i])
+								})
+							}),
+						)
 					}),
+
+					// APPLICATION SECTION
 					layout.Rigid(func(gtx layout.Context) layout.Dimensions {
 						return ui.counters.Layout(ui.theme, gtx)
 					}),
 				)
 			}),
 		)
-	},
-	)
+	})
 }
