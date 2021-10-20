@@ -47,13 +47,12 @@ func (vh *ValueHandler) Layout(th *material.Theme, gtx C) D {
 			btn.Background = globals.Colours["blue"]
 			btn.Color = globals.Colours["white"]
 
-			handleBtnEvents(vh.context, vh.unitVal, vh.changeUnit)
+			handleBtnEvents(vh.context, vh.startVal, vh.changeStart)
 			return btn.Layout(gtx)
 		}),
 
 		globals.SpacerX,
 
-		// TextField Widget - to change start value
 		layout.Flexed(1, func(gtx C) D {
 			eStart.TextSize = unit.Sp(18)
 			eStart.HintColor = globals.Colours["dark-slate-grey"]
@@ -67,7 +66,7 @@ func (vh *ValueHandler) Layout(th *material.Theme, gtx C) D {
 			})
 		}),
 
-		///////
+		globals.SpacerX,
 
 		layout.Rigid(func(gtx C) D {
 			vh.context = "unit"
@@ -149,10 +148,11 @@ func handleBtnEvents(context string, e component.TextField, btn widget.Clickable
 		inpVal := e.Text()
 		inpVal = strings.TrimSpace(inpVal)
 		intVal, _ := strconv.ParseInt(inpVal, 10, 64)
-		e.Clear()
-		globals.CountUnit = intVal
-		if context == "unit" {
+		if context == "start" {
+			globals.Count = intVal
 			globals.ResetVal = intVal
+		} else if context == "unit" {
+			globals.CountUnit = intVal
 		}
 	}
 }

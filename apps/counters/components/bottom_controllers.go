@@ -9,10 +9,6 @@ import (
 	"strconv"
 )
 
-var (
-//plusBtn = new(widget.Clickable)
-)
-
 type (
 	C = layout.Context
 	D = layout.Dimensions

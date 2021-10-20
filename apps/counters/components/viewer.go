@@ -13,7 +13,9 @@ type View struct{}
 
 func (v *View) Layout(th *material.Theme, gtx C) D {
 	size := image.Pt(gtx.Constraints.Max.X, gtx.Constraints.Max.Y)
-	return layout.Stack{}.Layout(
+	return layout.Stack{
+		Alignment: layout.NW,
+	}.Layout(
 		gtx,
 		layout.Expanded(func(gtx C) D {
 			view := globals.ColoredArea(
