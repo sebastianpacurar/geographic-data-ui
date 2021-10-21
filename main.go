@@ -1,10 +1,9 @@
 package main
 
 import (
-	"gioui-experiment/app_layout"
 	"gioui-experiment/apps/counters"
-	formatters "gioui-experiment/apps/formatters/components"
 	"gioui-experiment/apps/geometry"
+	textEditor "gioui-experiment/apps/text_editor/components"
 	"gioui-experiment/globals"
 	"gioui.org/app"
 	"gioui.org/f32"
@@ -58,17 +57,19 @@ func main() {
 
 // UI holds the entire states of the app.
 type UI struct {
-	theme         *material.Theme
-	topBar        app_layout.TopBar
-	navMenu       Menu
-	menuItem      MenuItem
-	counters      counters.Page
-	geometry      geometry.Geometry
-	jsonFormatter formatters.JsonFormatter
+	theme *material.Theme
+	//topBar     app_layout.TopBar
+	navMenu    Menu
+	menuItem   MenuItem
+	counters   counters.Page
+	geometry   geometry.Geometry
+	textEditor textEditor.TextEditor
 }
 
 type Menu struct {
 	active int
+	oldVal string
+	newVal string
 	items  []MenuItem
 	list   layout.List
 }
@@ -93,15 +94,15 @@ func newUI() *UI {
 			},
 		},
 		MenuItem{
-			name: "Formatters",
+			name: "Editor",
 			layContent: func(gtx C) D {
-				return ui.jsonFormatter.Layout(ui.theme, gtx)
+				return ui.textEditor.Layout(ui.theme, gtx)
 			},
 		},
 	)
-	ui.jsonFormatter.InitTextFields()
-	ui.counters.TopController.InitTextFields()
-	ui.theme = material.NewTheme(gofont.Collection())
+	ui.textEditor.InitTextFields()
+	ui.counters.Bottom.ValueHandlers.InitTextFields()
+	ui.navMenu.oldVal = "Counters"
 	return ui
 }
 
@@ -183,11 +184,11 @@ func (ui *UI) Layout(gtx C) D {
 			// NAVIGATION MENU SECTION
 			layout.Rigid(func(gtx C) D {
 				for i := range ui.navMenu.items {
-					for ui.navMenu.items[i].btn.Clicked() {
+					if ui.navMenu.items[i].btn.Clicked() {
 						ui.navMenu.active = i
+						ui.navMenu.newVal = ui.navMenu.items[i].name
 					}
 				}
-
 				return layout.Flex{
 					Axis: layout.Horizontal,
 				}.Layout(
@@ -213,20 +214,29 @@ func (ui *UI) Layout(gtx C) D {
 
 							layout.Stacked(func(gtx C) D {
 								return ui.navMenu.list.Layout(gtx, len(ui.navMenu.items), func(gtx C, id int) D {
-									application := &ui.navMenu.items[id]
+									menuItem := &ui.navMenu.items[id]
 
 									// name = the actual name of the application
 									// stretches the clickable area to fit the X-Axis
 									name := func(gtx C) D {
 										return layout.Flex{Axis: layout.Horizontal}.Layout(gtx,
 											layout.Flexed(1, func(gtx C) D {
-												return layout.UniformInset(globals.DefaultMargin).Layout(gtx, material.H6(ui.theme, application.name).Layout)
+												return layout.UniformInset(globals.DefaultMargin).Layout(gtx,
+													func(gtx C) D {
+														text := material.H6(ui.theme, menuItem.name)
+														if gtx.Queue == nil {
+															text.Color.A = 150
+														}
+														return layout.Center.Layout(gtx, text.Layout)
+													})
 											}))
 									}
 
 									// if it's not the current app, then create a clickable area on the whole X-Axis
 									if id != ui.navMenu.active {
-										return material.Clickable(gtx, &application.btn, name)
+										return material.Clickable(gtx, &menuItem.btn, func(gtx C) D {
+											return name(gtx)
+										})
 									}
 
 									// lay out the selected item in a grey-ish background
