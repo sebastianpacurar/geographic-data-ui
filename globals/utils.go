@@ -2,6 +2,7 @@ package globals
 
 import "C"
 import (
+	"encoding/json"
 	"gioui.org/layout"
 	"gioui.org/op"
 	"gioui.org/op/clip"
@@ -64,4 +65,24 @@ func GenerateRandomColor() color.NRGBA {
 		B: uint8(rand.Intn(max-min) + min),
 		A: 255,
 	}
+}
+
+// isInJsonString - checks to see if the provided Input is a JSON string
+func isInJsonString(data []byte) bool {
+	var jsonMessage json.RawMessage
+	err := json.Unmarshal(data, &jsonMessage)
+	if err != nil {
+		return false
+	}
+	return true
+}
+
+// isInJson - checks to see if the provided input is a JSON (interface)
+func isInJson(data []byte) bool {
+	var jsonMessage map[string]interface{}
+	err := json.Unmarshal(data, &jsonMessage)
+	if err != nil {
+		return false
+	}
+	return true
 }

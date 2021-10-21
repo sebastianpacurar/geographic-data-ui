@@ -1,4 +1,4 @@
-package components
+package controllers
 
 import (
 	"gioui-experiment/custom_widgets"
@@ -14,39 +14,24 @@ type (
 	D = layout.Dimensions
 )
 
-// Counter - component which controls the displayed data. It displays itself as:
-// plusBtn - this increments the current number.
-// minusBtn - this decrements the current number.
-// resetBtn - this resets the current value to the ResetVal from globals.
-type Counter struct {
+type Incrementor struct {
 	plusBtn, minusBtn, resetBtn widget.Clickable
 }
 
-// Layout - returns the Dimensions for the Counter design structure:
-// plusBtn, minusBtn = 2 rounded SimpleIconButtons
-// resetBtn is below them and fills the whole width
-func (c *Counter) Layout(th *material.Theme, gtx C) D {
+func (c *Incrementor) Layout(th *material.Theme, gtx C) D {
 	return layout.Flex{
 		Axis: layout.Vertical,
 	}.Layout(
 		gtx,
-
-		// Using flex-box on Y-Axis, which contains the 3 buttons
-		// The first child of the Flex layout contains a Rigid layout, in which the 2 buttons are flexed horizontally.
-		// The second child is the reset Button, returned as a layout.Rigid
 		layout.Rigid(func(gtx C) D {
 			return layout.Flex{
 				Axis: layout.Vertical,
-			}.Layout(
-				gtx,
+			}.Layout(gtx,
 				layout.Rigid(func(gtx C) D {
 					return layout.Flex{
 						Axis:    layout.Horizontal,
 						Spacing: layout.SpaceEvenly,
-					}.Layout(
-						gtx,
-
-						// Minus Button
+					}.Layout(gtx,
 						layout.Rigid(func(gtx C) D {
 							for range c.minusBtn.Clicks() {
 								globals.Count -= globals.CountUnit
