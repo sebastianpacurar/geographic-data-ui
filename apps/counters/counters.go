@@ -24,7 +24,9 @@ func (p *Page) Layout(th *material.Theme, gtx layout.Context) layout.Dimensions 
 	}.Layout(
 		gtx,
 		layout.Rigid(func(gt C) D {
-			return p.Top.Layout(th, gtx)
+			return globals.Inset.Layout(gtx, func(gtx C) D {
+				return p.Top.Layout(th, gtx)
+			})
 		}),
 		layout.Flexed(1, func(gtx C) D {
 			return p.View.Layout(th, gtx)

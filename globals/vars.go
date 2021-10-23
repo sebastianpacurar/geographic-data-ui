@@ -10,9 +10,11 @@ import (
 
 var (
 	CM            = int(math.Floor(37.795275591))
-	Count         = int64(0)
+	CountWhole    = int64(0)
+	CountNatural  = uint64(0)
 	CountUnit     = int64(1)
 	ResetVal      = int64(0)
+	CurrentNum    = "whole"
 	MenuWidth     = unit.Dp(225)
 	DefaultMargin = unit.Dp(10)
 	DefaultBorder = widget.Border{

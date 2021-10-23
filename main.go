@@ -182,11 +182,11 @@ func (ui *UI) Layout(gtx C) D {
 			}),
 
 			// NAVIGATION MENU SECTION
+			// TODO: in progress
 			layout.Rigid(func(gtx C) D {
-				for i := range ui.navMenu.items {
-					if ui.navMenu.items[i].btn.Clicked() {
+				for i, v := range ui.navMenu.items {
+					for range v.btn.Clicks() {
 						ui.navMenu.active = i
-						ui.navMenu.newVal = ui.navMenu.items[i].name
 					}
 				}
 				return layout.Flex{
@@ -219,7 +219,9 @@ func (ui *UI) Layout(gtx C) D {
 									// name = the actual name of the application
 									// stretches the clickable area to fit the X-Axis
 									name := func(gtx C) D {
-										return layout.Flex{Axis: layout.Horizontal}.Layout(gtx,
+										return layout.Flex{
+											Axis: layout.Horizontal,
+										}.Layout(gtx,
 											layout.Flexed(1, func(gtx C) D {
 												return layout.UniformInset(globals.DefaultMargin).Layout(gtx,
 													func(gtx C) D {

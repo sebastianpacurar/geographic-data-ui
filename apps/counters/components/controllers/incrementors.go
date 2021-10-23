@@ -34,7 +34,7 @@ func (c *Incrementor) Layout(th *material.Theme, gtx C) D {
 					}.Layout(gtx,
 						layout.Rigid(func(gtx C) D {
 							for range c.minusBtn.Clicks() {
-								globals.Count -= globals.CountUnit
+								globals.CountWhole -= globals.CountUnit
 							}
 
 							return globals.Inset.Layout(
@@ -54,12 +54,12 @@ func (c *Incrementor) Layout(th *material.Theme, gtx C) D {
 						// Reset Button
 						layout.Rigid(func(gtx C) D {
 							// if count == reset, disable Reset button
-							if globals.Count == globals.ResetVal {
+							if globals.CountWhole == globals.ResetVal {
 								gtx = gtx.Disabled()
 							}
 
 							for range c.resetBtn.Clicks() {
-								globals.Count = globals.ResetVal
+								globals.CountWhole = globals.ResetVal
 							}
 							return globals.Inset.Layout(
 								gtx,
@@ -78,7 +78,7 @@ func (c *Incrementor) Layout(th *material.Theme, gtx C) D {
 						// Plus Button
 						layout.Rigid(func(gtx C) D {
 							for range c.plusBtn.Clicks() {
-								globals.Count += globals.CountUnit
+								globals.CountWhole += globals.CountUnit
 							}
 
 							return globals.Inset.Layout(

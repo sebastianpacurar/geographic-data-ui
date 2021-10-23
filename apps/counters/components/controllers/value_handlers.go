@@ -149,7 +149,7 @@ func handleBtnEvents(context string, e component.TextField, btn widget.Clickable
 		inpVal = strings.TrimSpace(inpVal)
 		intVal, _ := strconv.ParseInt(inpVal, 10, 64)
 		if context == "start" {
-			globals.Count = intVal
+			globals.CountWhole = intVal
 			globals.ResetVal = intVal
 		} else if context == "unit" {
 			globals.CountUnit = intVal

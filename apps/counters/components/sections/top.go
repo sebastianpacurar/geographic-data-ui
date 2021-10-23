@@ -15,6 +15,11 @@ type Top struct {
 }
 
 func (t *Top) Layout(th *material.Theme, gtx C) D {
+
+	if t.naturalNums.Clicked() {
+
+	}
+
 	return layout.Flex{
 		Axis: layout.Horizontal,
 	}.Layout(gtx,
