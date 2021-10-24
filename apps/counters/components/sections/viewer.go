@@ -57,10 +57,17 @@ func (v *View) Layout(th *material.Theme, gtx C) D {
 		}),
 
 		layout.Stacked(func(gtx C) D {
-			mainVal := material.H3(th, strconv.FormatInt(globals.CountWhole, 10))
-			if globals.CountWhole < 0 {
+			var mainVal material.LabelStyle
+
+			if globals.CurrentNum == "signed" {
+				mainVal = material.H3(th, strconv.FormatInt(globals.Count, 10))
+			} else if globals.CurrentNum == "unsigned" {
+				mainVal = material.H3(th, strconv.FormatUint(globals.UCount, 10))
+			}
+
+			if globals.Count < 0 || globals.UCount < 0 {
 				mainVal.Color = globals.Colours["red"]
-			} else if globals.CountWhole > 0 {
+			} else if globals.Count > 0 || globals.UCount > 0 {
 				mainVal.Color = globals.Colours["dark-green"]
 			} else {
 				mainVal.Color = globals.Colours["grey"]

@@ -15,9 +15,16 @@ type Top struct {
 }
 
 func (t *Top) Layout(th *material.Theme, gtx C) D {
-
-	if t.naturalNums.Clicked() {
-
+	if t.naturalNums.Clicked() || t.primeNums.Clicked() {
+		globals.CurrentNum = "unsigned"
+		globals.UCount = 0
+		globals.UCountUnit = 1
+		globals.UResetVal = 0
+	} else if t.wholeNums.Clicked() {
+		globals.CurrentNum = "signed"
+		globals.Count = 0
+		globals.CountUnit = 1
+		globals.ResetVal = 0
 	}
 
 	return layout.Flex{
@@ -30,6 +37,7 @@ func (t *Top) Layout(th *material.Theme, gtx C) D {
 				LabelColor: globals.Colours["black"],
 				Button:     &t.wholeNums,
 				Label:      "Whole Numbers",
+				Icon:       nil,
 			}.Layout(gtx)
 		}),
 
@@ -42,6 +50,7 @@ func (t *Top) Layout(th *material.Theme, gtx C) D {
 				LabelColor: globals.Colours["black"],
 				Button:     &t.naturalNums,
 				Label:      "Natural Numbers",
+				Icon:       nil,
 			}.Layout(gtx)
 		}),
 
@@ -54,6 +63,7 @@ func (t *Top) Layout(th *material.Theme, gtx C) D {
 				LabelColor: globals.Colours["black"],
 				Button:     &t.primeNums,
 				Label:      "Prime Numbers",
+				Icon:       nil,
 			}.Layout(gtx)
 		}),
 	)

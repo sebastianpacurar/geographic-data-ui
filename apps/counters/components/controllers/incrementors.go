@@ -19,6 +19,14 @@ type Incrementor struct {
 }
 
 func (c *Incrementor) Layout(th *material.Theme, gtx C) D {
+	currVal := globals.CurrentNum
+	var parsedLabel string
+	if currVal == "signed" {
+		parsedLabel = strconv.FormatInt(globals.CountUnit, 10)
+	} else if currVal == "unsigned" {
+		parsedLabel = strconv.FormatUint(globals.UCountUnit, 10)
+	}
+
 	return layout.Flex{
 		Axis: layout.Vertical,
 	}.Layout(
@@ -34,7 +42,11 @@ func (c *Incrementor) Layout(th *material.Theme, gtx C) D {
 					}.Layout(gtx,
 						layout.Rigid(func(gtx C) D {
 							for range c.minusBtn.Clicks() {
-								globals.CountWhole -= globals.CountUnit
+								if currVal == "signed" {
+									globals.Count -= globals.CountUnit
+								} else if currVal == "unsigned" {
+									globals.UCount -= globals.UCountUnit
+								}
 							}
 
 							return globals.Inset.Layout(
@@ -45,7 +57,7 @@ func (c *Incrementor) Layout(th *material.Theme, gtx C) D {
 									LabelColor: globals.Colours["white"],
 									Button:     &c.minusBtn,
 									Icon:       globals.MinusIcon,
-									Label:      strconv.FormatInt(globals.CountUnit, 10),
+									Label:      parsedLabel,
 								}.Layout)
 
 						}),
@@ -54,13 +66,18 @@ func (c *Incrementor) Layout(th *material.Theme, gtx C) D {
 						// Reset Button
 						layout.Rigid(func(gtx C) D {
 							// if count == reset, disable Reset button
-							if globals.CountWhole == globals.ResetVal {
+							if globals.Count == globals.ResetVal || globals.UCount == globals.UResetVal {
 								gtx = gtx.Disabled()
 							}
 
 							for range c.resetBtn.Clicks() {
-								globals.CountWhole = globals.ResetVal
+								if currVal == "unsigned" {
+									globals.UCount = globals.UResetVal
+								} else if currVal == "signed" {
+									globals.Count = globals.ResetVal
+								}
 							}
+
 							return globals.Inset.Layout(
 								gtx,
 								custom_widgets.LabeledIconBtn{
@@ -69,7 +86,7 @@ func (c *Incrementor) Layout(th *material.Theme, gtx C) D {
 									LabelColor: globals.Colours["white"],
 									Button:     &c.resetBtn,
 									Icon:       globals.RefreshIcon,
-									Label:      strconv.FormatInt(globals.ResetVal, 10),
+									Label:      parsedLabel,
 								}.Layout)
 						}),
 
@@ -78,7 +95,11 @@ func (c *Incrementor) Layout(th *material.Theme, gtx C) D {
 						// Plus Button
 						layout.Rigid(func(gtx C) D {
 							for range c.plusBtn.Clicks() {
-								globals.CountWhole += globals.CountUnit
+								if currVal == "unsigned" {
+									globals.UCount += globals.UCountUnit
+								} else if currVal == "signed" {
+									globals.Count += globals.CountUnit
+								}
 							}
 
 							return globals.Inset.Layout(

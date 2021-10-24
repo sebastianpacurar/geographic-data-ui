@@ -10,11 +10,13 @@ import (
 
 var (
 	CM            = int(math.Floor(37.795275591))
-	CountWhole    = int64(0)
-	CountNatural  = uint64(0)
+	Count         = int64(0)
 	CountUnit     = int64(1)
 	ResetVal      = int64(0)
-	CurrentNum    = "whole"
+	UCount        = uint64(0)
+	UCountUnit    = uint64(1)
+	UResetVal     = uint64(0)
+	CurrentNum    = "signed"
 	MenuWidth     = unit.Dp(225)
 	DefaultMargin = unit.Dp(10)
 	DefaultBorder = widget.Border{
@@ -41,11 +43,6 @@ var (
 	SpacerX = layout.Rigid(
 		layout.Spacer{
 			Width: DefaultMargin,
-		}.Layout,
-	)
-	SpacerY = layout.Rigid(
-		layout.Spacer{
-			Height: DefaultMargin,
 		}.Layout,
 	)
 )
