@@ -147,12 +147,31 @@ func handleBtnEvents(context string, e component.TextField, btn widget.Clickable
 	case btn.Clicked():
 		inpVal := e.Text()
 		inpVal = strings.TrimSpace(inpVal)
-		intVal, _ := strconv.ParseInt(inpVal, 10, 64)
-		if context == "start" {
-			globals.Count = intVal
-			globals.ResetVal = intVal
-		} else if context == "unit" {
-			globals.CountUnit = intVal
+		switch globals.CurrentNum {
+		case "signed":
+			intVal, _ := strconv.ParseInt(inpVal, 10, 64)
+			if context == "start" {
+				globals.Count = intVal
+				globals.ResetVal = intVal
+			} else if context == "unit" {
+				if intVal == 0 {
+					globals.Count = 1
+				} else {
+					globals.CountUnit = intVal
+				}
+			}
+		case "unsigned":
+			intVal, _ := strconv.ParseUint(inpVal, 10, 64)
+			if context == "start" {
+				globals.UCount = intVal
+				globals.UResetVal = intVal
+			} else if context == "unit" {
+				if intVal == 0 {
+					globals.UCount = 1
+				} else {
+					globals.UCountUnit = intVal
+				}
+			}
 		}
 	}
 }

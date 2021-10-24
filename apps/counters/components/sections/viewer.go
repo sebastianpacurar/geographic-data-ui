@@ -15,7 +15,6 @@ import (
 type View struct{}
 
 func (v *View) Layout(th *material.Theme, gtx C) D {
-
 	size := image.Pt(gtx.Constraints.Max.X, gtx.Constraints.Max.Y)
 	return layout.Stack{
 		Alignment: layout.NW,
@@ -57,20 +56,11 @@ func (v *View) Layout(th *material.Theme, gtx C) D {
 		}),
 
 		layout.Stacked(func(gtx C) D {
-			var mainVal material.LabelStyle
-
+			var label material.LabelStyle
 			if globals.CurrentNum == "signed" {
-				mainVal = material.H3(th, strconv.FormatInt(globals.Count, 10))
+				label = material.H3(th, strconv.FormatInt(globals.Count, 10))
 			} else if globals.CurrentNum == "unsigned" {
-				mainVal = material.H3(th, strconv.FormatUint(globals.UCount, 10))
-			}
-
-			if globals.Count < 0 || globals.UCount < 0 {
-				mainVal.Color = globals.Colours["red"]
-			} else if globals.Count > 0 || globals.UCount > 0 {
-				mainVal.Color = globals.Colours["dark-green"]
-			} else {
-				mainVal.Color = globals.Colours["grey"]
+				label = material.H3(th, strconv.FormatUint(globals.UCount, 10))
 			}
 
 			return layout.Inset{
@@ -79,7 +69,7 @@ func (v *View) Layout(th *material.Theme, gtx C) D {
 				Bottom: unit.Dp(20),
 				Left:   unit.Dp(50),
 			}.Layout(gtx, func(gtx C) D {
-				return mainVal.Layout(gtx)
+				return label.Layout(gtx)
 			})
 		}))
 }

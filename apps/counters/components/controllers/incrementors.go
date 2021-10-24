@@ -20,11 +20,13 @@ type Incrementor struct {
 
 func (c *Incrementor) Layout(th *material.Theme, gtx C) D {
 	currVal := globals.CurrentNum
-	var parsedLabel string
+	var parsedLabel, resetLabel string
 	if currVal == "signed" {
 		parsedLabel = strconv.FormatInt(globals.CountUnit, 10)
+		resetLabel = strconv.FormatInt(globals.ResetVal, 10)
 	} else if currVal == "unsigned" {
 		parsedLabel = strconv.FormatUint(globals.UCountUnit, 10)
+		resetLabel = strconv.FormatUint(globals.UResetVal, 10)
 	}
 
 	return layout.Flex{
@@ -66,7 +68,7 @@ func (c *Incrementor) Layout(th *material.Theme, gtx C) D {
 						// Reset Button
 						layout.Rigid(func(gtx C) D {
 							// if count == reset, disable Reset button
-							if globals.Count == globals.ResetVal || globals.UCount == globals.UResetVal {
+							if isDisabled() {
 								gtx = gtx.Disabled()
 							}
 
@@ -86,7 +88,7 @@ func (c *Incrementor) Layout(th *material.Theme, gtx C) D {
 									LabelColor: globals.Colours["white"],
 									Button:     &c.resetBtn,
 									Icon:       globals.RefreshIcon,
-									Label:      parsedLabel,
+									Label:      resetLabel,
 								}.Layout)
 						}),
 
@@ -110,7 +112,7 @@ func (c *Incrementor) Layout(th *material.Theme, gtx C) D {
 									LabelColor: globals.Colours["black"],
 									Button:     &c.plusBtn,
 									Icon:       globals.PlusIcon,
-									Label:      strconv.FormatInt(globals.CountUnit, 10),
+									Label:      parsedLabel,
 								}.Layout,
 							)
 						}),
@@ -119,4 +121,29 @@ func (c *Incrementor) Layout(th *material.Theme, gtx C) D {
 			)
 		}),
 	)
+}
+
+func isDisabled() bool {
+	res := true
+	switch t := globals.CurrentNum; t {
+	case "signed":
+		if globals.Count != globals.ResetVal {
+			res = false
+		}
+	case "unsigned":
+		if globals.UCount != globals.UResetVal {
+			res = false
+		}
+	}
+	return res
+}
+
+//TODO: implement for int64 boundaries
+func handlePlusBtn() {
+
+}
+
+//TODO: implement mostly for negative values in case of uint64
+func handleMinusBtn() {
+
 }
