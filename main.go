@@ -2,7 +2,6 @@ package main
 
 import (
 	"gioui-experiment/apps/counters"
-	"gioui-experiment/apps/geometry"
 	textEditor "gioui-experiment/apps/text_editor/components"
 	"gioui-experiment/globals"
 	"gioui.org/app"
@@ -30,8 +29,8 @@ type (
 )
 
 const (
-	CachePrimes = 200000
-	CacheFibs   = 200000
+	CachePrimes = 100000
+	CacheFibs   = 100000
 )
 
 var menuBtn = new(widget.Clickable)
@@ -56,7 +55,6 @@ type UI struct {
 	navMenu    Menu
 	menuItem   MenuItem
 	counters   counters.Page
-	geometry   geometry.Geometry
 	textEditor textEditor.TextEditor
 }
 
@@ -94,6 +92,12 @@ func newUI() *UI {
 			name: "Editor",
 			layContent: func(gtx C) D {
 				return ui.textEditor.Layout(ui.theme, gtx)
+			},
+		},
+		MenuItem{
+			name: "Geography",
+			layContent: func(gtx C) D {
+				return D{}
 			},
 		},
 	)
@@ -171,7 +175,7 @@ func (ui *UI) Layout(gtx C) D {
 			// TODO: in progress
 			layout.Rigid(func(gtx C) D {
 				for i, v := range ui.navMenu.items {
-					for range v.btn.Clicks() {
+					if v.btn.Clicked() {
 						ui.navMenu.active = i
 					}
 				}

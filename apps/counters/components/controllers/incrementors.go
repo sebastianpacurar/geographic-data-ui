@@ -53,7 +53,8 @@ func (inc *Incrementor) Layout(th *material.Theme, gtx C) D {
 
 							for range inc.minusBtn.Clicks() {
 								if cv.PEnabled {
-									cv.UCount = cv.PCache[cv.PCurrIndex-1]
+									cv.UCount = cv.PCache[cv.PCurrIndex]
+									cv.PCurrIndex += 1
 								} else if cv.CurrVal == "signed" {
 									cv.Count -= cv.CountUnit
 								} else if cv.CurrVal == "unsigned" {
@@ -108,9 +109,9 @@ func (inc *Incrementor) Layout(th *material.Theme, gtx C) D {
 						layout.Rigid(func(gtx C) D {
 							for range inc.plusBtn.Clicks() {
 								if cv.PEnabled {
-
-								}
-								if cv.CurrVal == "unsigned" {
+									cv.UCount = cv.PCache[cv.PCurrIndex]
+									cv.PCurrIndex += 1
+								} else if cv.CurrVal == "unsigned" {
 									cv.UCount += cv.UCountUnit
 								} else {
 									cv.Count += cv.CountUnit
@@ -153,10 +154,26 @@ func (inc *Incrementor) isDisabled() bool {
 
 //TODO: implement for int64 boundaries
 func handlePlusBtn() {
-
+	if cv.PEnabled {
+		cv.UCount = cv.PCache[cv.PCurrIndex]
+		cv.PCurrIndex += 1
+	} else if cv.FEnabled {
+		//TODO: to be completed for both buttons
+	} else if cv.CurrVal == "signed" {
+		cv.Count += cv.CountUnit
+	} else if cv.CurrVal == "unsigned" {
+		cv.UCount += cv.UCountUnit
+	}
 }
 
 //TODO: implement mostly for negative values in case of uint64
 func handleMinusBtn() {
-
+	if cv.PEnabled {
+		cv.PCurrIndex -= 1
+		cv.UCount = cv.PCache[cv.PCurrIndex]
+	} else if cv.CurrVal == "signed" {
+		cv.Count -= cv.CountUnit
+	} else if cv.CurrVal == "unsigned" {
+		cv.UCount -= cv.UCountUnit
+	}
 }

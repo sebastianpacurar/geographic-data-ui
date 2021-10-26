@@ -5,14 +5,10 @@ import (
 )
 
 type CurrentValues struct {
-	Enabled    bool
-	CurrVal    string
-	Count      int64
-	UCount     uint64
-	CountUnit  int64
-	UCountUnit uint64
-	ResetVal   int64
-	UResetVal  uint64
+	Enabled                       bool
+	CurrVal                       string
+	Count, CountUnit, ResetVal    int64
+	UCount, UCountUnit, UResetVal uint64
 	Wholes
 	Naturals
 	Primes
@@ -28,7 +24,7 @@ type Primes struct {
 type Fibs struct {
 	FEnabled   bool
 	FCurrIndex int
-	FCache     []int64
+	FCache     []uint64
 }
 
 type Wholes struct {
@@ -82,13 +78,12 @@ func (p *Primes) GenPrimes(length int) {
 	}
 }
 
-func (f *Fibs) GetFibByIndex(n uint) int64 {
+func (f *Fibs) GetFibByIndex(n uint64) uint64 {
 	if n <= 1 {
-		return int64(n)
+		return n
 	}
-	var n2, n1 int64 = 0, 1
-
-	for i := uint(2); i < n; i++ {
+	var n2, n1 uint64 = 0, 1
+	for i := uint64(2); i < n; i++ {
 		n2, n1 = n1, n1+n2
 	}
 	return n2 + n1
@@ -97,7 +92,7 @@ func (f *Fibs) GetFibByIndex(n uint) int64 {
 // GenFibs - Generate Fibonacci sequence
 func (f *Fibs) GenFibs(length int) {
 	if len(f.FCache) == 0 {
-		index := uint(0)
+		index := uint64(0)
 		for len(f.FCache) < length {
 			f.FCache = append(f.FCache, f.GetFibByIndex(index))
 			index++
