@@ -13,6 +13,8 @@ import (
 	"unicode/utf8"
 )
 
+var cv = globals.CounterVals
+
 type ValueHandler struct {
 	startVal, unitVal       component.TextField
 	changeStart, changeUnit widget.Clickable
@@ -47,7 +49,7 @@ func (vh *ValueHandler) Layout(th *material.Theme, gtx C) D {
 			btn.Background = globals.Colours["blue"]
 			btn.Color = globals.Colours["white"]
 
-			handleBtnEvents(vh.context, vh.startVal, vh.changeStart)
+			vh.handleBtnEvents(vh.context, vh.startVal, vh.changeStart)
 			return btn.Layout(gtx)
 		}),
 
@@ -75,7 +77,7 @@ func (vh *ValueHandler) Layout(th *material.Theme, gtx C) D {
 			if !isFieldNumeric(vh.unitVal) {
 				gtx = gtx.Disabled()
 			}
-			handleBtnEvents(vh.context, vh.unitVal, vh.changeUnit)
+			vh.handleBtnEvents(vh.context, vh.unitVal, vh.changeUnit)
 			return btn.Layout(gtx)
 		}),
 
@@ -142,17 +144,36 @@ func (vh *ValueHandler) validateTextField(th *material.Theme, e component.TextFi
 	}
 }
 
-func handleBtnEvents(context string, e component.TextField, btn widget.Clickable) {
+func (vh *ValueHandler) handleBtnEvents(context string, e component.TextField, btn widget.Clickable) {
 	switch {
 	case btn.Clicked():
 		inpVal := e.Text()
 		inpVal = strings.TrimSpace(inpVal)
-		intVal, _ := strconv.ParseInt(inpVal, 10, 64)
-		if context == "start" {
-			globals.Count = intVal
-			globals.ResetVal = intVal
-		} else if context == "unit" {
-			globals.CountUnit = intVal
+		switch cv.CurrVal {
+		case "signed":
+			intVal, _ := strconv.ParseInt(inpVal, 10, 64)
+			if context == "start" {
+				cv.Count = intVal
+				cv.ResetVal = intVal
+			} else if context == "unit" {
+				if intVal == 0 {
+					cv.Count = 1
+				} else {
+					cv.CountUnit = intVal
+				}
+			}
+		case "unsigned":
+			intVal, _ := strconv.ParseUint(inpVal, 10, 64)
+			if context == "start" {
+				cv.UCount = intVal
+				cv.UResetVal = intVal
+			} else if context == "unit" {
+				if intVal == 0 {
+					cv.UCount = 1
+				} else {
+					cv.UCountUnit = intVal
+				}
+			}
 		}
 	}
 }

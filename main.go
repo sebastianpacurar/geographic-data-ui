@@ -2,7 +2,6 @@ package main
 
 import (
 	"gioui-experiment/apps/counters"
-	"gioui-experiment/apps/geometry"
 	textEditor "gioui-experiment/apps/text_editor/components"
 	"gioui-experiment/globals"
 	"gioui.org/app"
@@ -29,40 +28,33 @@ type (
 	D = layout.Dimensions
 )
 
-var (
-	menuBtn = new(widget.Clickable)
+const (
+	CachePrimes = 100000
+	CacheFibs   = 100000
 )
+
+var menuBtn = new(widget.Clickable)
 
 func main() {
 	ui := newUI()
-
-	// Starts a goroutine which executes an anonymous function.
-	// Starts the app and initializes the UI.
 	go func() {
 		w := app.NewWindow(
 			app.Title("Gio UI Experiment"),
 			app.Size(unit.Dp(1000), unit.Dp(800)),
 		)
-
-		// if err -> os.Exit(1), quits the goroutine
 		if err := ui.Run(w); err != nil {
 			log.Fatal(err)
 		}
-
-		// 0 is fine so the goroutine continues
 		os.Exit(0)
 	}()
 	app.Main()
 }
 
-// UI holds the entire states of the app.
 type UI struct {
-	theme *material.Theme
-	//topBar     app_layout.TopBar
+	theme      *material.Theme
 	navMenu    Menu
 	menuItem   MenuItem
 	counters   counters.Page
-	geometry   geometry.Geometry
 	textEditor textEditor.TextEditor
 }
 
@@ -80,8 +72,11 @@ type MenuItem struct {
 	layContent func(gtx C) D
 }
 
-// newUI returns a new UI which uses the Go Fonts, and initializes the Text Fields states
 func newUI() *UI {
+	// Cache is empty only when the app starts up
+	globals.CounterVals.GenPrimes(CachePrimes)
+	globals.CounterVals.GenFibs(CacheFibs)
+
 	ui := &UI{
 		theme: material.NewTheme(gofont.Collection()),
 	}
@@ -99,6 +94,12 @@ func newUI() *UI {
 				return ui.textEditor.Layout(ui.theme, gtx)
 			},
 		},
+		MenuItem{
+			name: "Geography",
+			layContent: func(gtx C) D {
+				return D{}
+			},
+		},
 	)
 	ui.textEditor.InitTextFields()
 	ui.counters.Bottom.ValueHandlers.InitTextFields()
@@ -106,19 +107,11 @@ func newUI() *UI {
 	return ui
 }
 
-// Run renders the application and responds to different events.
-// ops are the operations passed to the graphics context (gtx)
-// system.FrameEvent - this is sent when the application receives a re-render event:
-// it sets the context with the operations and the event. this is used to pass
-// around event information.
-// key.NameEscape - returning null means shut down the application.
-// system.DestroyEvent - this is sent when the application closes.
 func (ui *UI) Run(w *app.Window) error {
 	var ops op.Ops
 	for event := range w.Events() {
 		switch event := event.(type) {
 		case system.FrameEvent:
-			// Reset the layout Context for a new frame.
 			gtx := layout.NewContext(&ops, event)
 			ui.Layout(gtx)
 			event.Frame(gtx.Ops)
@@ -134,9 +127,6 @@ func (ui *UI) Run(w *app.Window) error {
 	return nil
 }
 
-// Layout - displays the content of the application.
-// Inset refers to the margins of the components, so there can be
-// a small margin around the entire contents of the app.
 func (ui *UI) Layout(gtx C) D {
 	windowBorder := widget.Border{
 		Color:        globals.Colours["dark-cyan"],
@@ -182,11 +172,11 @@ func (ui *UI) Layout(gtx C) D {
 			}),
 
 			// NAVIGATION MENU SECTION
+			// TODO: in progress
 			layout.Rigid(func(gtx C) D {
-				for i := range ui.navMenu.items {
-					if ui.navMenu.items[i].btn.Clicked() {
+				for i, v := range ui.navMenu.items {
+					if v.btn.Clicked() {
 						ui.navMenu.active = i
-						ui.navMenu.newVal = ui.navMenu.items[i].name
 					}
 				}
 				return layout.Flex{
@@ -219,7 +209,9 @@ func (ui *UI) Layout(gtx C) D {
 									// name = the actual name of the application
 									// stretches the clickable area to fit the X-Axis
 									name := func(gtx C) D {
-										return layout.Flex{Axis: layout.Horizontal}.Layout(gtx,
+										return layout.Flex{
+											Axis: layout.Horizontal,
+										}.Layout(gtx,
 											layout.Flexed(1, func(gtx C) D {
 												return layout.UniformInset(globals.DefaultMargin).Layout(gtx,
 													func(gtx C) D {
