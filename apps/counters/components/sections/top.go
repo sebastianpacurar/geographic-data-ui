@@ -9,22 +9,24 @@ import (
 )
 
 type Top struct {
-	wholeNums   widget.Clickable
-	naturalNums widget.Clickable
-	primeNums   widget.Clickable
+	changeToWhole   widget.Clickable
+	changeToNatural widget.Clickable
+	changeToPrime   widget.Clickable
+	changeToFib     widget.Clickable
 }
 
+var cv = globals.CounterVals
+
 func (t *Top) Layout(th *material.Theme, gtx C) D {
-	if t.naturalNums.Clicked() || t.primeNums.Clicked() {
-		globals.CurrentNum = "unsigned"
-		globals.UCount = 0
-		globals.UCountUnit = 1
-		globals.UResetVal = 0
-	} else if t.wholeNums.Clicked() {
-		globals.CurrentNum = "signed"
-		globals.Count = 0
-		globals.CountUnit = 1
-		globals.ResetVal = 0
+	if t.changeToNatural.Clicked() {
+		cv.CurrVal = "unsigned"
+		cv.PEnabled = false
+	} else if t.changeToWhole.Clicked() {
+		cv.CurrVal = "signed"
+		cv.PEnabled = false
+	} else if t.changeToPrime.Clicked() {
+		cv.CurrVal = "unsigned"
+		cv.PEnabled = true
 	}
 
 	return layout.Flex{
@@ -35,8 +37,8 @@ func (t *Top) Layout(th *material.Theme, gtx C) D {
 				Theme:      th,
 				BgColor:    globals.Colours["deep-sky-blue"],
 				LabelColor: globals.Colours["black"],
-				Button:     &t.wholeNums,
-				Label:      "Whole Numbers",
+				Button:     &t.changeToWhole,
+				Label:      "Z",
 				Icon:       nil,
 			}.Layout(gtx)
 		}),
@@ -48,8 +50,8 @@ func (t *Top) Layout(th *material.Theme, gtx C) D {
 				Theme:      th,
 				BgColor:    globals.Colours["deep-sky-blue"],
 				LabelColor: globals.Colours["black"],
-				Button:     &t.naturalNums,
-				Label:      "Natural Numbers",
+				Button:     &t.changeToNatural,
+				Label:      "N",
 				Icon:       nil,
 			}.Layout(gtx)
 		}),
@@ -61,8 +63,21 @@ func (t *Top) Layout(th *material.Theme, gtx C) D {
 				Theme:      th,
 				BgColor:    globals.Colours["deep-sky-blue"],
 				LabelColor: globals.Colours["black"],
-				Button:     &t.primeNums,
-				Label:      "Prime Numbers",
+				Button:     &t.changeToPrime,
+				Label:      "Primes",
+				Icon:       nil,
+			}.Layout(gtx)
+		}),
+
+		globals.SpacerX,
+
+		layout.Rigid(func(gtx layout.Context) layout.Dimensions {
+			return custom_widgets.LabeledIconBtn{
+				Theme:      th,
+				BgColor:    globals.Colours["deep-sky-blue"],
+				LabelColor: globals.Colours["black"],
+				Button:     &t.changeToFib,
+				Label:      "Fibo",
 				Icon:       nil,
 			}.Layout(gtx)
 		}),

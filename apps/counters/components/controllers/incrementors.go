@@ -14,19 +14,22 @@ type (
 	D = layout.Dimensions
 )
 
+var (
+	parsedLabel string
+	resetLabel  string
+)
+
 type Incrementor struct {
 	plusBtn, minusBtn, resetBtn widget.Clickable
 }
 
-func (c *Incrementor) Layout(th *material.Theme, gtx C) D {
-	currVal := globals.CurrentNum
-	var parsedLabel, resetLabel string
-	if currVal == "signed" {
-		parsedLabel = strconv.FormatInt(globals.CountUnit, 10)
-		resetLabel = strconv.FormatInt(globals.ResetVal, 10)
-	} else if currVal == "unsigned" {
-		parsedLabel = strconv.FormatUint(globals.UCountUnit, 10)
-		resetLabel = strconv.FormatUint(globals.UResetVal, 10)
+func (inc *Incrementor) Layout(th *material.Theme, gtx C) D {
+	if cv.CurrVal == "signed" {
+		parsedLabel = strconv.FormatInt(cv.CountUnit, 10)
+		resetLabel = strconv.FormatInt(cv.ResetVal, 10)
+	} else if cv.CurrVal == "unsigned" {
+		parsedLabel = strconv.FormatUint(cv.UCountUnit, 10)
+		resetLabel = strconv.FormatUint(cv.UResetVal, 10)
 	}
 
 	return layout.Flex{
@@ -43,11 +46,18 @@ func (c *Incrementor) Layout(th *material.Theme, gtx C) D {
 						Spacing: layout.SpaceEvenly,
 					}.Layout(gtx,
 						layout.Rigid(func(gtx C) D {
-							for range c.minusBtn.Clicks() {
-								if currVal == "signed" {
-									globals.Count -= globals.CountUnit
-								} else if currVal == "unsigned" {
-									globals.UCount -= globals.UCountUnit
+
+							if cv.PEnabled && cv.PCurrIndex == 0 {
+								gtx = gtx.Disabled()
+							}
+
+							for range inc.minusBtn.Clicks() {
+								if cv.PEnabled {
+									cv.UCount = cv.PCache[cv.PCurrIndex-1]
+								} else if cv.CurrVal == "signed" {
+									cv.Count -= cv.CountUnit
+								} else if cv.CurrVal == "unsigned" {
+									cv.UCount -= cv.UCountUnit
 								}
 							}
 
@@ -57,7 +67,7 @@ func (c *Incrementor) Layout(th *material.Theme, gtx C) D {
 									Theme:      th,
 									BgColor:    globals.Colours["red"],
 									LabelColor: globals.Colours["white"],
-									Button:     &c.minusBtn,
+									Button:     &inc.minusBtn,
 									Icon:       globals.MinusIcon,
 									Label:      parsedLabel,
 								}.Layout)
@@ -68,15 +78,15 @@ func (c *Incrementor) Layout(th *material.Theme, gtx C) D {
 						// Reset Button
 						layout.Rigid(func(gtx C) D {
 							// if count == reset, disable Reset button
-							if isDisabled() {
+							if inc.isDisabled() {
 								gtx = gtx.Disabled()
 							}
 
-							for range c.resetBtn.Clicks() {
-								if currVal == "unsigned" {
-									globals.UCount = globals.UResetVal
-								} else if currVal == "signed" {
-									globals.Count = globals.ResetVal
+							for range inc.resetBtn.Clicks() {
+								if cv.CurrVal == "unsigned" {
+									cv.UCount = cv.UResetVal
+								} else {
+									cv.Count = cv.ResetVal
 								}
 							}
 
@@ -86,7 +96,7 @@ func (c *Incrementor) Layout(th *material.Theme, gtx C) D {
 									Theme:      th,
 									BgColor:    globals.Colours["blue"],
 									LabelColor: globals.Colours["white"],
-									Button:     &c.resetBtn,
+									Button:     &inc.resetBtn,
 									Icon:       globals.RefreshIcon,
 									Label:      resetLabel,
 								}.Layout)
@@ -96,11 +106,14 @@ func (c *Incrementor) Layout(th *material.Theme, gtx C) D {
 
 						// Plus Button
 						layout.Rigid(func(gtx C) D {
-							for range c.plusBtn.Clicks() {
-								if currVal == "unsigned" {
-									globals.UCount += globals.UCountUnit
-								} else if currVal == "signed" {
-									globals.Count += globals.CountUnit
+							for range inc.plusBtn.Clicks() {
+								if cv.PEnabled {
+
+								}
+								if cv.CurrVal == "unsigned" {
+									cv.UCount += cv.UCountUnit
+								} else {
+									cv.Count += cv.CountUnit
 								}
 							}
 
@@ -110,7 +123,7 @@ func (c *Incrementor) Layout(th *material.Theme, gtx C) D {
 									Theme:      th,
 									BgColor:    globals.Colours["green"],
 									LabelColor: globals.Colours["black"],
-									Button:     &c.plusBtn,
+									Button:     &inc.plusBtn,
 									Icon:       globals.PlusIcon,
 									Label:      parsedLabel,
 								}.Layout,
@@ -123,15 +136,15 @@ func (c *Incrementor) Layout(th *material.Theme, gtx C) D {
 	)
 }
 
-func isDisabled() bool {
+func (inc *Incrementor) isDisabled() bool {
 	res := true
-	switch t := globals.CurrentNum; t {
+	switch cv.CurrVal {
 	case "signed":
-		if globals.Count != globals.ResetVal {
+		if cv.Count != cv.ResetVal {
 			res = false
 		}
 	case "unsigned":
-		if globals.UCount != globals.UResetVal {
+		if cv.UCount != cv.UResetVal {
 			res = false
 		}
 	}

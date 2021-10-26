@@ -1,22 +1,33 @@
 package globals
 
 import (
+	"gioui-experiment/apps/counters/components/utils"
 	"gioui.org/layout"
 	"gioui.org/unit"
 	"gioui.org/widget"
 	"image/color"
-	"math"
 )
 
 var (
-	CM            = int(math.Floor(37.795275591))
-	Count         = int64(0)
-	CountUnit     = int64(1)
-	ResetVal      = int64(0)
-	UCount        = uint64(0)
-	UCountUnit    = uint64(1)
-	UResetVal     = uint64(0)
-	CurrentNum    = "signed"
+	CounterVals = &utils.CurrentValues{
+		Enabled:    true,
+		CurrVal:    "signed",
+		Count:      0,
+		UCount:     0,
+		CountUnit:  1,
+		UCountUnit: 1,
+		ResetVal:   0,
+		UResetVal:  0,
+		Primes: utils.Primes{
+			PEnabled:   false,
+			PCurrIndex: 0,
+		},
+		Fibs: utils.Fibs{
+			FEnabled:   false,
+			FCurrIndex: 0,
+		},
+	}
+
 	MenuWidth     = unit.Dp(225)
 	DefaultMargin = unit.Dp(10)
 	DefaultBorder = widget.Border{

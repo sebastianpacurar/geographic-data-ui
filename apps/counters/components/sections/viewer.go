@@ -35,7 +35,7 @@ func (v *View) Layout(th *material.Theme, gtx C) D {
 					Axis: layout.Horizontal,
 				}.Layout(gtx,
 					layout.Flexed(1, func(gtx C) D {
-						text := material.H6(th, fmt.Sprintf("%s numbers", globals.CurrentNum))
+						text := material.H6(th, fmt.Sprintf("%s numbers", cv.CurrVal))
 						return layout.Inset{
 							Top: unit.Dp(20),
 						}.Layout(gtx, func(gtx C) D {
@@ -57,10 +57,10 @@ func (v *View) Layout(th *material.Theme, gtx C) D {
 
 		layout.Stacked(func(gtx C) D {
 			var label material.LabelStyle
-			if globals.CurrentNum == "signed" {
-				label = material.H3(th, strconv.FormatInt(globals.Count, 10))
-			} else if globals.CurrentNum == "unsigned" {
-				label = material.H3(th, strconv.FormatUint(globals.UCount, 10))
+			if cv.CurrVal == "signed" {
+				label = material.H3(th, strconv.FormatInt(cv.Count, 10))
+			} else {
+				label = material.H3(th, strconv.FormatUint(cv.UCount, 10))
 			}
 
 			return layout.Inset{
