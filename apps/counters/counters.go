@@ -3,7 +3,7 @@ package counters
 import (
 	"gioui-experiment/apps/counters/components/sections"
 	"gioui-experiment/apps/counters/components/utils"
-	"gioui-experiment/globals"
+	g "gioui-experiment/globals"
 	"gioui.org/layout"
 	"gioui.org/widget/material"
 )
@@ -26,7 +26,7 @@ func (p *Page) Layout(th *material.Theme, gtx layout.Context) layout.Dimensions 
 	}.Layout(
 		gtx,
 		layout.Rigid(func(gt C) D {
-			return globals.Inset.Layout(gtx, func(gtx C) D {
+			return g.Inset.Layout(gtx, func(gtx C) D {
 				return p.Top.Layout(th, gtx)
 			})
 		}),
@@ -34,7 +34,7 @@ func (p *Page) Layout(th *material.Theme, gtx layout.Context) layout.Dimensions 
 			return p.View.Layout(th, gtx)
 		}),
 		layout.Rigid(func(gtx C) D {
-			return globals.Inset.Layout(gtx, func(gtx C) D {
+			return g.Inset.Layout(gtx, func(gtx C) D {
 				return p.Bottom.Layout(th, gtx)
 			})
 		}),

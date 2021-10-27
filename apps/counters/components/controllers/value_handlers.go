@@ -2,7 +2,7 @@ package controllers
 
 import (
 	"gioui-experiment/apps/counters/components/utils"
-	"gioui-experiment/globals"
+	g "gioui-experiment/globals"
 	"gioui.org/layout"
 	"gioui.org/text"
 	"gioui.org/unit"
@@ -43,19 +43,19 @@ func (vh *ValueHandler) Layout(th *material.Theme, gtx C) D {
 			}
 			vh.context = "start"
 			btn := material.Button(th, &vh.changeStart, "Start From")
-			btn.Background = globals.Colours["blue"]
-			btn.Color = globals.Colours["white"]
+			btn.Background = g.Colours["blue"]
+			btn.Color = g.Colours["white"]
 
 			vh.handleBtnEvents(vh.context, vh.startVal, vh.changeStart, cv)
 			return btn.Layout(gtx)
 		}),
 
-		globals.SpacerX,
+		g.SpacerX,
 
 		layout.Flexed(1, func(gtx C) D {
 			eStart.TextSize = unit.Sp(18)
-			eStart.HintColor = globals.Colours["dark-slate-grey"]
-			border := globals.DefaultBorder
+			eStart.HintColor = g.Colours["dark-slate-grey"]
+			border := g.DefaultBorder
 			vh.validateTextField(th, vh.startVal, eStart, &border)
 			return border.Layout(gtx, func(gtx C) D {
 				return layout.UniformInset(unit.Dp(8)).Layout(
@@ -65,12 +65,12 @@ func (vh *ValueHandler) Layout(th *material.Theme, gtx C) D {
 			})
 		}),
 
-		globals.SpacerX,
+		g.SpacerX,
 
 		layout.Rigid(func(gtx C) D {
 			vh.context = "unit"
 			btn := material.Button(th, &vh.changeUnit, "Set Unit To")
-			btn.Background = globals.Colours["blue"]
+			btn.Background = g.Colours["blue"]
 			if !isFieldNumeric(vh.unitVal) {
 				gtx = gtx.Disabled()
 			}
@@ -78,12 +78,12 @@ func (vh *ValueHandler) Layout(th *material.Theme, gtx C) D {
 			return btn.Layout(gtx)
 		}),
 
-		globals.SpacerX,
+		g.SpacerX,
 
 		layout.Flexed(1, func(gtx C) D {
 			eUnit.TextSize = unit.Sp(18)
-			eUnit.HintColor = globals.Colours["dark-slate-grey"]
-			border := globals.DefaultBorder
+			eUnit.HintColor = g.Colours["dark-slate-grey"]
+			border := g.DefaultBorder
 			vh.validateTextField(th, vh.unitVal, eUnit, &border)
 			return border.Layout(gtx, func(gtx C) D {
 				return layout.UniformInset(unit.Dp(8)).Layout(
@@ -132,9 +132,9 @@ func (vh *ValueHandler) validateTextField(th *material.Theme, e component.TextFi
 	case e.Len() >= 18:
 		trimInput(e, e.Len()-18)
 	case !isFieldNumeric(e):
-		b.Color = globals.Colours["red"]
+		b.Color = g.Colours["red"]
 		b.Width = unit.Px(5)
-		eStyle.Color = globals.Colours["dark-red"]
+		eStyle.Color = g.Colours["dark-red"]
 	case e.Focused():
 		b.Color = th.Palette.ContrastBg
 		b.Width = unit.Px(3)

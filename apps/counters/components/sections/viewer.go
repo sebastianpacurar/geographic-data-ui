@@ -3,7 +3,7 @@ package sections
 import (
 	"fmt"
 	"gioui-experiment/apps/counters/components/utils"
-	"gioui-experiment/globals"
+	g "gioui-experiment/globals"
 	"gioui.org/f32"
 	"gioui.org/layout"
 	"gioui.org/op/clip"
@@ -23,10 +23,10 @@ func (v *View) Layout(th *material.Theme, gtx C) D {
 	}.Layout(
 		gtx,
 		layout.Expanded(func(gtx C) D {
-			view := globals.ColoredArea(
+			view := g.ColoredArea(
 				gtx,
 				gtx.Constraints.Constrain(size),
-				globals.Colours["antique-white"],
+				g.Colours["antique-white"],
 			)
 			return view
 		}),
