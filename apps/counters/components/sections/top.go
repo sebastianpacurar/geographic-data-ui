@@ -3,7 +3,7 @@ package sections
 import (
 	"gioui-experiment/apps/counters/components/utils"
 	"gioui-experiment/custom_widgets"
-	"gioui-experiment/globals"
+	g "gioui-experiment/globals"
 	"gioui.org/layout"
 	"gioui.org/widget"
 	"gioui.org/widget/material"
@@ -50,47 +50,47 @@ func (t *Top) Layout(th *material.Theme, gtx C) D {
 		layout.Rigid(func(gtx layout.Context) layout.Dimensions {
 			return custom_widgets.LabeledIconBtn{
 				Theme:      th,
-				BgColor:    globals.Colours["deep-sky-blue"],
-				LabelColor: globals.Colours["black"],
+				BgColor:    g.Colours["deep-sky-blue"],
+				LabelColor: g.Colours["black"],
 				Button:     &t.changeToWhole,
 				Label:      "Z",
 				Icon:       nil,
 			}.Layout(gtx)
 		}),
 
-		globals.SpacerX,
+		g.SpacerX,
 
 		layout.Rigid(func(gtx layout.Context) layout.Dimensions {
 			return custom_widgets.LabeledIconBtn{
 				Theme:      th,
-				BgColor:    globals.Colours["deep-sky-blue"],
-				LabelColor: globals.Colours["black"],
+				BgColor:    g.Colours["deep-sky-blue"],
+				LabelColor: g.Colours["black"],
 				Button:     &t.changeToNatural,
 				Label:      "N",
 				Icon:       nil,
 			}.Layout(gtx)
 		}),
 
-		globals.SpacerX,
+		g.SpacerX,
 
 		layout.Rigid(func(gtx layout.Context) layout.Dimensions {
 			return custom_widgets.LabeledIconBtn{
 				Theme:      th,
-				BgColor:    globals.Colours["deep-sky-blue"],
-				LabelColor: globals.Colours["black"],
+				BgColor:    g.Colours["deep-sky-blue"],
+				LabelColor: g.Colours["black"],
 				Button:     &t.changeToPrime,
 				Label:      "Primes",
 				Icon:       nil,
 			}.Layout(gtx)
 		}),
 
-		globals.SpacerX,
+		g.SpacerX,
 
 		layout.Rigid(func(gtx layout.Context) layout.Dimensions {
 			return custom_widgets.LabeledIconBtn{
 				Theme:      th,
-				BgColor:    globals.Colours["deep-sky-blue"],
-				LabelColor: globals.Colours["black"],
+				BgColor:    g.Colours["deep-sky-blue"],
+				LabelColor: g.Colours["black"],
 				Button:     &t.changeToFib,
 				Label:      "Fibo",
 				Icon:       nil,

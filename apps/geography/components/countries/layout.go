@@ -1,7 +1,6 @@
 package countries
 
 import (
-	"fmt"
 	"gioui.org/layout"
 	"gioui.org/widget/material"
 )
@@ -18,6 +17,5 @@ func (d *Display) Layout(th *material.Theme, gtx C) D {
 	for i := range data {
 		data[i] = Data[i].Name.Common
 	}
-	fmt.Println(data)
 	return material.H2(th, data[0]).Layout(gtx)
 }

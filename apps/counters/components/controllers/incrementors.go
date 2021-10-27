@@ -3,7 +3,7 @@ package controllers
 import (
 	"gioui-experiment/apps/counters/components/utils"
 	"gioui-experiment/custom_widgets"
-	"gioui-experiment/globals"
+	g "gioui-experiment/globals"
 	"gioui.org/layout"
 	"gioui.org/widget"
 	"gioui.org/widget/material"
@@ -58,18 +58,18 @@ func (inc *Incrementor) Layout(th *material.Theme, gtx C) D {
 								inc.handleMinusBtn(cv)
 							}
 
-							return globals.Inset.Layout(gtx,
+							return g.Inset.Layout(gtx,
 								custom_widgets.LabeledIconBtn{
 									Theme:      th,
-									BgColor:    globals.Colours["red"],
-									LabelColor: globals.Colours["white"],
+									BgColor:    g.Colours["red"],
+									LabelColor: g.Colours["white"],
 									Button:     &inc.minusBtn,
-									Icon:       globals.MinusIcon,
+									Icon:       g.MinusIcon,
 									Label:      parsedLabel,
 								}.Layout)
 
 						}),
-						globals.SpacerX,
+						g.SpacerX,
 
 						// Reset Button
 						layout.Rigid(func(gtx C) D {
@@ -86,18 +86,18 @@ func (inc *Incrementor) Layout(th *material.Theme, gtx C) D {
 								}
 							}
 
-							return globals.Inset.Layout(gtx,
+							return g.Inset.Layout(gtx,
 								custom_widgets.LabeledIconBtn{
 									Theme:      th,
-									BgColor:    globals.Colours["blue"],
-									LabelColor: globals.Colours["white"],
+									BgColor:    g.Colours["blue"],
+									LabelColor: g.Colours["white"],
 									Button:     &inc.resetBtn,
-									Icon:       globals.RefreshIcon,
+									Icon:       g.RefreshIcon,
 									Label:      resetLabel,
 								}.Layout)
 						}),
 
-						globals.SpacerX,
+						g.SpacerX,
 
 						// Plus Button
 						layout.Rigid(func(gtx C) D {
@@ -105,13 +105,13 @@ func (inc *Incrementor) Layout(th *material.Theme, gtx C) D {
 								inc.handlePlusBtn(cv)
 							}
 
-							return globals.Inset.Layout(gtx,
+							return g.Inset.Layout(gtx,
 								custom_widgets.LabeledIconBtn{
 									Theme:      th,
-									BgColor:    globals.Colours["green"],
-									LabelColor: globals.Colours["black"],
+									BgColor:    g.Colours["green"],
+									LabelColor: g.Colours["black"],
 									Button:     &inc.plusBtn,
-									Icon:       globals.PlusIcon,
+									Icon:       g.PlusIcon,
 									Label:      parsedLabel,
 								}.Layout,
 							)
