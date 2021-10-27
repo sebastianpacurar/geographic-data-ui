@@ -1,6 +1,7 @@
 package sections
 
 import (
+	"gioui-experiment/apps/counters/components/utils"
 	"gioui-experiment/custom_widgets"
 	"gioui-experiment/globals"
 	"gioui.org/layout"
@@ -15,18 +16,32 @@ type Top struct {
 	changeToFib     widget.Clickable
 }
 
-var cv = globals.CounterVals
-
 func (t *Top) Layout(th *material.Theme, gtx C) D {
+	cv := utils.CounterVals
 	if t.changeToNatural.Clicked() {
 		cv.CurrVal = "unsigned"
 		cv.PEnabled = false
+		cv.NEnabled = true
+		cv.FEnabled = false
+		cv.WEnabled = false
 	} else if t.changeToWhole.Clicked() {
 		cv.CurrVal = "signed"
 		cv.PEnabled = false
+		cv.NEnabled = false
+		cv.FEnabled = false
+		cv.WEnabled = true
 	} else if t.changeToPrime.Clicked() {
 		cv.CurrVal = "unsigned"
 		cv.PEnabled = true
+		cv.NEnabled = false
+		cv.FEnabled = false
+		cv.WEnabled = false
+	} else if t.changeToFib.Clicked() {
+		cv.CurrVal = "unsigned"
+		cv.PEnabled = false
+		cv.NEnabled = false
+		cv.FEnabled = true
+		cv.WEnabled = false
 	}
 
 	return layout.Flex{

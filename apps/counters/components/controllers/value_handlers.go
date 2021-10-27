@@ -1,6 +1,7 @@
 package controllers
 
 import (
+	"gioui-experiment/apps/counters/components/utils"
 	"gioui-experiment/globals"
 	"gioui.org/layout"
 	"gioui.org/text"
@@ -13,15 +14,12 @@ import (
 	"unicode/utf8"
 )
 
-var cv = globals.CounterVals
-
 type ValueHandler struct {
 	startVal, unitVal       component.TextField
 	changeStart, changeUnit widget.Clickable
 	context                 string
 }
 
-// InitTextFields - initializes the state for the TextFields
 func (vh *ValueHandler) InitTextFields() {
 	vh.startVal.SingleLine = true
 	vh.unitVal.SingleLine = true
@@ -29,9 +27,8 @@ func (vh *ValueHandler) InitTextFields() {
 	vh.unitVal.Alignment = layout.Alignment(text.Start)
 }
 
-// Layout - displays the Start From button and text input horizontally.
-// The editor is flexed, so it can enlarge/shrink while resizing on the X-Axis.
 func (vh *ValueHandler) Layout(th *material.Theme, gtx C) D {
+	cv := utils.CounterVals
 	eStart := material.Editor(th, &vh.startVal.Editor, "0")
 	eUnit := material.Editor(th, &vh.unitVal.Editor, "1")
 
@@ -49,7 +46,7 @@ func (vh *ValueHandler) Layout(th *material.Theme, gtx C) D {
 			btn.Background = globals.Colours["blue"]
 			btn.Color = globals.Colours["white"]
 
-			vh.handleBtnEvents(vh.context, vh.startVal, vh.changeStart)
+			vh.handleBtnEvents(vh.context, vh.startVal, vh.changeStart, cv)
 			return btn.Layout(gtx)
 		}),
 
@@ -77,7 +74,7 @@ func (vh *ValueHandler) Layout(th *material.Theme, gtx C) D {
 			if !isFieldNumeric(vh.unitVal) {
 				gtx = gtx.Disabled()
 			}
-			vh.handleBtnEvents(vh.context, vh.unitVal, vh.changeUnit)
+			vh.handleBtnEvents(vh.context, vh.unitVal, vh.changeUnit, cv)
 			return btn.Layout(gtx)
 		}),
 
@@ -144,7 +141,9 @@ func (vh *ValueHandler) validateTextField(th *material.Theme, e component.TextFi
 	}
 }
 
-func (vh *ValueHandler) handleBtnEvents(context string, e component.TextField, btn widget.Clickable) {
+//TODO: this will be a total mess for fibs and primes at the same time
+// rethink structure or break it into smaller pieces!!!!!
+func (vh *ValueHandler) handleBtnEvents(context string, e component.TextField, btn widget.Clickable, cv *utils.CurrentValues) {
 	switch {
 	case btn.Clicked():
 		inpVal := e.Text()

@@ -2,6 +2,7 @@ package counters
 
 import (
 	"gioui-experiment/apps/counters/components/sections"
+	"gioui-experiment/apps/counters/components/utils"
 	"gioui-experiment/globals"
 	"gioui.org/layout"
 	"gioui.org/widget/material"
@@ -16,6 +17,7 @@ type Page struct {
 	Top    sections.Top
 	View   sections.View
 	Bottom sections.Bottom
+	utils.CurrentValues
 }
 
 func (p *Page) Layout(th *material.Theme, gtx layout.Context) layout.Dimensions {

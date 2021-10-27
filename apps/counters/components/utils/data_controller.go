@@ -4,6 +4,31 @@ import (
 	"math"
 )
 
+var CounterVals = &CurrentValues{
+	Enabled:    true,
+	CurrVal:    "signed",
+	Count:      0,
+	UCount:     0,
+	CountUnit:  1,
+	UCountUnit: 1,
+	ResetVal:   0,
+	UResetVal:  0,
+	Naturals: Naturals{
+		NEnabled: true,
+	},
+	Wholes: Wholes{
+		WEnabled: false,
+	},
+	Primes: Primes{
+		PEnabled:   false,
+		PCurrIndex: 0,
+	},
+	Fibs: Fibs{
+		FEnabled:   false,
+		FCurrIndex: 0,
+	},
+}
+
 type CurrentValues struct {
 	Enabled                       bool
 	CurrVal                       string

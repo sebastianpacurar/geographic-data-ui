@@ -2,8 +2,10 @@ package main
 
 import (
 	"gioui-experiment/apps/counters"
+	"gioui-experiment/apps/counters/components/utils"
+	"gioui-experiment/apps/geography"
 	textEditor "gioui-experiment/apps/text_editor/components"
-	"gioui-experiment/globals"
+	g "gioui-experiment/globals"
 	"gioui.org/app"
 	"gioui.org/f32"
 	"gioui.org/font/gofont"
@@ -29,11 +31,13 @@ type (
 )
 
 const (
-	CachePrimes = 100000
-	CacheFibs   = 100000
+	CachePrimes = 10000
+	CacheFibs   = 10000
 )
 
-var menuBtn = new(widget.Clickable)
+var (
+	menuBtn = new(widget.Clickable)
+)
 
 func main() {
 	ui := newUI()
@@ -55,6 +59,7 @@ type UI struct {
 	navMenu    Menu
 	menuItem   MenuItem
 	counters   counters.Page
+	geography  geography.Page
 	textEditor textEditor.TextEditor
 }
 
@@ -73,9 +78,9 @@ type MenuItem struct {
 }
 
 func newUI() *UI {
-	// Cache is empty only when the app starts up
-	globals.CounterVals.GenPrimes(CachePrimes)
-	globals.CounterVals.GenFibs(CacheFibs)
+	cv := utils.CounterVals
+	cv.GenPrimes(CachePrimes)
+	cv.GenFibs(CacheFibs)
 
 	ui := &UI{
 		theme: material.NewTheme(gofont.Collection()),
@@ -97,10 +102,16 @@ func newUI() *UI {
 		MenuItem{
 			name: "Geography",
 			layContent: func(gtx C) D {
-				return D{}
+				return ui.geography.Layout(ui.theme, gtx)
 			},
 		},
 	)
+
+	err := ui.geography.Countries.InitCountries()
+	if err != nil {
+		return nil
+	}
+
 	ui.textEditor.InitTextFields()
 	ui.counters.Bottom.ValueHandlers.InitTextFields()
 	ui.navMenu.oldVal = "Counters"
@@ -129,7 +140,7 @@ func (ui *UI) Run(w *app.Window) error {
 
 func (ui *UI) Layout(gtx C) D {
 	windowBorder := widget.Border{
-		Color:        globals.Colours["dark-cyan"],
+		Color:        g.Colours["dark-cyan"],
 		CornerRadius: unit.Dp(0),
 		Width:        unit.Dp(3),
 	}
@@ -147,10 +158,10 @@ func (ui *UI) Layout(gtx C) D {
 				return layout.Stack{}.Layout(gtx,
 					layout.Expanded(func(gtx C) D {
 						size := image.Pt(gtx.Constraints.Max.X, gtx.Constraints.Min.Y+10/2)
-						bar := globals.ColoredArea(
+						bar := g.ColoredArea(
 							gtx,
 							gtx.Constraints.Constrain(size),
-							globals.Colours["dark-cyan"],
+							g.Colours["dark-cyan"],
 						)
 						return bar
 					}),
@@ -160,10 +171,10 @@ func (ui *UI) Layout(gtx C) D {
 							Top:  unit.Dp(5),
 						}.Layout(gtx, func(gtx C) D {
 							btn := component.SimpleIconButton(
-								globals.Colours["dark-cyan"],
-								globals.Colours["white"],
+								g.Colours["dark-cyan"],
+								g.Colours["white"],
 								menuBtn,
-								globals.MenuIcon,
+								g.MenuIcon,
 							)
 							return btn.Layout(gtx)
 						})
@@ -184,7 +195,7 @@ func (ui *UI) Layout(gtx C) D {
 				}.Layout(
 					gtx,
 					layout.Rigid(func(gtx C) D {
-						width := gtx.Px(globals.MenuWidth)
+						width := gtx.Px(g.MenuWidth)
 						containerSize := image.Pt(width, gtx.Constraints.Max.Y)
 						gtx.Constraints = layout.Exact(gtx.Constraints.Constrain(containerSize))
 
@@ -194,10 +205,10 @@ func (ui *UI) Layout(gtx C) D {
 							gtx,
 							layout.Expanded(func(gtx C) D {
 								size := image.Pt(gtx.Constraints.Max.X, gtx.Constraints.Max.Y)
-								bar := globals.ColoredArea(
+								bar := g.ColoredArea(
 									gtx,
 									gtx.Constraints.Constrain(size),
-									globals.Colours["sea-green"],
+									g.Colours["sea-green"],
 								)
 								return bar
 							}),
@@ -213,7 +224,7 @@ func (ui *UI) Layout(gtx C) D {
 											Axis: layout.Horizontal,
 										}.Layout(gtx,
 											layout.Flexed(1, func(gtx C) D {
-												return layout.UniformInset(globals.DefaultMargin).Layout(gtx,
+												return layout.UniformInset(g.DefaultMargin).Layout(gtx,
 													func(gtx C) D {
 														text := material.H6(ui.theme, menuItem.name)
 														if gtx.Queue == nil {
