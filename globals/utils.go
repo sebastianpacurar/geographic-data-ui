@@ -2,7 +2,6 @@ package globals
 
 import "C"
 import (
-	"encoding/json"
 	"gioui.org/layout"
 	"gioui.org/op"
 	"gioui.org/op/clip"
@@ -17,8 +16,6 @@ import (
 	"strings"
 )
 
-// ColoredArea - returns the dimensions of a customizable coloured area
-// args - graphics context, a size for x and y of type int, and a color
 func ColoredArea(gtx layout.Context, size image.Point, color color.NRGBA) layout.Dimensions {
 	defer op.Save(gtx.Ops).Load()
 	clip.Rect{Max: size}.Add(gtx.Ops)
@@ -27,10 +24,6 @@ func ColoredArea(gtx layout.Context, size image.Point, color color.NRGBA) layout
 	return layout.Dimensions{Size: size}
 }
 
-// GetAppsNames - What this does is to return all the folder names from "apps" package
-// In case any of the results from reading the directory using Readdirnames(0) is a file,
-// then do not append it to the apps []string.
-// TODO: will be used with the menu and navigation drawer in the future
 func GetAppsNames() []string {
 	var apps []string
 	file, err := os.Open("apps")
@@ -68,21 +61,21 @@ func GenerateRandomColor() color.NRGBA {
 }
 
 // isInJsonString - checks to see if the provided Input is a JSON string
-func isInJsonString(data []byte) bool {
-	var jsonMessage json.RawMessage
-	err := json.Unmarshal(data, &jsonMessage)
-	if err != nil {
-		return false
-	}
-	return true
-}
-
-// isInJson - checks to see if the provided input is a JSON (interface)
-func isInJson(data []byte) bool {
-	var jsonMessage map[string]interface{}
-	err := json.Unmarshal(data, &jsonMessage)
-	if err != nil {
-		return false
-	}
-	return true
-}
+//func isInJsonString(data []byte) bool {
+//	var jsonMessage json.RawMessage
+//	err := json.Unmarshal(data, &jsonMessage)
+//	if err != nil {
+//		return false
+//	}
+//	return true
+//}
+//
+//// isInJson - checks to see if the provided input is a JSON (interface)
+//func isInJson(data []byte) bool {
+//	var jsonMessage map[string]interface{}
+//	err := json.Unmarshal(data, &jsonMessage)
+//	if err != nil {
+//		return false
+//	}
+//	return true
+//}

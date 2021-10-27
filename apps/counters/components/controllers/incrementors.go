@@ -1,6 +1,7 @@
 package controllers
 
 import (
+	"gioui-experiment/apps/counters/components/utils"
 	"gioui-experiment/custom_widgets"
 	"gioui-experiment/globals"
 	"gioui.org/layout"
@@ -20,10 +21,13 @@ var (
 )
 
 type Incrementor struct {
-	plusBtn, minusBtn, resetBtn widget.Clickable
+	plusBtn  widget.Clickable
+	minusBtn widget.Clickable
+	resetBtn widget.Clickable
 }
 
 func (inc *Incrementor) Layout(th *material.Theme, gtx C) D {
+	cv := utils.CounterVals
 	if cv.CurrVal == "signed" {
 		parsedLabel = strconv.FormatInt(cv.CountUnit, 10)
 		resetLabel = strconv.FormatInt(cv.ResetVal, 10)
@@ -34,8 +38,7 @@ func (inc *Incrementor) Layout(th *material.Theme, gtx C) D {
 
 	return layout.Flex{
 		Axis: layout.Vertical,
-	}.Layout(
-		gtx,
+	}.Layout(gtx,
 		layout.Rigid(func(gtx C) D {
 			return layout.Flex{
 				Axis: layout.Vertical,
@@ -47,23 +50,15 @@ func (inc *Incrementor) Layout(th *material.Theme, gtx C) D {
 					}.Layout(gtx,
 						layout.Rigid(func(gtx C) D {
 
-							if cv.PEnabled && cv.PCurrIndex == 0 {
+							if inc.isMinusBtnDisabled(cv) {
 								gtx = gtx.Disabled()
 							}
 
 							for range inc.minusBtn.Clicks() {
-								if cv.PEnabled {
-									cv.UCount = cv.PCache[cv.PCurrIndex]
-									cv.PCurrIndex += 1
-								} else if cv.CurrVal == "signed" {
-									cv.Count -= cv.CountUnit
-								} else if cv.CurrVal == "unsigned" {
-									cv.UCount -= cv.UCountUnit
-								}
+								inc.handleMinusBtn(cv)
 							}
 
-							return globals.Inset.Layout(
-								gtx,
+							return globals.Inset.Layout(gtx,
 								custom_widgets.LabeledIconBtn{
 									Theme:      th,
 									BgColor:    globals.Colours["red"],
@@ -79,7 +74,7 @@ func (inc *Incrementor) Layout(th *material.Theme, gtx C) D {
 						// Reset Button
 						layout.Rigid(func(gtx C) D {
 							// if count == reset, disable Reset button
-							if inc.isDisabled() {
+							if inc.isResetBtnDisabled(cv) {
 								gtx = gtx.Disabled()
 							}
 
@@ -91,8 +86,7 @@ func (inc *Incrementor) Layout(th *material.Theme, gtx C) D {
 								}
 							}
 
-							return globals.Inset.Layout(
-								gtx,
+							return globals.Inset.Layout(gtx,
 								custom_widgets.LabeledIconBtn{
 									Theme:      th,
 									BgColor:    globals.Colours["blue"],
@@ -108,18 +102,10 @@ func (inc *Incrementor) Layout(th *material.Theme, gtx C) D {
 						// Plus Button
 						layout.Rigid(func(gtx C) D {
 							for range inc.plusBtn.Clicks() {
-								if cv.PEnabled {
-									cv.UCount = cv.PCache[cv.PCurrIndex]
-									cv.PCurrIndex += 1
-								} else if cv.CurrVal == "unsigned" {
-									cv.UCount += cv.UCountUnit
-								} else {
-									cv.Count += cv.CountUnit
-								}
+								inc.handlePlusBtn(cv)
 							}
 
-							return globals.Inset.Layout(
-								gtx,
+							return globals.Inset.Layout(gtx,
 								custom_widgets.LabeledIconBtn{
 									Theme:      th,
 									BgColor:    globals.Colours["green"],
@@ -137,7 +123,7 @@ func (inc *Incrementor) Layout(th *material.Theme, gtx C) D {
 	)
 }
 
-func (inc *Incrementor) isDisabled() bool {
+func (inc Incrementor) isResetBtnDisabled(cv *utils.CurrentValues) bool {
 	res := true
 	switch cv.CurrVal {
 	case "signed":
@@ -152,10 +138,26 @@ func (inc *Incrementor) isDisabled() bool {
 	return res
 }
 
-//TODO: implement for int64 boundaries
-func handlePlusBtn() {
+func (inc Incrementor) isMinusBtnDisabled(cv *utils.CurrentValues) bool {
+	res := false
 	if cv.PEnabled {
-		cv.UCount = cv.PCache[cv.PCurrIndex]
+		diff := cv.UCount - cv.UCountUnit
+		if diff < 0 || cv.PCurrIndex == 0 {
+			res = true
+		}
+	} else if cv.NEnabled {
+		diff := cv.UCount - cv.UCountUnit
+		if diff < 0 || cv.Count == 0 {
+			res = true
+		}
+	}
+	return res
+}
+
+//TODO: implement for int64 boundaries
+func (inc Incrementor) handlePlusBtn(cv *utils.CurrentValues) {
+	if cv.PEnabled {
+		cv.UCount = cv.PCache[cv.PCurrIndex+1]
 		cv.PCurrIndex += 1
 	} else if cv.FEnabled {
 		//TODO: to be completed for both buttons
@@ -167,13 +169,13 @@ func handlePlusBtn() {
 }
 
 //TODO: implement mostly for negative values in case of uint64
-func handleMinusBtn() {
+func (inc Incrementor) handleMinusBtn(cv *utils.CurrentValues) {
 	if cv.PEnabled {
+		cv.UCount = cv.PCache[cv.PCurrIndex-1]
 		cv.PCurrIndex -= 1
-		cv.UCount = cv.PCache[cv.PCurrIndex]
-	} else if cv.CurrVal == "signed" {
+	} else if cv.FEnabled {
+		//TODO: to be completed for both buttons
+	} else if cv.NEnabled || cv.WEnabled {
 		cv.Count -= cv.CountUnit
-	} else if cv.CurrVal == "unsigned" {
-		cv.UCount -= cv.UCountUnit
 	}
 }
