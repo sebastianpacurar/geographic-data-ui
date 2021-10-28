@@ -4,38 +4,32 @@ import (
 	"math"
 )
 
+const (
+	WHOLES   = 0
+	NATURALS = 1
+	PRIMES   = 2
+	FIBS     = 3
+)
+
 var CounterVals = &CurrentValues{
-	Enabled:    true,
-	CurrVal:    "signed",
-	Count:      0,
-	UCount:     0,
-	CountUnit:  1,
-	UCountUnit: 1,
-	ResetVal:   0,
-	UResetVal:  0,
-	Naturals: Naturals{
-		NEnabled: true,
-	},
-	Wholes: Wholes{
-		WEnabled: false,
-	},
-	Primes: Primes{
-		PEnabled:   false,
-		PCurrIndex: 0,
-	},
-	Fibs: Fibs{
-		FEnabled:   false,
-		FCurrIndex: 0,
-	},
+	Enabled: true,
+	// wholes, naturals, primes, fibs in this particular order
+	ActiveNumType: []bool{true, false, false, false},
+	CurrVal:       "signed",
+	Count:         0,
+	UCount:        0,
+	CountUnit:     1,
+	UCountUnit:    1,
+	ResetVal:      0,
+	UResetVal:     0,
 }
 
 type CurrentValues struct {
 	Enabled                       bool
+	ActiveNumType                 []bool
 	CurrVal                       string
 	Count, CountUnit, ResetVal    int64
 	UCount, UCountUnit, UResetVal uint64
-	Wholes
-	Naturals
 	Primes
 	Fibs
 }
@@ -50,14 +44,6 @@ type Fibs struct {
 	FEnabled   bool
 	FCurrIndex int
 	FCache     []uint64
-}
-
-type Wholes struct {
-	WEnabled bool
-}
-
-type Naturals struct {
-	NEnabled bool
 }
 
 func isPrime(n uint64) bool {

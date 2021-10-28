@@ -140,12 +140,12 @@ func (inc Incrementor) isResetBtnDisabled(cv *utils.CurrentValues) bool {
 
 func (inc Incrementor) isMinusBtnDisabled(cv *utils.CurrentValues) bool {
 	res := false
-	if cv.PEnabled {
+	if cv.ActiveNumType[utils.PRIMES] {
 		diff := cv.UCount - cv.UCountUnit
 		if diff < 0 || cv.PCurrIndex == 0 {
 			res = true
 		}
-	} else if cv.NEnabled {
+	} else if cv.ActiveNumType[utils.NATURALS] {
 		diff := cv.UCount - cv.UCountUnit
 		if diff < 0 || cv.Count == 0 {
 			res = true
@@ -156,10 +156,15 @@ func (inc Incrementor) isMinusBtnDisabled(cv *utils.CurrentValues) bool {
 
 //TODO: implement for int64 boundaries
 func (inc Incrementor) handlePlusBtn(cv *utils.CurrentValues) {
-	if cv.PEnabled {
-		cv.UCount = cv.PCache[cv.PCurrIndex+1]
+	if cv.ActiveNumType[utils.PRIMES] {
+		if cv.PCurrIndex == 0 {
+			cv.UCount = cv.PCache[cv.PCurrIndex+1]
+		} else {
+			cv.UCount = cv.PCache[cv.PCurrIndex]
+		}
 		cv.PCurrIndex += 1
-	} else if cv.FEnabled {
+
+	} else if cv.ActiveNumType[utils.FIBS] {
 		//TODO: to be completed for both buttons
 	} else if cv.CurrVal == "signed" {
 		cv.Count += cv.CountUnit
@@ -170,12 +175,12 @@ func (inc Incrementor) handlePlusBtn(cv *utils.CurrentValues) {
 
 //TODO: implement mostly for negative values in case of uint64
 func (inc Incrementor) handleMinusBtn(cv *utils.CurrentValues) {
-	if cv.PEnabled {
+	if cv.ActiveNumType[utils.PRIMES] {
 		cv.UCount = cv.PCache[cv.PCurrIndex-1]
 		cv.PCurrIndex -= 1
-	} else if cv.FEnabled {
+	} else if cv.ActiveNumType[utils.FIBS] {
 		//TODO: to be completed for both buttons
-	} else if cv.NEnabled || cv.WEnabled {
+	} else if cv.ActiveNumType[utils.NATURALS] || cv.ActiveNumType[utils.WHOLES] {
 		cv.Count -= cv.CountUnit
 	}
 }
