@@ -59,9 +59,11 @@ func (v *View) Layout(th *material.Theme, gtx C) D {
 
 		layout.Stacked(func(gtx C) D {
 			var label material.LabelStyle
-			if cv.PEnabled || cv.FEnabled || cv.NEnabled {
+			if cv.ActiveNumType[utils.PRIMES] ||
+				cv.ActiveNumType[utils.FIBS] ||
+				cv.ActiveNumType[utils.NATURALS] {
 				label = material.H3(th, strconv.FormatUint(cv.UCount, 10))
-			} else if cv.WEnabled {
+			} else if cv.ActiveNumType[utils.WHOLES] {
 				label = material.H3(th, strconv.FormatInt(cv.Count, 10))
 			}
 
