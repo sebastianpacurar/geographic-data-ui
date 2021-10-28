@@ -1,12 +1,13 @@
 package controllers
 
 import (
-	"gioui-experiment/apps/counters/components/utils"
+	"gioui-experiment/apps/counters/components/data"
 	"gioui-experiment/custom_widgets"
 	g "gioui-experiment/globals"
 	"gioui.org/layout"
 	"gioui.org/widget"
 	"gioui.org/widget/material"
+	"math"
 	"strconv"
 )
 
@@ -27,14 +28,8 @@ type Incrementor struct {
 }
 
 func (inc *Incrementor) Layout(th *material.Theme, gtx C) D {
-	cv := utils.CounterVals
-	if cv.CurrVal == "signed" {
-		parsedLabel = strconv.FormatInt(cv.CountUnit, 10)
-		resetLabel = strconv.FormatInt(cv.ResetVal, 10)
-	} else if cv.CurrVal == "unsigned" {
-		parsedLabel = strconv.FormatUint(cv.UCountUnit, 10)
-		resetLabel = strconv.FormatUint(cv.UResetVal, 10)
-	}
+	cv := data.CounterVals
+	inc.GetLabels(cv)
 
 	return layout.Flex{
 		Axis: layout.Vertical,
@@ -73,17 +68,12 @@ func (inc *Incrementor) Layout(th *material.Theme, gtx C) D {
 
 						// Reset Button
 						layout.Rigid(func(gtx C) D {
-							// if count == reset, disable Reset button
 							if inc.isResetBtnDisabled(cv) {
 								gtx = gtx.Disabled()
 							}
 
 							for range inc.resetBtn.Clicks() {
-								if cv.CurrVal == "unsigned" {
-									cv.UCount = cv.UResetVal
-								} else {
-									cv.Count = cv.ResetVal
-								}
+								inc.handleResetBtn(cv)
 							}
 
 							return g.Inset.Layout(gtx,
@@ -123,64 +113,96 @@ func (inc *Incrementor) Layout(th *material.Theme, gtx C) D {
 	)
 }
 
-func (inc Incrementor) isResetBtnDisabled(cv *utils.CurrentValues) bool {
-	res := true
-	switch cv.CurrVal {
-	case "signed":
-		if cv.Count != cv.ResetVal {
-			res = false
-		}
-	case "unsigned":
-		if cv.UCount != cv.UResetVal {
-			res = false
-		}
-	}
-	return res
-}
-
-func (inc Incrementor) isMinusBtnDisabled(cv *utils.CurrentValues) bool {
+func (inc Incrementor) isResetBtnDisabled(cv *data.CurrentValues) bool {
 	res := false
-	if cv.ActiveNumType[utils.PRIMES] {
-		diff := cv.UCount - cv.UCountUnit
-		if diff < 0 || cv.PCurrIndex == 0 {
-			res = true
-		}
-	} else if cv.ActiveNumType[utils.NATURALS] {
-		diff := cv.UCount - cv.UCountUnit
-		if diff < 0 || cv.Count == 0 {
-			res = true
-		}
+	switch cv.GetActiveSequence() {
+	case data.PRIMES:
+		res = cv.PCount == cv.PCache[cv.PResetVal]
+	case data.FIBS:
+		res = cv.FCount == cv.FCache[cv.FResetVal]
+	case data.NATURALS:
+		res = cv.NCount == cv.NResetVal
+	case data.WHOLES:
+		res = cv.WCount == cv.WResetVal
 	}
 	return res
 }
 
-//TODO: implement for int64 boundaries
-func (inc Incrementor) handlePlusBtn(cv *utils.CurrentValues) {
-	if cv.ActiveNumType[utils.PRIMES] {
-		if cv.PCurrIndex == 0 {
-			cv.UCount = cv.PCache[cv.PCurrIndex+1]
-		} else {
-			cv.UCount = cv.PCache[cv.PCurrIndex]
-		}
-		cv.PCurrIndex += 1
+func (inc Incrementor) isMinusBtnDisabled(cv *data.CurrentValues) bool {
+	res := false
+	switch cv.GetActiveSequence() {
+	case data.PRIMES:
+		res = cv.PCurrIndex == 0 || (cv.PCount-cv.PCountUnit) < 0
+	case data.FIBS:
+		res = cv.FCurrIndex == 0 || (cv.FCount-cv.FCountUnit) < 0
+	case data.NATURALS:
+		res = cv.NCount == 0 || (cv.NCount-cv.NCountUnit) < 0
+	case data.WHOLES:
+		// don't let Wholes Counter jump from math.MinInt(64) to math.MaxInt(64) due to
+		//  boundary limitations
+		res = cv.WCount == math.MinInt64 || (cv.WCount-cv.WCount) > 0
+	}
+	return res
+}
 
-	} else if cv.ActiveNumType[utils.FIBS] {
-		//TODO: to be completed for both buttons
-	} else if cv.CurrVal == "signed" {
-		cv.Count += cv.CountUnit
-	} else if cv.CurrVal == "unsigned" {
-		cv.UCount += cv.UCountUnit
+func (inc Incrementor) handleResetBtn(cv *data.CurrentValues) {
+	switch cv.GetActiveSequence() {
+	case data.PRIMES:
+		cv.PCurrIndex = int(cv.PResetVal)
+		cv.PCount = cv.PCache[cv.PCurrIndex]
+	case data.FIBS:
+		cv.FCurrIndex = int(cv.FResetVal)
+		cv.FCount = cv.FCache[cv.FCurrIndex]
+	case data.NATURALS:
+		cv.NCount = cv.NResetVal
+	case data.WHOLES:
+		cv.WCount = cv.WResetVal
 	}
 }
 
-//TODO: implement mostly for negative values in case of uint64
-func (inc Incrementor) handleMinusBtn(cv *utils.CurrentValues) {
-	if cv.ActiveNumType[utils.PRIMES] {
-		cv.UCount = cv.PCache[cv.PCurrIndex-1]
-		cv.PCurrIndex -= 1
-	} else if cv.ActiveNumType[utils.FIBS] {
-		//TODO: to be completed for both buttons
-	} else if cv.ActiveNumType[utils.NATURALS] || cv.ActiveNumType[utils.WHOLES] {
-		cv.Count -= cv.CountUnit
+func (inc Incrementor) handlePlusBtn(cv *data.CurrentValues) {
+	switch cv.GetActiveSequence() {
+	case data.PRIMES:
+		cv.PCount = cv.PCache[cv.PCurrIndex+1]
+		cv.PCurrIndex++
+	case data.FIBS:
+		cv.FCount = cv.FCache[cv.FCurrIndex+1]
+		cv.FCurrIndex++
+	case data.NATURALS:
+		cv.NCount += cv.NCountUnit
+	case data.WHOLES:
+		cv.WCount += cv.WCountUnit
+	}
+}
+
+func (inc Incrementor) handleMinusBtn(cv *data.CurrentValues) {
+	switch cv.GetActiveSequence() {
+	case data.PRIMES:
+		cv.PCount = cv.PCache[cv.PCurrIndex-1]
+		cv.PCurrIndex--
+	case data.FIBS:
+		cv.FCount = cv.FCache[cv.FCurrIndex-1]
+		cv.FCurrIndex--
+	case data.NATURALS:
+		cv.NCount -= cv.NCountUnit
+	case data.WHOLES:
+		cv.WCount -= cv.WCountUnit
+	}
+}
+
+func (inc Incrementor) GetLabels(cv *data.CurrentValues) {
+	switch cv.GetActiveSequence() {
+	case data.PRIMES:
+		parsedLabel = strconv.FormatUint(cv.PCountUnit, 10)
+		resetLabel = strconv.FormatUint(cv.PResetVal, 10)
+	case data.FIBS:
+		parsedLabel = strconv.FormatUint(cv.FCountUnit, 10)
+		resetLabel = strconv.FormatUint(cv.FResetVal, 10)
+	case data.NATURALS:
+		parsedLabel = strconv.FormatUint(cv.NCountUnit, 10)
+		resetLabel = strconv.FormatUint(cv.NResetVal, 10)
+	case data.WHOLES:
+		parsedLabel = strconv.FormatInt(cv.WCountUnit, 10)
+		resetLabel = strconv.FormatInt(cv.WResetVal, 10)
 	}
 }

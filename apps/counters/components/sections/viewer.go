@@ -2,7 +2,7 @@ package sections
 
 import (
 	"fmt"
-	"gioui-experiment/apps/counters/components/utils"
+	"gioui-experiment/apps/counters/components/data"
 	g "gioui-experiment/globals"
 	"gioui.org/f32"
 	"gioui.org/layout"
@@ -16,7 +16,7 @@ import (
 type View struct{}
 
 func (v *View) Layout(th *material.Theme, gtx C) D {
-	cv := utils.CounterVals
+	cv := data.CounterVals
 	size := image.Pt(gtx.Constraints.Max.X, gtx.Constraints.Max.Y)
 	return layout.Stack{
 		Alignment: layout.NW,
@@ -37,7 +37,7 @@ func (v *View) Layout(th *material.Theme, gtx C) D {
 					Axis: layout.Horizontal,
 				}.Layout(gtx,
 					layout.Flexed(1, func(gtx C) D {
-						text := material.H6(th, fmt.Sprintf("%s", cv.CurrVal))
+						text := material.H6(th, fmt.Sprintf("%s", cv.GetActiveSequence()))
 						return layout.Inset{
 							Top: unit.Dp(20),
 						}.Layout(gtx, func(gtx C) D {
@@ -58,22 +58,28 @@ func (v *View) Layout(th *material.Theme, gtx C) D {
 		}),
 
 		layout.Stacked(func(gtx C) D {
-			var label material.LabelStyle
-			if cv.ActiveNumType[utils.PRIMES] ||
-				cv.ActiveNumType[utils.FIBS] ||
-				cv.ActiveNumType[utils.NATURALS] {
-				label = material.H3(th, strconv.FormatUint(cv.UCount, 10))
-			} else if cv.ActiveNumType[utils.WHOLES] {
-				label = material.H3(th, strconv.FormatInt(cv.Count, 10))
-			}
-
 			return layout.Inset{
 				Top:    unit.Dp(80),
 				Right:  unit.Dp(50),
 				Bottom: unit.Dp(20),
 				Left:   unit.Dp(50),
 			}.Layout(gtx, func(gtx C) D {
-				return label.Layout(gtx)
+				return v.ParseCount(th, cv).Layout(gtx)
 			})
 		}))
+}
+
+func (v View) ParseCount(th *material.Theme, cv *data.CurrentValues) material.LabelStyle {
+	var res string
+	switch cv.GetActiveSequence() {
+	case data.PRIMES:
+		res = strconv.FormatUint(cv.PCount, 10)
+	case data.FIBS:
+		res = strconv.FormatUint(cv.FCount, 10)
+	case data.NATURALS:
+		res = strconv.FormatUint(cv.NCount, 10)
+	case data.WHOLES:
+		res = strconv.FormatInt(cv.WCount, 10)
+	}
+	return material.H5(th, res)
 }
