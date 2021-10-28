@@ -1,7 +1,7 @@
 package controllers
 
 import (
-	"gioui-experiment/apps/counters/components/utils"
+	"gioui-experiment/apps/counters/components/data"
 	g "gioui-experiment/globals"
 	"gioui.org/layout"
 	"gioui.org/text"
@@ -17,7 +17,6 @@ import (
 type ValueHandler struct {
 	startVal, unitVal       component.TextField
 	changeStart, changeUnit widget.Clickable
-	context                 string
 }
 
 func (vh *ValueHandler) InitTextFields() {
@@ -28,7 +27,7 @@ func (vh *ValueHandler) InitTextFields() {
 }
 
 func (vh *ValueHandler) Layout(th *material.Theme, gtx C) D {
-	cv := utils.CounterVals
+	cv := data.CounterVals
 	eStart := material.Editor(th, &vh.startVal.Editor, "0")
 	eUnit := material.Editor(th, &vh.unitVal.Editor, "1")
 
@@ -41,12 +40,12 @@ func (vh *ValueHandler) Layout(th *material.Theme, gtx C) D {
 			if !isFieldNumeric(vh.startVal) {
 				gtx = gtx.Disabled()
 			}
-			vh.context = "start"
 			btn := material.Button(th, &vh.changeStart, "Start From")
 			btn.Background = g.Colours["blue"]
 			btn.Color = g.Colours["white"]
-
-			vh.handleBtnEvents(vh.context, vh.startVal, vh.changeStart, cv)
+			for range vh.changeStart.Clicks() {
+				vh.handleStartBtn(vh.startVal, cv)
+			}
 			return btn.Layout(gtx)
 		}),
 
@@ -68,13 +67,15 @@ func (vh *ValueHandler) Layout(th *material.Theme, gtx C) D {
 		g.SpacerX,
 
 		layout.Rigid(func(gtx C) D {
-			vh.context = "unit"
 			btn := material.Button(th, &vh.changeUnit, "Set Unit To")
 			btn.Background = g.Colours["blue"]
 			if !isFieldNumeric(vh.unitVal) {
 				gtx = gtx.Disabled()
 			}
-			vh.handleBtnEvents(vh.context, vh.unitVal, vh.changeUnit, cv)
+
+			for range vh.changeUnit.Clicks() {
+				vh.handleUnitBtn(vh.unitVal, cv)
+			}
 			return btn.Layout(gtx)
 		}),
 
@@ -141,38 +142,42 @@ func (vh *ValueHandler) validateTextField(th *material.Theme, e component.TextFi
 	}
 }
 
-//TODO: this will be a total mess for fibs and primes at the same time
-// rethink structure or break it into smaller pieces!!!!!
-func (vh *ValueHandler) handleBtnEvents(context string, e component.TextField, btn widget.Clickable, cv *utils.CurrentValues) {
-	switch {
-	case btn.Clicked():
-		inpVal := e.Text()
-		inpVal = strings.TrimSpace(inpVal)
-		switch cv.CurrVal {
-		case "signed":
-			intVal, _ := strconv.ParseInt(inpVal, 10, 64)
-			if context == "start" {
-				cv.Count = intVal
-				cv.ResetVal = intVal
-			} else if context == "unit" {
-				if intVal == 0 {
-					cv.Count = 1
-				} else {
-					cv.CountUnit = intVal
-				}
-			}
-		case "unsigned":
-			intVal, _ := strconv.ParseUint(inpVal, 10, 64)
-			if context == "start" {
-				cv.UCount = intVal
-				cv.UResetVal = intVal
-			} else if context == "unit" {
-				if intVal == 0 {
-					cv.UCount = 1
-				} else {
-					cv.UCountUnit = intVal
-				}
-			}
-		}
+func (vh *ValueHandler) handleStartBtn(e component.TextField, cv *data.CurrentValues) {
+	val := strings.TrimSpace(e.Text())
+	switch cv.GetActiveSequence() {
+	case data.PRIMES:
+		numVal, _ := strconv.ParseUint(val, 10, 64)
+		cv.PCurrIndex = int(numVal)
+		cv.PCount = cv.PCache[cv.PCurrIndex]
+	case data.FIBS:
+		numVal, _ := strconv.ParseUint(val, 10, 64)
+		cv.FCurrIndex = int(numVal)
+		cv.FCount = cv.FCache[cv.FCurrIndex]
+	case data.NATURALS:
+		numVal, _ := strconv.ParseUint(val, 10, 64)
+		cv.NCount = numVal
+	case data.WHOLES:
+		numVal, _ := strconv.ParseInt(val, 10, 64)
+		cv.WCount = numVal
+	}
+}
+
+func (vh *ValueHandler) handleUnitBtn(e component.TextField, cv *data.CurrentValues) {
+	val := strings.TrimSpace(e.Text())
+	switch cv.GetActiveSequence() {
+	case data.PRIMES:
+		numVal, _ := strconv.ParseUint(val, 10, 64)
+		cv.PCurrIndex = int(numVal)
+		cv.PCount = cv.PCache[cv.PCurrIndex]
+	case data.FIBS:
+		numVal, _ := strconv.ParseUint(val, 10, 64)
+		cv.FCurrIndex = int(numVal)
+		cv.FCount = cv.FCache[cv.FCurrIndex]
+	case data.NATURALS:
+		numVal, _ := strconv.ParseUint(val, 10, 64)
+		cv.NCount = numVal
+	case data.WHOLES:
+		numVal, _ := strconv.ParseInt(val, 10, 64)
+		cv.WCount = numVal
 	}
 }

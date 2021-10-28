@@ -2,7 +2,7 @@ package main
 
 import (
 	"gioui-experiment/apps/counters"
-	"gioui-experiment/apps/counters/components/utils"
+	"gioui-experiment/apps/counters/components/data"
 	"gioui-experiment/apps/geography"
 	textEditor "gioui-experiment/apps/text_editor/components"
 	g "gioui-experiment/globals"
@@ -31,8 +31,8 @@ type (
 )
 
 const (
-	CachePrimes = 10000
-	CacheFibs   = 10000
+	CachePrimes = 100000
+	CacheFibs   = 100000
 )
 
 var (
@@ -78,7 +78,7 @@ type MenuItem struct {
 }
 
 func newUI() *UI {
-	cv := utils.CounterVals
+	cv := data.CounterVals
 	cv.GenPrimes(CachePrimes)
 	cv.GenFibs(CacheFibs)
 
