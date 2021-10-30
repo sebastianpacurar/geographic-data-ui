@@ -5,65 +5,49 @@ import (
 )
 
 const (
+	PLIMIT = 50
+	FLIMIT = 50
+
+	ONE = 1
+
 	WHOLES   = "wholes"
 	NATURALS = "naturals"
 	PRIMES   = "primes"
 	FIBS     = "fibs"
 )
 
-type CurrentValues struct {
-	Enabled        bool
-	ActiveSequence map[string]bool
-	Primes
-	Fibs
-	Naturals
-	Wholes
-}
+type (
+	CurrentValues struct {
+		Enabled bool
+		Generator
+	}
 
-type Primes struct {
-	PCount     uint64
-	PCountUnit uint64
-	PResetVal  uint64
-	PCurrIndex int
-	PCache     []uint64
-}
-
-type Fibs struct {
-	FCount     uint64
-	FCountUnit uint64
-	FResetVal  uint64
-	FCurrIndex int
-	FCache     []uint64
-}
-
-type Naturals struct {
-	NCount     uint64
-	NCountUnit uint64
-	NResetVal  uint64
-}
-
-type Wholes struct {
-	WCount     int64
-	WCountUnit int64
-	WResetVal  int64
-}
+	Generator struct {
+		ActiveSeq map[string]bool
+		Displayed uint64
+		Index     int
+		Cache     map[string][]uint64
+		Step      uint64
+		Start     uint64
+	}
+)
 
 func (cv CurrentValues) GetActiveSequence() string {
 	var activeSeq string
-	for k := range CounterVals.ActiveSequence {
-		if CounterVals.ActiveSequence[k] {
+	for k := range CounterVals.ActiveSeq {
+		if CounterVals.ActiveSeq[k] {
 			activeSeq = k
 		}
 	}
 	return activeSeq
 }
 
-func (cv CurrentValues) SetActiveSequence(active string) {
-	for k := range CounterVals.ActiveSequence {
+func (cv *CurrentValues) SetActiveSequence(active string) {
+	for k := range CounterVals.ActiveSeq {
 		if k == active {
-			CounterVals.ActiveSequence[k] = true
+			CounterVals.ActiveSeq[k] = true
 		} else {
-			CounterVals.ActiveSequence[k] = false
+			CounterVals.ActiveSeq[k] = false
 		}
 	}
 }
@@ -72,7 +56,6 @@ func isPrime(n uint64) bool {
 	if (n%2 == 0 && n != 2) || (n%3 == 0 && n != 3) || (n%5 == 0 && n != 5) {
 		return false
 	}
-
 	sqRoot := uint64(math.Sqrt(float64(n)))
 	for i := uint64(2); i <= sqRoot; i++ {
 		if n%i == 0 {
@@ -83,14 +66,19 @@ func isPrime(n uint64) bool {
 }
 
 // GenPrimes - Generate Prime sequence
-func (p *Primes) GenPrimes(length int) {
-	if len(p.PCache) == 0 {
-		num := uint64(2)
-		for len(p.PCache) < length {
+func (g *Generator) GenPrimes(length int) {
+	if len(g.Cache[PRIMES]) == 0 {
+		g.Cache[PRIMES] = make([]uint64, length)
+		g.Cache[PRIMES][0] = 2
+		num := uint64(3)
+		i := 1
+
+		for i < length {
 			if isPrime(num) {
-				p.PCache = append(p.PCache, num)
+				g.Cache[PRIMES][i] = num
+				i++
 			}
-			num++
+			num += 2
 		}
 	}
 
@@ -112,7 +100,7 @@ func (p *Primes) GenPrimes(length int) {
 	//}
 }
 
-func (f *Fibs) GetFibByIndex(n uint64) uint64 {
+func (g *Generator) GetFibByIndex(n uint64) uint64 {
 	if n <= 1 {
 		return n
 	}
@@ -124,11 +112,12 @@ func (f *Fibs) GetFibByIndex(n uint64) uint64 {
 }
 
 // GenFibs - Generate Fibonacci sequence
-func (f *Fibs) GenFibs(length int) {
-	if len(f.FCache) == 0 {
+func (g *Generator) GenFibs(length int) {
+	if len(g.Cache[FIBS]) == 0 {
+		g.Cache[FIBS] = make([]uint64, length)
 		index := uint64(0)
-		for len(f.FCache) < length {
-			f.FCache = append(f.FCache, f.GetFibByIndex(index))
+		for i := range g.Cache[FIBS] {
+			g.Cache[FIBS][i] = g.GetFibByIndex(index)
 			index++
 		}
 	}
@@ -136,30 +125,16 @@ func (f *Fibs) GenFibs(length int) {
 
 var CounterVals = &CurrentValues{
 	Enabled: true,
-	ActiveSequence: map[string]bool{
-		WHOLES:   true,
-		NATURALS: false,
-		PRIMES:   false,
-		FIBS:     false,
-	},
-	Primes: Primes{
-		PCount:     uint64(2),
-		PCountUnit: uint64(1),
-		PResetVal:  uint64(0),
-	},
-	Fibs: Fibs{
-		FCount:     uint64(0),
-		FCountUnit: uint64(1),
-		FResetVal:  uint64(0),
-	},
-	Naturals: Naturals{
-		NCount:     uint64(0),
-		NCountUnit: uint64(1),
-		NResetVal:  uint64(0),
-	},
-	Wholes: Wholes{
-		WCount:     int64(0),
-		WCountUnit: int64(1),
-		WResetVal:  int64(0),
+	Generator: Generator{
+		Displayed: ONE,
+		Step:      ONE,
+		Start:     ONE,
+		ActiveSeq: map[string]bool{
+			WHOLES:   true,
+			NATURALS: false,
+			PRIMES:   false,
+			FIBS:     false,
+		},
+		Cache: make(map[string][]uint64),
 	},
 }

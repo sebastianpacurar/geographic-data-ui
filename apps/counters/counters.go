@@ -10,13 +10,13 @@ import (
 type (
 	C = layout.Context
 	D = layout.Dimensions
-)
 
-type Page struct {
-	Top    sections.Top
-	View   sections.View
-	Bottom sections.Bottom
-}
+	Page struct {
+		Top    sections.Top
+		View   sections.View
+		Bottom sections.Bottom
+	}
+)
 
 func (p *Page) Layout(th *material.Theme, gtx layout.Context) layout.Dimensions {
 	return layout.Flex{

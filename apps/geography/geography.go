@@ -10,12 +10,12 @@ import (
 type (
 	C = layout.Context
 	D = layout.Dimensions
-)
 
-type Page struct {
-	display   countries.Display
-	Countries countries.Countries
-}
+	Page struct {
+		display   countries.Display
+		Countries countries.Countries
+	}
+)
 
 func (p *Page) Layout(th *material.Theme, gtx C) D {
 	return layout.Flex{

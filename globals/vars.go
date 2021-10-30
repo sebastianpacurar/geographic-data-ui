@@ -3,19 +3,14 @@ package globals
 import (
 	"gioui.org/layout"
 	"gioui.org/unit"
-	"gioui.org/widget"
 	"image/color"
 )
 
 var (
-	MenuWidth     = unit.Dp(225)
-	DefaultMargin = unit.Dp(10)
-	DefaultBorder = widget.Border{
-		Color:        Colours["grey"],
-		CornerRadius: unit.Dp(3),
-		Width:        unit.Px(2),
-	}
-	Colours = map[string]color.NRGBA{
+	MenuWidth         = unit.Dp(225)
+	CountersMenuWidth = unit.Dp(250)
+	DefaultMargin     = unit.Dp(10)
+	Colours           = map[string]color.NRGBA{
 		"red":             {R: 255, A: 255},
 		"dark-red":        {R: 139, A: 255},
 		"blue":            {B: 255, A: 255},
@@ -29,6 +24,7 @@ var (
 		"white":           {R: 255, G: 255, B: 255, A: 255},
 		"black":           {A: 255},
 		"antique-white":   {R: 250, G: 235, B: 215, A: 255},
+		"aero-blue":       {R: 201, G: 255, B: 229, A: 255},
 	}
 	Inset   = layout.UniformInset(DefaultMargin)
 	SpacerX = layout.Rigid(
