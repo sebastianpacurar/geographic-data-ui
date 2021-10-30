@@ -9,13 +9,15 @@ import (
 type (
 	C = layout.Context
 	D = layout.Dimensions
+
+	Bottom struct {
+		ValueHandlers controllers.ValueHandler
+		Incrementor   controllers.Incrementor
+	}
 )
 
-type Bottom struct {
-	ValueHandlers controllers.ValueHandler
-	Incrementor   controllers.Incrementor
-}
-
+// TODO
+// Will probably give up on the Bottom section to give more room for displaying huge and multiple data at the same time
 func (b *Bottom) Layout(th *material.Theme, gtx C) D {
 	return layout.Flex{
 		Axis:      layout.Horizontal,

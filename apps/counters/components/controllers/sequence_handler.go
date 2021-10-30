@@ -10,10 +10,10 @@ import (
 )
 
 type SequenceHandler struct {
-	changeToWhole   widget.Clickable
-	changeToNatural widget.Clickable
-	changeToPrime   widget.Clickable
-	changeToFib     widget.Clickable
+	toWhole   widget.Clickable
+	toNatural widget.Clickable
+	toPrime   widget.Clickable
+	toFib     widget.Clickable
 }
 
 func (sh *SequenceHandler) Layout(th *material.Theme, gtx C) D {
@@ -22,14 +22,14 @@ func (sh *SequenceHandler) Layout(th *material.Theme, gtx C) D {
 		Axis: layout.Horizontal,
 	}.Layout(gtx,
 		layout.Rigid(func(gtx layout.Context) layout.Dimensions {
-			for range sh.changeToWhole.Clicks() {
+			for range sh.toWhole.Clicks() {
 				sh.handleSequenceType(cv, data.WHOLES)
 			}
 			return custom_widgets.LabeledIconBtn{
 				Theme:      th,
 				BgColor:    g.Colours["deep-sky-blue"],
 				LabelColor: g.Colours["black"],
-				Button:     &sh.changeToWhole,
+				Button:     &sh.toWhole,
 				Label:      "Z",
 				Icon:       nil,
 			}.Layout(gtx)
@@ -38,14 +38,14 @@ func (sh *SequenceHandler) Layout(th *material.Theme, gtx C) D {
 		g.SpacerX,
 
 		layout.Rigid(func(gtx layout.Context) layout.Dimensions {
-			for range sh.changeToNatural.Clicks() {
+			for range sh.toNatural.Clicks() {
 				sh.handleSequenceType(cv, data.NATURALS)
 			}
 			return custom_widgets.LabeledIconBtn{
 				Theme:      th,
 				BgColor:    g.Colours["deep-sky-blue"],
 				LabelColor: g.Colours["black"],
-				Button:     &sh.changeToNatural,
+				Button:     &sh.toNatural,
 				Label:      "N",
 				Icon:       nil,
 			}.Layout(gtx)
@@ -54,14 +54,14 @@ func (sh *SequenceHandler) Layout(th *material.Theme, gtx C) D {
 		g.SpacerX,
 
 		layout.Rigid(func(gtx layout.Context) layout.Dimensions {
-			for range sh.changeToPrime.Clicks() {
+			for range sh.toPrime.Clicks() {
 				sh.handleSequenceType(cv, data.PRIMES)
 			}
 			return custom_widgets.LabeledIconBtn{
 				Theme:      th,
 				BgColor:    g.Colours["deep-sky-blue"],
 				LabelColor: g.Colours["black"],
-				Button:     &sh.changeToPrime,
+				Button:     &sh.toPrime,
 				Label:      "Primes",
 				Icon:       nil,
 			}.Layout(gtx)
@@ -70,14 +70,14 @@ func (sh *SequenceHandler) Layout(th *material.Theme, gtx C) D {
 		g.SpacerX,
 
 		layout.Rigid(func(gtx layout.Context) layout.Dimensions {
-			for range sh.changeToFib.Clicks() {
+			for range sh.toFib.Clicks() {
 				sh.handleSequenceType(cv, data.FIBS)
 			}
 			return custom_widgets.LabeledIconBtn{
 				Theme:      th,
 				BgColor:    g.Colours["deep-sky-blue"],
 				LabelColor: g.Colours["black"],
-				Button:     &sh.changeToFib,
+				Button:     &sh.toFib,
 				Label:      "Fibs",
 				Icon:       nil,
 			}.Layout(gtx)
@@ -85,26 +85,15 @@ func (sh *SequenceHandler) Layout(th *material.Theme, gtx C) D {
 	)
 }
 
-func (sh SequenceHandler) handleSequenceType(cv *data.CurrentValues, target string) {
+func (sh *SequenceHandler) handleSequenceType(cv *data.CurrentValues, target string) {
+	cv.Index = 0
+	cv.Step = 1
+	cv.Start = 1
 	switch target {
-	case data.PRIMES:
-		cv.PCurrIndex = 0
-		cv.PCount = cv.PCache[cv.PCurrIndex]
-		cv.PCountUnit = 1
-		cv.PResetVal = 0
-	case data.FIBS:
-		cv.FCurrIndex = 0
-		cv.FCount = cv.FCache[cv.FCurrIndex]
-		cv.PCountUnit = 1
-		cv.FResetVal = 0
-	case data.NATURALS:
-		cv.NCount = 0
-		cv.NCountUnit = 1
-		cv.FResetVal = 0
-	case data.WHOLES:
-		cv.WCount = 0
-		cv.WCountUnit = 1
-		cv.FResetVal = 0
+	case data.PRIMES, data.FIBS:
+		cv.Displayed = cv.Cache[target][cv.Index]
+	default:
+		cv.Displayed = 1
 	}
 	cv.SetActiveSequence(target)
 }

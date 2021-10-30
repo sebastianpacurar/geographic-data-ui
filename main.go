@@ -30,11 +30,6 @@ type (
 	D = layout.Dimensions
 )
 
-const (
-	CachePrimes = 100000
-	CacheFibs   = 100000
-)
-
 var (
 	menuBtn = new(widget.Clickable)
 )
@@ -79,8 +74,8 @@ type MenuItem struct {
 
 func newUI() *UI {
 	cv := data.CounterVals
-	cv.GenPrimes(CachePrimes)
-	cv.GenFibs(CacheFibs)
+	cv.GenPrimes(data.PLIMIT)
+	cv.GenFibs(data.FLIMIT)
 
 	ui := &UI{
 		theme: material.NewTheme(gofont.Collection()),
@@ -113,8 +108,6 @@ func newUI() *UI {
 	}
 
 	ui.textEditor.InitTextFields()
-	ui.counters.Bottom.ValueHandlers.InitTextFields()
-	ui.navMenu.oldVal = "Counters"
 	return ui
 }
 
@@ -227,12 +220,10 @@ func (ui *UI) Layout(gtx C) D {
 												return layout.UniformInset(g.DefaultMargin).Layout(gtx,
 													func(gtx C) D {
 														text := material.H6(ui.theme, menuItem.name)
-														if gtx.Queue == nil {
-															text.Color.A = 150
-														}
 														return layout.Center.Layout(gtx, text.Layout)
 													})
-											}))
+											}),
+										)
 									}
 
 									// if it's not the current app, then create a clickable area on the whole X-Axis
