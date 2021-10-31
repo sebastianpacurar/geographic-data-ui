@@ -52,7 +52,7 @@ func (vh *ValueHandler) Layout(th *material.Theme, gtx C) D {
 		layout.Flexed(1, func(gtx C) D {
 			return g.Inset.Layout(gtx, func(C) D {
 				vh.handleSkipToggle(cv)
-				return material.Switch(th, &vh.startFrom.toggle).Layout(gtx)
+				return material.CheckBox(th, &vh.startFrom.toggle, "").Layout(gtx)
 			})
 		}),
 
@@ -67,7 +67,7 @@ func (vh *ValueHandler) Layout(th *material.Theme, gtx C) D {
 		layout.Flexed(1, func(gtx C) D {
 			return g.Inset.Layout(gtx, func(C) D {
 				vh.handleStartToggle(cv)
-				return material.Switch(th, &vh.skipBy.toggle).Layout(gtx)
+				return material.CheckBox(th, &vh.skipBy.toggle, "").Layout(gtx)
 			})
 		}),
 	)

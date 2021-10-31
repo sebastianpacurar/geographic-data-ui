@@ -5,6 +5,7 @@ import (
 	"gioui-experiment/apps/counters/components/data"
 	"gioui-experiment/apps/geography"
 	textEditor "gioui-experiment/apps/text_editor/components"
+	colour "gioui-experiment/custom_themes/colors"
 	g "gioui-experiment/globals"
 	"gioui.org/app"
 	"gioui.org/f32"
@@ -133,7 +134,7 @@ func (ui *UI) Run(w *app.Window) error {
 
 func (ui *UI) Layout(gtx C) D {
 	windowBorder := widget.Border{
-		Color:        g.Colours["dark-cyan"],
+		Color:        g.Colours[colour.DARK_CYAN],
 		CornerRadius: unit.Dp(0),
 		Width:        unit.Dp(3),
 	}
@@ -154,7 +155,7 @@ func (ui *UI) Layout(gtx C) D {
 						bar := g.ColoredArea(
 							gtx,
 							gtx.Constraints.Constrain(size),
-							g.Colours["dark-cyan"],
+							g.Colours[colour.DARK_CYAN],
 						)
 						return bar
 					}),
@@ -164,8 +165,8 @@ func (ui *UI) Layout(gtx C) D {
 							Top:  unit.Dp(5),
 						}.Layout(gtx, func(gtx C) D {
 							btn := component.SimpleIconButton(
-								g.Colours["dark-cyan"],
-								g.Colours["white"],
+								g.Colours[colour.DARK_CYAN],
+								g.Colours[colour.WHITE],
 								menuBtn,
 								g.MenuIcon,
 							)
@@ -181,8 +182,10 @@ func (ui *UI) Layout(gtx C) D {
 				for i, v := range ui.navMenu.items {
 					if v.btn.Clicked() {
 						ui.navMenu.active = i
+						break
 					}
 				}
+				activeApp = &ui.navMenu.items[ui.navMenu.active]
 				return layout.Flex{
 					Axis: layout.Horizontal,
 				}.Layout(
@@ -201,7 +204,7 @@ func (ui *UI) Layout(gtx C) D {
 								bar := g.ColoredArea(
 									gtx,
 									gtx.Constraints.Constrain(size),
-									g.Colours["sea-green"],
+									g.Colours[colour.SEA_GREEN],
 								)
 								return bar
 							}),
@@ -228,9 +231,7 @@ func (ui *UI) Layout(gtx C) D {
 
 									// if it's not the current app, then create a clickable area on the whole X-Axis
 									if id != ui.navMenu.active {
-										return material.Clickable(gtx, &menuItem.btn, func(gtx C) D {
-											return name(gtx)
-										})
+										return material.Clickable(gtx, &menuItem.btn, name)
 									}
 
 									// lay out the selected item in a grey-ish background

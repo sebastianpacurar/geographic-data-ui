@@ -12,9 +12,8 @@ type (
 	D = layout.Dimensions
 
 	Page struct {
-		Top    sections.Top
-		View   sections.View
-		Bottom sections.Bottom
+		Top  sections.Top
+		View sections.View
 	}
 )
 
@@ -30,11 +29,6 @@ func (p *Page) Layout(th *material.Theme, gtx layout.Context) layout.Dimensions 
 		}),
 		layout.Flexed(1, func(gtx C) D {
 			return p.View.Layout(th, gtx)
-		}),
-		layout.Rigid(func(gtx C) D {
-			return g.Inset.Layout(gtx, func(gtx C) D {
-				return p.Bottom.Layout(th, gtx)
-			})
 		}),
 	)
 }

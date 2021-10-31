@@ -1,9 +1,9 @@
 package sections
 
 import (
-	"fmt"
 	"gioui-experiment/apps/counters/components/controllers"
 	"gioui-experiment/apps/counters/components/data"
+	"gioui-experiment/custom_themes/colors"
 	g "gioui-experiment/globals"
 	"gioui.org/f32"
 	"gioui.org/layout"
@@ -17,6 +17,7 @@ import (
 type View struct {
 	inc controllers.Incrementor
 	sd  controllers.StatsData
+	vh  controllers.ValueHandler
 }
 
 func (v *View) Layout(th *material.Theme, gtx C) D {
@@ -36,7 +37,7 @@ func (v *View) Layout(th *material.Theme, gtx C) D {
 					view := g.ColoredArea(
 						gtx,
 						gtx.Constraints.Constrain(size),
-						g.Colours["antique-white"],
+						g.Colours[colors.GREY],
 					)
 					return view
 				}),
@@ -51,18 +52,20 @@ func (v *View) Layout(th *material.Theme, gtx C) D {
 						}),
 
 						layout.Stacked(func(gtx C) D {
-							return layout.Flex{
-								Axis: layout.Horizontal,
-							}.Layout(gtx,
-								layout.Flexed(1, func(gtx C) D {
-									text := material.H6(th, fmt.Sprintf("%s", cv.GetActiveSequence()))
-									return layout.Inset{
-										Top: unit.Dp(20),
-									}.Layout(gtx, func(gtx C) D {
-										return layout.Center.Layout(gtx, text.Layout)
-									})
-								}),
-							)
+							return layout.Inset{
+								Top: unit.Dp(10),
+							}.Layout(gtx, func(gtx C) D {
+								return layout.Flex{
+									Axis: layout.Horizontal,
+								}.Layout(gtx,
+									layout.Flexed(1, func(gtx C) D {
+										return v.inc.Layout(th, gtx)
+									}),
+
+									layout.Flexed(2, func(gtx C) D {
+										return v.vh.Layout(th, gtx)
+									}))
+							})
 						}),
 					)
 				}),
@@ -87,16 +90,30 @@ func (v *View) Layout(th *material.Theme, gtx C) D {
 				}),
 			)
 		}),
+
+		/// RIGHT SIDE PANEL IS CREATED HERE!
 		layout.Rigid(func(gtx C) D {
-			return layout.Stack{Alignment: layout.S}.Layout(gtx,
+			return layout.Stack{Alignment: layout.N}.Layout(gtx,
 				layout.Expanded(func(gtx C) D {
 					size := image.Pt(gtx.Constraints.Max.X, gtx.Constraints.Max.Y)
 					bar := g.ColoredArea(
 						gtx,
 						gtx.Constraints.Constrain(size),
-						g.Colours["aero-blue"],
+						g.Colours[colors.AERO_BLUE],
 					)
 					return bar
+				}),
+				layout.Stacked(func(gtx C) D {
+					return layout.Flex{
+						Axis: layout.Vertical,
+					}.Layout(gtx,
+
+						// STATS AREA STARTS HERE
+						/// Key - Value pair design for Stats
+						layout.Rigid(func(gtx C) D {
+							return v.sd.Layout(th, gtx)
+						}),
+					)
 				}),
 			)
 		}),

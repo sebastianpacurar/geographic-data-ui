@@ -1,7 +1,8 @@
 package components
 
 import (
-	"gioui-experiment/globals"
+	color "gioui-experiment/custom_themes/colors"
+	g "gioui-experiment/globals"
 	"gioui.org/layout"
 	"gioui.org/text"
 	"gioui.org/unit"
@@ -45,7 +46,7 @@ func (te *TextEditor) InitTextFields() {
 func (te *TextEditor) Layout(th *material.Theme, gtx C) D {
 	input := material.Editor(th, &te.inNotes.Editor, "Type your Thoughts...")
 
-	return layout.UniformInset(globals.DefaultMargin).Layout(gtx, func(gtx C) D {
+	return layout.UniformInset(g.DefaultMargin).Layout(gtx, func(gtx C) D {
 		return layout.Flex{
 			Axis:      layout.Horizontal,
 			WeightSum: 2,
@@ -54,9 +55,9 @@ func (te *TextEditor) Layout(th *material.Theme, gtx C) D {
 			// Input Text
 			layout.Flexed(1, func(gtx C) D {
 				input.TextSize = unit.Sp(20)
-				input.HintColor = globals.Colours["dark-slate-grey"]
+				input.HintColor = g.Colours[color.DARK_SLATE_GREY]
 				border := widget.Border{
-					Color:        globals.Colours["grey"],
+					Color:        g.Colours[color.GREY],
 					CornerRadius: unit.Dp(5),
 					Width:        unit.Px(2),
 				}
@@ -74,9 +75,9 @@ func (te *TextEditor) Layout(th *material.Theme, gtx C) D {
 			}),
 			layout.Flexed(1, func(gtx C) D {
 				input.TextSize = unit.Sp(20)
-				input.HintColor = globals.Colours["dark-slate-grey"]
+				input.HintColor = g.Colours[color.DARK_SLATE_GREY]
 				border := widget.Border{
-					Color:        globals.Colours["grey"],
+					Color:        g.Colours[color.GREY],
 					CornerRadius: unit.Dp(5),
 					Width:        unit.Px(2),
 				}
