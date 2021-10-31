@@ -24,57 +24,47 @@ type (
 func (inc *Incrementor) Layout(th *material.Theme, gtx C) D {
 	cv := data.CounterVals
 	return layout.Flex{
-		Axis: layout.Vertical,
+		Axis:    layout.Horizontal,
+		Spacing: layout.SpaceEnd,
 	}.Layout(gtx,
+
+		// MinusButton
 		layout.Rigid(func(gtx C) D {
-			return layout.Flex{
-				Axis: layout.Vertical,
-			}.Layout(gtx,
-				layout.Rigid(func(gtx C) D {
-					return layout.Flex{
-						Axis:    layout.Horizontal,
-						Spacing: layout.SpaceEvenly,
-					}.Layout(gtx,
-						layout.Rigid(func(gtx C) D {
-							if inc.isMinusBtnDisabled(cv) {
-								gtx = gtx.Disabled()
-							}
-							for range inc.minusBtn.Clicks() {
-								inc.handleMinusBtn(cv)
-							}
-							return g.Inset.Layout(gtx,
-								material.IconButton(th, &inc.minusBtn, g.MinusIcon).Layout)
-						}),
-						g.SpacerX,
+			if inc.isMinusBtnDisabled(cv) {
+				gtx = gtx.Disabled()
+			}
+			for range inc.minusBtn.Clicks() {
+				inc.handleMinusBtn(cv)
+			}
+			return g.Inset.Layout(gtx,
+				material.IconButton(th, &inc.minusBtn, g.MinusIcon).Layout)
+		}),
+		g.SpacerX,
 
-						// Reset Button
-						layout.Rigid(func(gtx C) D {
-							if inc.isResetBtnDisabled(cv) {
-								gtx = gtx.Disabled()
-							}
-							for range inc.resetBtn.Clicks() {
-								inc.handleResetBtn(cv)
-							}
-							return g.Inset.Layout(gtx,
-								material.IconButton(th, &inc.resetBtn, g.RefreshIcon).Layout)
-						}),
+		// Reset Button
+		layout.Rigid(func(gtx C) D {
+			if inc.isResetBtnDisabled(cv) {
+				gtx = gtx.Disabled()
+			}
+			for range inc.resetBtn.Clicks() {
+				inc.handleResetBtn(cv)
+			}
+			return g.Inset.Layout(gtx,
+				material.IconButton(th, &inc.resetBtn, g.RefreshIcon).Layout)
+		}),
 
-						g.SpacerX,
+		g.SpacerX,
 
-						// Plus Button
-						layout.Rigid(func(gtx C) D {
-							if inc.isPlusBtnDisabled(cv) {
-								gtx = gtx.Disabled()
-							}
-							for range inc.plusBtn.Clicks() {
-								inc.handlePlusBtn(cv)
-							}
-							return g.Inset.Layout(gtx,
-								material.IconButton(th, &inc.plusBtn, g.PlusIcon).Layout)
-						}),
-					)
-				}),
-			)
+		// Plus Button
+		layout.Rigid(func(gtx C) D {
+			if inc.isPlusBtnDisabled(cv) {
+				gtx = gtx.Disabled()
+			}
+			for range inc.plusBtn.Clicks() {
+				inc.handlePlusBtn(cv)
+			}
+			return g.Inset.Layout(gtx,
+				material.IconButton(th, &inc.plusBtn, g.PlusIcon).Layout)
 		}),
 	)
 }
@@ -84,7 +74,7 @@ func (inc *Incrementor) isResetBtnDisabled(cv *data.CurrentValues) bool {
 	res := false
 	switch seq {
 	case data.PRIMES, data.FIBS:
-		res = cv.Displayed == cv.Cache[seq][int(cv.Start)-1]
+		res = cv.Cache[seq][cv.Index] == cv.Cache[seq][int(cv.Start)-1]
 	case data.NATURALS, data.WHOLES:
 		res = cv.Displayed == cv.Start
 	}
@@ -96,9 +86,9 @@ func (inc *Incrementor) isMinusBtnDisabled(cv *data.CurrentValues) bool {
 	res := false
 	switch seq {
 	case data.PRIMES, data.FIBS:
-		res = cv.Index == 0
+		res = cv.Index <= 0
 	case data.NATURALS, data.WHOLES:
-		res = cv.Displayed == 0
+		res = cv.Displayed <= 0
 	}
 	return res
 }
@@ -120,7 +110,6 @@ func (inc *Incrementor) handleResetBtn(cv *data.CurrentValues) {
 	switch seq {
 	case data.PRIMES, data.FIBS:
 		cv.Index = int(cv.Start) - 1
-		cv.Displayed = cv.Cache[seq][cv.Index]
 	case data.NATURALS, data.WHOLES:
 		cv.Displayed = cv.Start
 	}

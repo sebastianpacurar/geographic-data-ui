@@ -88,11 +88,6 @@ func (sh *SequenceHandler) handleSequenceType(cv *data.CurrentValues, target str
 	cv.Index = 0
 	cv.Step = 1
 	cv.Start = 1
-	switch target {
-	case data.PRIMES, data.FIBS:
-		cv.Displayed = cv.Cache[target][cv.Index]
-	default:
-		cv.Displayed = 1
-	}
+	cv.Displayed = 1
 	cv.SetActiveSequence(target)
 }

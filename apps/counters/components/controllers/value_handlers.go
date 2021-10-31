@@ -23,54 +23,61 @@ type (
 
 	startFrom struct {
 		textField component.TextField
-		toggle    widget.Bool
+		btn       widget.Clickable
 	}
 
 	skipBy struct {
 		textField component.TextField
-		toggle    widget.Bool
+		btn       widget.Clickable
 	}
 
 	resetTo struct {
 		textField component.TextField
-		toggle    widget.Bool
+		btn       widget.Clickable
 	}
 )
 
 func (vh *ValueHandler) Layout(th *material.Theme, gtx C) D {
 	cv := data.CounterVals
 	return layout.Flex{
-		Axis: layout.Horizontal,
+		Axis:      layout.Vertical,
+		Alignment: layout.Middle,
 	}.Layout(
 		gtx,
-		layout.Flexed(1, func(gtx C) D {
-			return vh.InputBox(gtx, th, &vh.startFrom.textField, cv, "start")
+		layout.Rigid(func(gtx C) D {
+			return layout.Flex{
+				Axis: layout.Horizontal,
+			}.Layout(gtx,
+				layout.Flexed(1, func(gtx C) D {
+					return vh.InputBox(gtx, th, &vh.startFrom.textField, cv, "start")
+				}),
+				layout.Flexed(1, func(gtx C) D {
+					for range vh.startFrom.btn.Clicks() {
+						vh.handleStartBtn(cv)
+					}
+					return g.Inset.Layout(gtx, func(C) D {
+						return material.Button(th, &vh.startFrom.btn, "set start").Layout(gtx)
+					})
+				}),
+			)
 		}),
-
-		g.SpacerX,
-
-		layout.Flexed(1, func(gtx C) D {
-			return g.Inset.Layout(gtx, func(C) D {
-				vh.handleSkipToggle(cv)
-				return material.CheckBox(th, &vh.startFrom.toggle, "").Layout(gtx)
-			})
-		}),
-
-		g.SpacerX,
-
-		layout.Flexed(1, func(gtx C) D {
-			return vh.InputBox(gtx, th, &vh.skipBy.textField, cv, "skip")
-		}),
-
-		g.SpacerX,
-
-		layout.Flexed(1, func(gtx C) D {
-			return g.Inset.Layout(gtx, func(C) D {
-				vh.handleStartToggle(cv)
-				return material.CheckBox(th, &vh.skipBy.toggle, "").Layout(gtx)
-			})
-		}),
-	)
+		layout.Rigid(func(gtx C) D {
+			return layout.Flex{
+				Axis: layout.Horizontal,
+			}.Layout(gtx,
+				layout.Flexed(1, func(gtx C) D {
+					return vh.InputBox(gtx, th, &vh.skipBy.textField, cv, "skip")
+				}),
+				layout.Flexed(1, func(gtx C) D {
+					for range vh.skipBy.btn.Clicks() {
+						vh.handleSkipBtn(cv)
+					}
+					return g.Inset.Layout(gtx, func(C) D {
+						return material.Button(th, &vh.skipBy.btn, "set step").Layout(gtx)
+					})
+				}),
+			)
+		}))
 }
 
 func (vh *ValueHandler) InputBox(gtx C, th *material.Theme, e *component.TextField, cv *data.CurrentValues, context string) D {
@@ -94,7 +101,7 @@ func (vh *ValueHandler) InputBox(gtx C, th *material.Theme, e *component.TextFie
 			placeholder = "set skip to n"
 			e.CharLimit = 5
 		}
-	default:
+	case data.NATURALS, data.WHOLES:
 		switch context {
 		case "start":
 			placeholder = "start from n"
@@ -123,30 +130,20 @@ func isNumeric(val string) bool {
 	return true
 }
 
-func (vh *ValueHandler) handleStartToggle(cv *data.CurrentValues) {
-	if vh.startFrom.toggle.Changed() {
-		if vh.startFrom.toggle.Value {
-			val := strings.TrimSpace(vh.startFrom.textField.Text())
-			numVal, _ := strconv.ParseUint(val, 10, 64)
-			cv.Index = int(numVal) - 1
-			cv.Start = uint64(cv.Index)
-			cv.Displayed = numVal
-		} else {
-			cv.Index = 0
-			cv.Start = data.ONE
-			cv.Displayed = data.ONE
-		}
+func (vh *ValueHandler) handleStartBtn(cv *data.CurrentValues) {
+	val := strings.TrimSpace(vh.startFrom.textField.Text())
+	numVal, _ := strconv.ParseUint(val, 10, 64)
+	seq := cv.GetActiveSequence()
+	switch seq {
+	case data.PRIMES, data.FIBS:
+		cv.Index = int(numVal) - 1
+	case data.NATURALS, data.WHOLES:
+		cv.Displayed = numVal
 	}
 }
 
-func (vh *ValueHandler) handleSkipToggle(cv *data.CurrentValues) {
-	if vh.skipBy.toggle.Changed() {
-		if vh.skipBy.toggle.Value {
-			val := strings.TrimSpace(vh.skipBy.textField.Text())
-			numVal, _ := strconv.ParseUint(val, 10, 64)
-			cv.Step = numVal
-		} else {
-			cv.Step = data.ONE
-		}
-	}
+func (vh *ValueHandler) handleSkipBtn(cv *data.CurrentValues) {
+	val := strings.TrimSpace(vh.skipBy.textField.Text())
+	numVal, _ := strconv.ParseUint(val, 10, 64)
+	cv.Step = numVal
 }
