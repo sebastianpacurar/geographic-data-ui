@@ -16,8 +16,7 @@ import (
 
 type View struct {
 	inc controllers.Incrementor
-	sd  controllers.StatsData
-	vh  controllers.ValueHandler
+	sd  controllers.ControlPanel
 }
 
 func (v *View) Layout(th *material.Theme, gtx C) D {
@@ -37,11 +36,13 @@ func (v *View) Layout(th *material.Theme, gtx C) D {
 					view := g.ColoredArea(
 						gtx,
 						gtx.Constraints.Constrain(size),
-						g.Colours[colors.GREY],
+						g.Colours[colors.ANTIQUE_WHITE],
 					)
 					return view
 				}),
 
+				/// 100 height BAR DISPLAYED ABOVE THE DISPLAYED NUMBER
+				///
 				layout.Stacked(func(gtx C) D {
 					return layout.Stack{}.Layout(gtx,
 						layout.Expanded(func(gtx C) D {
@@ -51,25 +52,22 @@ func (v *View) Layout(th *material.Theme, gtx C) D {
 							return D{}
 						}),
 
+						/// INCREMENTORS
+						///
 						layout.Stacked(func(gtx C) D {
-							return layout.Inset{
-								Top: unit.Dp(10),
-							}.Layout(gtx, func(gtx C) D {
+							return layout.UniformInset(g.DefaultMargin).Layout(gtx, func(gtx C) D {
 								return layout.Flex{
 									Axis: layout.Horizontal,
 								}.Layout(gtx,
 									layout.Flexed(1, func(gtx C) D {
 										return v.inc.Layout(th, gtx)
-									}),
-
-									layout.Flexed(2, func(gtx C) D {
-										return v.vh.Layout(th, gtx)
 									}))
 							})
-						}),
-					)
+						}))
 				}),
 
+				/// DISPLAYED NUMBER
+				///
 				layout.Stacked(func(gtx C) D {
 					return layout.Inset{
 						Top:    unit.Dp(80),
@@ -87,35 +85,13 @@ func (v *View) Layout(th *material.Theme, gtx C) D {
 						}
 						return material.H5(th, val).Layout(gtx)
 					})
-				}),
-			)
+				}))
 		}),
 
-		/// RIGHT SIDE PANEL IS CREATED HERE!
+		///
+		/// RIGHT HAND PANEL IS RENDERED HERE
 		layout.Rigid(func(gtx C) D {
-			return layout.Stack{Alignment: layout.N}.Layout(gtx,
-				layout.Expanded(func(gtx C) D {
-					size := image.Pt(gtx.Constraints.Max.X, gtx.Constraints.Max.Y)
-					bar := g.ColoredArea(
-						gtx,
-						gtx.Constraints.Constrain(size),
-						g.Colours[colors.AERO_BLUE],
-					)
-					return bar
-				}),
-				layout.Stacked(func(gtx C) D {
-					return layout.Flex{
-						Axis: layout.Vertical,
-					}.Layout(gtx,
-
-						// STATS AREA STARTS HERE
-						/// Key - Value pair design for Stats
-						layout.Rigid(func(gtx C) D {
-							return v.sd.Layout(th, gtx)
-						}),
-					)
-				}),
-			)
+			return v.sd.Layout(th, gtx)
 		}),
 	)
 }
