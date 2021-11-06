@@ -11,25 +11,25 @@ type (
 	C = layout.Context
 	D = layout.Dimensions
 
-	Page struct {
+	Application struct {
 		display   countries.Display
 		Countries countries.Countries
 	}
 )
 
-func (p *Page) Layout(th *material.Theme, gtx C) D {
+func (app *Application) Layout(gtx C, th *material.Theme) D {
 	return layout.Flex{
 		Axis: layout.Vertical,
 	}.Layout(gtx,
 		layout.Rigid(func(gtx C) D {
-			test := material.H2(th, "Geography Page")
+			test := material.H2(th, "Geography Application")
 			return test.Layout(gtx)
 		}),
 
 		g.SpacerX,
 
 		layout.Rigid(func(gtx C) D {
-			return p.display.Layout(th, gtx)
+			return app.display.Layout(gtx, th)
 		}),
 	)
 }

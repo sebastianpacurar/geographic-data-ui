@@ -12,7 +12,7 @@ type (
 
 type Display struct{}
 
-func (d *Display) Layout(th *material.Theme, gtx C) D {
+func (d *Display) Layout(gtx C, th *material.Theme) D {
 	data := make([]string, len(Data))
 	for i := range data {
 		data[i] = Data[i].Name.Common

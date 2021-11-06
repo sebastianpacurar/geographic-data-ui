@@ -21,8 +21,8 @@ type (
 	}
 )
 
-func (inc *Incrementor) Layout(th *material.Theme, gtx C) D {
-	cv := data.CounterVals
+func (inc *Incrementor) Layout(gtx C, th *material.Theme) D {
+	cv := data.CurrVals
 	return layout.Flex{
 		Axis:    layout.Horizontal,
 		Spacing: layout.SpaceEnd,
@@ -69,7 +69,7 @@ func (inc *Incrementor) Layout(th *material.Theme, gtx C) D {
 	)
 }
 
-func (inc *Incrementor) isResetBtnDisabled(cv *data.CurrentValues) bool {
+func (inc *Incrementor) isResetBtnDisabled(cv *data.Generator) bool {
 	seq := cv.GetActiveSequence()
 	res := false
 	switch seq {
@@ -81,7 +81,7 @@ func (inc *Incrementor) isResetBtnDisabled(cv *data.CurrentValues) bool {
 	return res
 }
 
-func (inc *Incrementor) isMinusBtnDisabled(cv *data.CurrentValues) bool {
+func (inc *Incrementor) isMinusBtnDisabled(cv *data.Generator) bool {
 	seq := cv.GetActiveSequence()
 	res := false
 	switch seq {
@@ -93,7 +93,7 @@ func (inc *Incrementor) isMinusBtnDisabled(cv *data.CurrentValues) bool {
 	return res
 }
 
-func (inc *Incrementor) isPlusBtnDisabled(cv *data.CurrentValues) bool {
+func (inc *Incrementor) isPlusBtnDisabled(cv *data.Generator) bool {
 	seq := cv.GetActiveSequence()
 	res := false
 	switch seq {
@@ -105,7 +105,7 @@ func (inc *Incrementor) isPlusBtnDisabled(cv *data.CurrentValues) bool {
 	return res
 }
 
-func (inc *Incrementor) handleResetBtn(cv *data.CurrentValues) {
+func (inc *Incrementor) handleResetBtn(cv *data.Generator) {
 	seq := cv.GetActiveSequence()
 	switch seq {
 	case data.PRIMES, data.FIBS:
@@ -115,7 +115,7 @@ func (inc *Incrementor) handleResetBtn(cv *data.CurrentValues) {
 	}
 }
 
-func (inc *Incrementor) handlePlusBtn(cv *data.CurrentValues) {
+func (inc *Incrementor) handlePlusBtn(cv *data.Generator) {
 	seq := cv.GetActiveSequence()
 	switch seq {
 	case data.PRIMES, data.FIBS:
@@ -125,7 +125,7 @@ func (inc *Incrementor) handlePlusBtn(cv *data.CurrentValues) {
 	}
 }
 
-func (inc *Incrementor) handleMinusBtn(cv *data.CurrentValues) {
+func (inc *Incrementor) handleMinusBtn(cv *data.Generator) {
 	seq := cv.GetActiveSequence()
 	switch seq {
 	case data.PRIMES, data.FIBS:
@@ -135,7 +135,7 @@ func (inc *Incrementor) handleMinusBtn(cv *data.CurrentValues) {
 	}
 }
 
-func (inc *Incrementor) parseResetLabel(cv *data.CurrentValues) string {
+func (inc *Incrementor) parseResetLabel(cv *data.Generator) string {
 	var lbl string
 	seq := cv.GetActiveSequence()
 	switch seq {

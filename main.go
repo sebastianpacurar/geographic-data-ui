@@ -1,48 +1,27 @@
 package main
 
 import (
+	application "gioui-experiment/apps"
 	"gioui-experiment/apps/counters"
-	"gioui-experiment/apps/counters/components/data"
-	"gioui-experiment/apps/geography"
-	textEditor "gioui-experiment/apps/text_editor/components"
-	colour "gioui-experiment/custom_themes/colors"
-	g "gioui-experiment/globals"
 	"gioui.org/app"
-	"gioui.org/f32"
 	"gioui.org/font/gofont"
 	"gioui.org/io/key"
 	"gioui.org/io/system"
 	"gioui.org/layout"
 	"gioui.org/op"
-	"gioui.org/op/clip"
-	"gioui.org/op/paint"
 	"gioui.org/unit"
-	"gioui.org/widget"
 	"gioui.org/widget/material"
-	"gioui.org/x/component"
-	"image"
-	"image/color"
 	"log"
 	"os"
 )
 
-type (
-	C = layout.Context
-	D = layout.Dimensions
-)
-
-var (
-	menuBtn = new(widget.Clickable)
-)
-
 func main() {
-	ui := newUI()
 	go func() {
 		w := app.NewWindow(
 			app.Title("Gio UI Experiment"),
 			app.Size(unit.Dp(1000), unit.Dp(800)),
 		)
-		if err := ui.Run(w); err != nil {
+		if err := Run(w); err != nil {
 			log.Fatal(err)
 		}
 		os.Exit(0)
@@ -50,75 +29,18 @@ func main() {
 	app.Main()
 }
 
-type UI struct {
-	theme      *material.Theme
-	navMenu    Menu
-	menuItem   MenuItem
-	counters   counters.Page
-	geography  geography.Page
-	textEditor textEditor.TextEditor
-}
-
-type Menu struct {
-	active int
-	oldVal string
-	newVal string
-	items  []MenuItem
-	list   layout.List
-}
-
-type MenuItem struct {
-	name       string
-	btn        widget.Clickable
-	layContent func(gtx C) D
-}
-
-func newUI() *UI {
-	cv := data.CounterVals
-	cv.GenPrimes(data.PLIMIT)
-	cv.GenFibs(data.FLIMIT)
-
-	ui := &UI{
-		theme: material.NewTheme(gofont.Collection()),
-	}
-	ui.navMenu.list.Axis = layout.Vertical
-	ui.navMenu.items = append(ui.navMenu.items,
-		MenuItem{
-			name: "Counters",
-			layContent: func(gtx C) D {
-				return ui.counters.Layout(ui.theme, gtx)
-			},
-		},
-		MenuItem{
-			name: "Editor",
-			layContent: func(gtx C) D {
-				return ui.textEditor.Layout(ui.theme, gtx)
-			},
-		},
-		MenuItem{
-			name: "Geography",
-			layContent: func(gtx C) D {
-				return ui.geography.Layout(ui.theme, gtx)
-			},
-		},
-	)
-
-	err := ui.geography.Countries.InitCountries()
-	if err != nil {
-		return nil
-	}
-
-	ui.textEditor.InitTextFields()
-	return ui
-}
-
-func (ui *UI) Run(w *app.Window) error {
+func Run(w *app.Window) error {
 	var ops op.Ops
+	th := material.NewTheme(gofont.Collection())
+
+	router := application.NewRouter()
+	router.Register(0, counters.New(&router))
+
 	for event := range w.Events() {
 		switch event := event.(type) {
 		case system.FrameEvent:
 			gtx := layout.NewContext(&ops, event)
-			ui.Layout(gtx)
+			router.Layout(gtx, th)
 			event.Frame(gtx.Ops)
 		case key.Event:
 			switch event.Name {
@@ -130,131 +52,4 @@ func (ui *UI) Run(w *app.Window) error {
 		}
 	}
 	return nil
-}
-
-func (ui *UI) Layout(gtx C) D {
-	windowBorder := widget.Border{
-		Color:        g.Colours[colour.DARK_CYAN],
-		CornerRadius: unit.Dp(0),
-		Width:        unit.Dp(3),
-	}
-
-	// activeApp = the currently selected menu item
-	activeApp := &ui.navMenu.items[ui.navMenu.active]
-	return windowBorder.Layout(gtx, func(gtx C) D {
-		return layout.Flex{
-			Axis: layout.Vertical,
-		}.Layout(
-			gtx,
-
-			/// TOP BAR SECTION
-			layout.Rigid(func(gtx C) D {
-				return layout.Stack{}.Layout(gtx,
-					layout.Expanded(func(gtx C) D {
-						size := image.Pt(gtx.Constraints.Max.X, gtx.Constraints.Min.Y+10/2)
-						bar := g.ColoredArea(
-							gtx,
-							gtx.Constraints.Constrain(size),
-							g.Colours[colour.DARK_CYAN],
-						)
-						return bar
-					}),
-					layout.Stacked(func(gtx C) D {
-						return layout.Inset{
-							Left: unit.Dp(10),
-							Top:  unit.Dp(5),
-						}.Layout(gtx, func(gtx C) D {
-							btn := component.SimpleIconButton(
-								g.Colours[colour.DARK_CYAN],
-								g.Colours[colour.WHITE],
-								menuBtn,
-								g.MenuIcon,
-							)
-							return btn.Layout(gtx)
-						})
-					}),
-				)
-			}),
-
-			// NAVIGATION MENU SECTION
-			// TODO: in progress
-			layout.Rigid(func(gtx C) D {
-				for i, v := range ui.navMenu.items {
-					if v.btn.Clicked() {
-						ui.navMenu.active = i
-						break
-					}
-				}
-				activeApp = &ui.navMenu.items[ui.navMenu.active]
-				return layout.Flex{
-					Axis: layout.Horizontal,
-				}.Layout(
-					gtx,
-					layout.Rigid(func(gtx C) D {
-						width := gtx.Px(g.MenuWidth)
-						containerSize := image.Pt(width, gtx.Constraints.Max.Y)
-						gtx.Constraints = layout.Exact(gtx.Constraints.Constrain(containerSize))
-
-						return layout.Stack{
-							Alignment: layout.NW,
-						}.Layout(
-							gtx,
-							layout.Expanded(func(gtx C) D {
-								size := image.Pt(gtx.Constraints.Max.X, gtx.Constraints.Max.Y)
-								bar := g.ColoredArea(
-									gtx,
-									gtx.Constraints.Constrain(size),
-									g.Colours[colour.SEA_GREEN],
-								)
-								return bar
-							}),
-
-							layout.Stacked(func(gtx C) D {
-								return ui.navMenu.list.Layout(gtx, len(ui.navMenu.items), func(gtx C, id int) D {
-									menuItem := &ui.navMenu.items[id]
-
-									// name = the actual name of the application
-									// stretches the clickable area to fit the X-Axis
-									name := func(gtx C) D {
-										return layout.Flex{
-											Axis: layout.Horizontal,
-										}.Layout(gtx,
-											layout.Flexed(1, func(gtx C) D {
-												return layout.UniformInset(g.DefaultMargin).Layout(gtx,
-													func(gtx C) D {
-														text := material.H6(ui.theme, menuItem.name)
-														return layout.Center.Layout(gtx, text.Layout)
-													})
-											}),
-										)
-									}
-
-									// if it's not the current app, then create a clickable area on the whole X-Axis
-									if id != ui.navMenu.active {
-										return material.Clickable(gtx, &menuItem.btn, name)
-									}
-
-									// lay out the selected item in a grey-ish background
-									return layout.Stack{}.Layout(gtx,
-										layout.Expanded(func(gtx C) D {
-											clip.UniformRRect(f32.Rectangle{
-												Max: layout.FPt(gtx.Constraints.Max),
-											}, 0).Add(gtx.Ops)
-											paint.Fill(gtx.Ops, color.NRGBA{A: 64})
-											return D{}
-										}),
-										layout.Stacked(name),
-									)
-								})
-							}),
-						)
-					}),
-
-					/// APPLICATION SECTION
-					layout.Rigid(func(gtx C) D {
-						return activeApp.layContent(gtx)
-					}))
-			}),
-		)
-	})
 }
