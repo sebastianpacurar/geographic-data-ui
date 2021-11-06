@@ -36,7 +36,7 @@ func (app *Application) Overflow() []component.OverflowAction {
 
 func (app *Application) NavItem() component.NavItem {
 	return component.NavItem{
-		Name: "Counters",
+		Name: "Counters - overly complicated ",
 	}
 }
 
