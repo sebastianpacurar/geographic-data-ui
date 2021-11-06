@@ -1,9 +1,8 @@
 package apps
 
 import (
-	"gioui-experiment/globals"
+	g "gioui-experiment/globals"
 	"gioui.org/layout"
-	"gioui.org/op/paint"
 	"gioui.org/widget/material"
 	"gioui.org/x/component"
 	"time"
@@ -27,7 +26,6 @@ type (
 		NavAnim component.VisibilityAnimation
 		*component.AppBar
 		*component.ModalLayer
-		NonModalDrawer bool
 	}
 )
 
@@ -38,7 +36,7 @@ func NewRouter() Router {
 	modalNav := component.ModalNavFrom(&nav, modal)
 
 	bar := component.NewAppBar(modal)
-	bar.NavigationIcon = globals.MenuIcon
+	bar.NavigationIcon = g.MenuIcon
 
 	na := component.VisibilityAnimation{
 		State:    component.Invisible,
@@ -80,29 +78,25 @@ func (r *Router) Layout(gtx C, th *material.Theme) D {
 	for _, event := range r.AppBar.Events(gtx) {
 		switch event.(type) {
 		case component.AppBarNavigationClicked:
-			if r.NonModalDrawer {
-				r.NavAnim.ToggleVisibility(gtx.Now)
-			} else {
-				r.ModalNavDrawer.Appear(gtx.Now)
-				r.NavAnim.Disappear(gtx.Now)
-			}
+			r.ModalNavDrawer.Appear(gtx.Now)
+			r.NavAnim.Disappear(gtx.Now)
 		}
 	}
 	if r.ModalNavDrawer.NavDestinationChanged() {
 		r.SwitchTo(r.ModalNavDrawer.CurrentNavDestination())
 	}
 
-	paint.Fill(gtx.Ops, th.Palette.Bg)
 	content := layout.Flexed(1, func(gtx C) D {
 		return layout.Flex{
 			Axis: layout.Horizontal,
 		}.Layout(gtx,
 			layout.Rigid(func(gtx C) D {
-				gtx.Constraints.Max.X /= 3
 				return r.NavDrawer.Layout(gtx, th, &r.NavAnim)
 			}),
 			layout.Flexed(1, func(gtx C) D {
-				return r.pages[r.current].Layout(gtx, th)
+				return g.Inset.Layout(gtx, func(gtx C) D {
+					return r.pages[r.current].Layout(gtx, th)
+				})
 			}),
 		)
 	})
@@ -114,6 +108,7 @@ func (r *Router) Layout(gtx C, th *material.Theme) D {
 	}.Layout(gtx, bar, content)
 
 	r.ModalLayer.Layout(gtx, th)
+
 	return D{
 		Size: gtx.Constraints.Max,
 	}

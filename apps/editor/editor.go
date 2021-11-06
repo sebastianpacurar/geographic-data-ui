@@ -1,7 +1,8 @@
-package geography
+package editor
 
 import (
 	"gioui-experiment/apps"
+	"gioui-experiment/apps/editor/components"
 	"gioui.org/layout"
 	"gioui.org/widget/material"
 	"gioui.org/x/component"
@@ -12,6 +13,7 @@ type (
 	D = layout.Dimensions
 
 	Application struct {
+		editor components.TextEditor
 		*apps.Router
 	}
 )
@@ -32,17 +34,10 @@ func (app *Application) Overflow() []component.OverflowAction {
 
 func (app *Application) NavItem() component.NavItem {
 	return component.NavItem{
-		Name: "Geography - countries, state, statistics",
+		Name: "Editor - multifunctional text editor",
 	}
 }
 
 func (app *Application) Layout(gtx C, th *material.Theme) D {
-	return layout.Flex{
-		Axis: layout.Vertical,
-	}.Layout(gtx,
-		layout.Rigid(func(gtx C) D {
-			test := material.H2(th, "Geography Application")
-			return test.Layout(gtx)
-		}),
-	)
+	return app.editor.Layout(gtx, th)
 }

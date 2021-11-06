@@ -3,6 +3,8 @@ package main
 import (
 	application "gioui-experiment/apps"
 	"gioui-experiment/apps/counters"
+	"gioui-experiment/apps/editor"
+	"gioui-experiment/apps/geography"
 	"gioui.org/app"
 	"gioui.org/font/gofont"
 	"gioui.org/io/key"
@@ -35,6 +37,8 @@ func Run(w *app.Window) error {
 
 	router := application.NewRouter()
 	router.Register(0, counters.New(&router))
+	router.Register(1, editor.New(&router))
+	router.Register(2, geography.New(&router))
 
 	for event := range w.Events() {
 		switch event := event.(type) {
