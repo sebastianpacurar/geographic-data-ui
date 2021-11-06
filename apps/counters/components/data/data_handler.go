@@ -17,11 +17,6 @@ const (
 )
 
 type (
-	CurrentValues struct {
-		Enabled bool
-		Generator
-	}
-
 	Generator struct {
 		ActiveSeq map[string]bool
 		Displayed uint64
@@ -32,22 +27,22 @@ type (
 	}
 )
 
-func (cv CurrentValues) GetActiveSequence() string {
+func (gen Generator) GetActiveSequence() string {
 	var activeSeq string
-	for k := range CounterVals.ActiveSeq {
-		if CounterVals.ActiveSeq[k] {
+	for k := range gen.ActiveSeq {
+		if gen.ActiveSeq[k] {
 			activeSeq = k
 		}
 	}
 	return activeSeq
 }
 
-func (cv *CurrentValues) SetActiveSequence(active string) {
-	for k := range CounterVals.ActiveSeq {
+func (gen *Generator) SetActiveSequence(active string) {
+	for k := range gen.ActiveSeq {
 		if k == active {
-			CounterVals.ActiveSeq[k] = true
+			gen.ActiveSeq[k] = true
 		} else {
-			CounterVals.ActiveSeq[k] = false
+			gen.ActiveSeq[k] = false
 		}
 	}
 }
@@ -66,16 +61,16 @@ func isPrime(n uint64) bool {
 }
 
 // GenPrimes - Generate Prime sequence
-func (g *Generator) GenPrimes(length int) {
-	if len(g.Cache[PRIMES]) == 0 {
-		g.Cache[PRIMES] = make([]uint64, length)
-		g.Cache[PRIMES][0] = 2
+func (gen *Generator) GenPrimes(length int) {
+	if len(gen.Cache[PRIMES]) == 0 {
+		gen.Cache[PRIMES] = make([]uint64, length)
+		gen.Cache[PRIMES][0] = 2
 		num := uint64(3)
 		i := 1
 
 		for i < length {
 			if isPrime(num) {
-				g.Cache[PRIMES][i] = num
+				gen.Cache[PRIMES][i] = num
 				i++
 			}
 			num += 2
@@ -100,7 +95,7 @@ func (g *Generator) GenPrimes(length int) {
 	//}
 }
 
-func (g *Generator) GetFibByIndex(n uint64) uint64 {
+func GetFibByIndex(n uint64) uint64 {
 	if n <= 1 {
 		return n
 	}
@@ -112,29 +107,26 @@ func (g *Generator) GetFibByIndex(n uint64) uint64 {
 }
 
 // GenFibs - Generate Fibonacci sequence
-func (g *Generator) GenFibs(length int) {
-	if len(g.Cache[FIBS]) == 0 {
-		g.Cache[FIBS] = make([]uint64, length)
+func (gen *Generator) GenFibs(length int) {
+	if len(gen.Cache[FIBS]) == 0 {
+		gen.Cache[FIBS] = make([]uint64, length)
 		index := uint64(0)
-		for i := range g.Cache[FIBS] {
-			g.Cache[FIBS][i] = g.GetFibByIndex(index)
+		for i := range gen.Cache[FIBS] {
+			gen.Cache[FIBS][i] = GetFibByIndex(index)
 			index++
 		}
 	}
 }
 
-var CounterVals = &CurrentValues{
-	Enabled: true,
-	Generator: Generator{
-		Displayed: ONE,
-		Step:      ONE,
-		Start:     ONE,
-		ActiveSeq: map[string]bool{
-			WHOLES:   true,
-			NATURALS: false,
-			PRIMES:   false,
-			FIBS:     false,
-		},
-		Cache: make(map[string][]uint64),
+var CurrVals = &Generator{
+	Displayed: ONE,
+	Step:      ONE,
+	Start:     ONE,
+	ActiveSeq: map[string]bool{
+		WHOLES:   true,
+		NATURALS: false,
+		PRIMES:   false,
+		FIBS:     false,
 	},
+	Cache: make(map[string][]uint64),
 }

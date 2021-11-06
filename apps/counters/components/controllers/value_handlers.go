@@ -37,8 +37,8 @@ type (
 	}
 )
 
-func (vh *ValueHandler) Layout(th *material.Theme, gtx C) D {
-	cv := data.CounterVals
+func (vh *ValueHandler) Layout(gtx C, th *material.Theme) D {
+	cv := data.CurrVals
 	return layout.Flex{
 		Axis:      layout.Vertical,
 		Alignment: layout.Middle,
@@ -80,7 +80,7 @@ func (vh *ValueHandler) Layout(th *material.Theme, gtx C) D {
 		}))
 }
 
-func (vh *ValueHandler) InputBox(gtx C, th *material.Theme, e *component.TextField, cv *data.CurrentValues, context string) D {
+func (vh *ValueHandler) InputBox(gtx C, th *material.Theme, e *component.TextField, cv *data.Generator, context string) D {
 	if !isNumeric(e.Text()) {
 		e.SetError("only digits allowed")
 	} else {
@@ -130,7 +130,7 @@ func isNumeric(val string) bool {
 	return true
 }
 
-func (vh *ValueHandler) handleStartBtn(cv *data.CurrentValues) {
+func (vh *ValueHandler) handleStartBtn(cv *data.Generator) {
 	val := strings.TrimSpace(vh.startFrom.textField.Text())
 	numVal, _ := strconv.ParseUint(val, 10, 64)
 	seq := cv.GetActiveSequence()
@@ -142,7 +142,7 @@ func (vh *ValueHandler) handleStartBtn(cv *data.CurrentValues) {
 	}
 }
 
-func (vh *ValueHandler) handleSkipBtn(cv *data.CurrentValues) {
+func (vh *ValueHandler) handleSkipBtn(cv *data.Generator) {
 	val := strings.TrimSpace(vh.skipBy.textField.Text())
 	numVal, _ := strconv.ParseUint(val, 10, 64)
 	cv.Step = numVal

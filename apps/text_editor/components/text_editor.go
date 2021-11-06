@@ -43,7 +43,7 @@ func (te *TextEditor) InitTextFields() {
 }
 
 // Layout - Still in progress!
-func (te *TextEditor) Layout(th *material.Theme, gtx C) D {
+func (te *TextEditor) Layout(gtx C, th *material.Theme) D {
 	input := material.Editor(th, &te.inNotes.Editor, "Type your Thoughts...")
 
 	return layout.UniformInset(g.DefaultMargin).Layout(gtx, func(gtx C) D {

@@ -13,7 +13,7 @@ type ControlPanel struct {
 	vh ValueHandler
 }
 
-func (cp *ControlPanel) Layout(th *material.Theme, gtx C) D {
+func (cp *ControlPanel) Layout(gtx C, th *material.Theme) D {
 	return layout.Stack{Alignment: layout.N}.Layout(gtx,
 		layout.Expanded(func(gtx C) D {
 			size := image.Pt(gtx.Constraints.Max.X, gtx.Constraints.Max.Y)
@@ -38,7 +38,7 @@ func (cp *ControlPanel) Layout(th *material.Theme, gtx C) D {
 						Bottom: unit.Dp(10),
 						Left:   unit.Dp(15),
 					}.Layout(gtx, func(gtx C) D {
-						return cp.vh.Layout(th, gtx)
+						return cp.vh.Layout(gtx, th)
 					})
 				}),
 			)

@@ -15,11 +15,11 @@ type (
 	}
 )
 
-func (t *Top) Layout(th *material.Theme, gtx C) D {
+func (t *Top) Layout(gtx C, th *material.Theme) D {
 	return layout.Flex{
 		Axis: layout.Horizontal,
 	}.Layout(gtx,
 		layout.Flexed(1, func(gtx C) D {
-			return t.seq.Layout(th, gtx)
+			return t.seq.Layout(gtx, th)
 		}))
 }

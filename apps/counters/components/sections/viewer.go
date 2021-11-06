@@ -19,8 +19,8 @@ type View struct {
 	sd  controllers.ControlPanel
 }
 
-func (v *View) Layout(th *material.Theme, gtx C) D {
-	cv := data.CounterVals
+func (v *View) Layout(gtx C, th *material.Theme) D {
+	cv := data.CurrVals
 	size := image.Pt(gtx.Constraints.Max.X, gtx.Constraints.Max.Y)
 	return layout.Flex{
 		Axis: layout.Horizontal,
@@ -60,7 +60,7 @@ func (v *View) Layout(th *material.Theme, gtx C) D {
 									Axis: layout.Horizontal,
 								}.Layout(gtx,
 									layout.Flexed(1, func(gtx C) D {
-										return v.inc.Layout(th, gtx)
+										return v.inc.Layout(gtx, th)
 									}))
 							})
 						}))
@@ -91,7 +91,7 @@ func (v *View) Layout(th *material.Theme, gtx C) D {
 		///
 		/// RIGHT HAND PANEL IS RENDERED HERE
 		layout.Rigid(func(gtx C) D {
-			return v.sd.Layout(th, gtx)
+			return v.sd.Layout(gtx, th)
 		}),
 	)
 }

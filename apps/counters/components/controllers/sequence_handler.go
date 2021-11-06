@@ -17,8 +17,8 @@ type SequenceHandler struct {
 	toFib     widget.Clickable
 }
 
-func (sh *SequenceHandler) Layout(th *material.Theme, gtx C) D {
-	cv := data.CounterVals
+func (sh *SequenceHandler) Layout(gtx C, th *material.Theme) D {
+	cv := data.CurrVals
 	return layout.Flex{Axis: layout.Horizontal}.Layout(gtx,
 		layout.Rigid(func(gtx C) D {
 			for range sh.toWhole.Clicks() {
@@ -84,7 +84,7 @@ func (sh *SequenceHandler) Layout(th *material.Theme, gtx C) D {
 	)
 }
 
-func (sh *SequenceHandler) handleSequenceType(cv *data.CurrentValues, target string) {
+func (sh *SequenceHandler) handleSequenceType(cv *data.Generator, target string) {
 	cv.Index = 0
 	cv.Step = 1
 	cv.Start = 1
