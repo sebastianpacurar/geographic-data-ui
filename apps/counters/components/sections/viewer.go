@@ -16,7 +16,7 @@ import (
 
 type View struct {
 	inc controllers.Incrementor
-	sd  controllers.ControlPanel
+	cp  controllers.ControlPanel
 }
 
 func (v *View) Layout(gtx C, th *material.Theme) D {
@@ -91,7 +91,7 @@ func (v *View) Layout(gtx C, th *material.Theme) D {
 		///
 		/// RIGHT HAND PANEL IS RENDERED HERE
 		layout.Rigid(func(gtx C) D {
-			return v.sd.Layout(gtx, th)
+			return v.cp.Layout(gtx, th)
 		}),
 	)
 }

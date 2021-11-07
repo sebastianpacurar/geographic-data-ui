@@ -11,7 +11,6 @@ import (
 	"gioui.org/x/component"
 	"strconv"
 	"strings"
-	"unicode"
 )
 
 type (
@@ -24,11 +23,13 @@ type (
 	startFrom struct {
 		textField component.TextField
 		btn       widget.Clickable
+		isValid   bool
 	}
 
 	skipBy struct {
 		textField component.TextField
 		btn       widget.Clickable
+		isValid   bool
 	}
 
 	resetTo struct {
@@ -39,53 +40,58 @@ type (
 
 func (vh *ValueHandler) Layout(gtx C, th *material.Theme) D {
 	cv := data.CurrVals
-	return layout.Flex{
-		Axis:      layout.Vertical,
-		Alignment: layout.Middle,
-	}.Layout(
-		gtx,
-		layout.Rigid(func(gtx C) D {
-			return layout.Flex{
-				Axis: layout.Horizontal,
-			}.Layout(gtx,
-				layout.Flexed(1, func(gtx C) D {
-					return vh.InputBox(gtx, th, &vh.startFrom.textField, cv, "start")
-				}),
-				layout.Flexed(1, func(gtx C) D {
-					for range vh.startFrom.btn.Clicks() {
-						vh.handleStartBtn(cv)
-					}
-					return g.Inset.Layout(gtx, func(C) D {
-						return material.Button(th, &vh.startFrom.btn, "set start").Layout(gtx)
-					})
-				}),
-			)
-		}),
-		layout.Rigid(func(gtx C) D {
-			return layout.Flex{
-				Axis: layout.Horizontal,
-			}.Layout(gtx,
-				layout.Flexed(1, func(gtx C) D {
-					return vh.InputBox(gtx, th, &vh.skipBy.textField, cv, "skip")
-				}),
-				layout.Flexed(1, func(gtx C) D {
-					for range vh.skipBy.btn.Clicks() {
-						vh.handleSkipBtn(cv)
-					}
-					return g.Inset.Layout(gtx, func(C) D {
-						return material.Button(th, &vh.skipBy.btn, "set step").Layout(gtx)
-					})
-				}),
-			)
-		}))
+	// start field
+	startFromField := layout.Flexed(1, func(gtx C) D {
+		return vh.InputBox(gtx, th, &vh.startFrom.textField, cv, "start")
+	})
+	// start button
+	startFromBtn := layout.Flexed(1, func(gtx C) D {
+		field := vh.startFrom.textField
+		if field.IsErrored() || field.Len() == 0 {
+			gtx = gtx.Disabled()
+		}
+		for range vh.startFrom.btn.Clicks() {
+			vh.handleStartBtn(cv)
+		}
+		return g.Inset.Layout(gtx, func(C) D {
+			return material.Button(th, &vh.startFrom.btn, "set start").Layout(gtx)
+		})
+	})
+	// skip (step) field
+	skipByField := layout.Flexed(1, func(gtx C) D {
+		return vh.InputBox(gtx, th, &vh.skipBy.textField, cv, "skip")
+	})
+	// skip (step) button
+	skipByBtn := layout.Flexed(1, func(gtx C) D {
+		field := vh.skipBy.textField
+		if field.IsErrored() || field.Len() == 0 {
+			gtx = gtx.Disabled()
+		}
+		for range vh.skipBy.btn.Clicks() {
+			vh.handleSkipBtn(cv)
+		}
+		return g.Inset.Layout(gtx, func(C) D {
+			return material.Button(th, &vh.skipBy.btn, "set step").Layout(gtx)
+		})
+	})
+
+	// lay startRow = horizontal layout for startFromField - startFromBtn
+	startRow := layout.Rigid(func(gtx C) D {
+		return layout.Flex{}.Layout(gtx, startFromField, startFromBtn)
+	})
+
+	// lay skipRow = horizontal layout for skipByField - skipByBtn
+	skipRow := layout.Rigid(func(gtx C) D {
+		return layout.Flex{}.Layout(gtx, skipByField, skipByBtn)
+	})
+
+	// lay out startRow and skipRow vertically
+	return layout.Flex{Axis: layout.Vertical, Alignment: layout.Middle}.Layout(gtx,
+		startRow, skipRow,
+	)
 }
 
 func (vh *ValueHandler) InputBox(gtx C, th *material.Theme, e *component.TextField, cv *data.Generator, context string) D {
-	if !isNumeric(e.Text()) {
-		e.SetError("only digits allowed")
-	} else {
-		e.ClearError()
-	}
 	seq := cv.GetActiveSequence()
 	var placeholder string
 	switch seq {
@@ -98,7 +104,7 @@ func (vh *ValueHandler) InputBox(gtx C, th *material.Theme, e *component.TextFie
 			placeholder = "set reset to n"
 			e.CharLimit = 10
 		case "skip":
-			placeholder = "set skip to n"
+			placeholder = "set skip by n"
 			e.CharLimit = 5
 		}
 	case data.NATURALS, data.WHOLES:
@@ -107,27 +113,29 @@ func (vh *ValueHandler) InputBox(gtx C, th *material.Theme, e *component.TextFie
 			placeholder = "start from n"
 			e.CharLimit = 15
 		case "skip":
-			placeholder = "set skip to n"
+			placeholder = "set skip by n"
 			e.CharLimit = 15
 		}
 	}
 	if e.Len() > int(e.CharLimit) {
 		e.SetError("limit exceeded")
+	} else if !isNumeric(e.Text()) && e.Len() > 0 {
+		e.SetError("only digits")
 	} else {
 		e.ClearError()
 	}
+
 	e.SingleLine = true
 	e.Alignment = layout.Alignment(text.Start)
 	return e.Layout(gtx, th, placeholder)
 }
 
 func isNumeric(val string) bool {
-	for _, r := range val {
-		if !unicode.IsDigit(r) {
-			return false
-		}
+	if _, err := strconv.ParseInt(val, 10, 64); err != nil {
+		return false
+	} else {
+		return true
 	}
-	return true
 }
 
 func (vh *ValueHandler) handleStartBtn(cv *data.Generator) {
