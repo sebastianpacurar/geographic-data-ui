@@ -70,7 +70,7 @@ func (inc *Incrementor) isResetBtnDisabled(cv *data.Generator) bool {
 	switch seq {
 	case data.PRIMES, data.FIBS:
 		res = cv.Cache[seq][cv.Index] == cv.Cache[seq][int(cv.Start)-1]
-	case data.NATURALS, data.WHOLES:
+	case data.NATURALS, data.INTEGERS:
 		res = cv.Displayed == cv.Start
 	}
 	return res
@@ -82,7 +82,7 @@ func (inc *Incrementor) isMinusBtnDisabled(cv *data.Generator) bool {
 	switch seq {
 	case data.PRIMES, data.FIBS:
 		res = cv.Index <= 0
-	case data.NATURALS, data.WHOLES:
+	case data.NATURALS, data.INTEGERS:
 		res = cv.Displayed <= 0
 	}
 	return res
@@ -94,7 +94,7 @@ func (inc *Incrementor) isPlusBtnDisabled(cv *data.Generator) bool {
 	switch seq {
 	case data.PRIMES, data.FIBS:
 		res = cv.Index == len(cv.Cache[seq])-1
-	case data.NATURALS, data.WHOLES:
+	case data.NATURALS, data.INTEGERS:
 		res = cv.Displayed == math.MaxUint64
 	}
 	return res
@@ -105,7 +105,7 @@ func (inc *Incrementor) handleResetBtn(cv *data.Generator) {
 	switch seq {
 	case data.PRIMES, data.FIBS:
 		cv.Index = int(cv.Start) - 1
-	case data.NATURALS, data.WHOLES:
+	case data.NATURALS, data.INTEGERS:
 		cv.Displayed = cv.Start
 	}
 }
@@ -115,7 +115,7 @@ func (inc *Incrementor) handlePlusBtn(cv *data.Generator) {
 	switch seq {
 	case data.PRIMES, data.FIBS:
 		cv.Index += int(cv.Step)
-	case data.NATURALS, data.WHOLES:
+	case data.NATURALS, data.INTEGERS:
 		cv.Displayed += cv.Step
 	}
 }
@@ -125,7 +125,7 @@ func (inc *Incrementor) handleMinusBtn(cv *data.Generator) {
 	switch seq {
 	case data.PRIMES, data.FIBS:
 		cv.Index -= int(cv.Step)
-	case data.NATURALS, data.WHOLES:
+	case data.NATURALS, data.INTEGERS:
 		cv.Displayed -= cv.Step
 	}
 }
@@ -136,7 +136,7 @@ func (inc *Incrementor) parseResetLabel(cv *data.Generator) string {
 	switch seq {
 	case data.PRIMES, data.FIBS:
 		lbl = strconv.FormatUint(cv.Cache[seq][cv.Start-1], 10)
-	case data.NATURALS, data.WHOLES:
+	case data.NATURALS, data.INTEGERS:
 		lbl = strconv.FormatUint(cv.Start, 10)
 	}
 	return lbl

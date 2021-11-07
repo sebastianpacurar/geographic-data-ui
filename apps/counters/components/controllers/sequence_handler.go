@@ -22,7 +22,7 @@ func (sh *SequenceHandler) Layout(gtx C, th *material.Theme) D {
 
 	toWholesBtn := layout.Rigid(func(gtx C) D {
 		for range sh.toWhole.Clicks() {
-			sh.handleSequenceType(cv, data.WHOLES)
+			sh.handleSequenceType(cv, data.INTEGERS)
 		}
 		return custom_widgets.LabeledIconBtn{
 			Theme:      th,

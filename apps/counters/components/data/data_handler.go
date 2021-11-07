@@ -5,12 +5,12 @@ import (
 )
 
 const (
-	PLIMIT = 50
-	FLIMIT = 50
+	PLIMIT = 1000
+	FLIMIT = 1000
 
 	ONE = 1
 
-	WHOLES   = "wholes"
+	INTEGERS = "wholes"
 	NATURALS = "naturals"
 	PRIMES   = "primes"
 	FIBS     = "fibs"
@@ -41,6 +41,16 @@ func (gen *Generator) SetActiveSequence(active string) {
 	for k := range gen.ActiveSeq {
 		if k == active {
 			gen.ActiveSeq[k] = true
+
+			// generate primes and fibs only once, in case the cache is empty
+			if len(gen.Cache[k]) == 0 {
+				switch k {
+				case PRIMES:
+					gen.GenPrimes(PLIMIT)
+				case FIBS:
+					gen.GenFibs(FLIMIT)
+				}
+			}
 		} else {
 			gen.ActiveSeq[k] = false
 		}
@@ -123,7 +133,7 @@ var CurrVals = &Generator{
 	Step:      ONE,
 	Start:     ONE,
 	ActiveSeq: map[string]bool{
-		WHOLES:   true,
+		INTEGERS: true,
 		NATURALS: false,
 		PRIMES:   false,
 		FIBS:     false,
