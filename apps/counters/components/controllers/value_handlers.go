@@ -98,22 +98,19 @@ func (vh *ValueHandler) InputBox(gtx C, th *material.Theme, e *component.TextFie
 	case data.PRIMES, data.FIBS:
 		switch context {
 		case "start":
-			placeholder = fmt.Sprintf("n-th %s", seq[:len(seq)-1])
+			placeholder = fmt.Sprintf("n-th %s num", seq[:len(seq)-1])
 			e.CharLimit = 5
-		case "reset":
-			placeholder = "set reset to n"
-			e.CharLimit = 10
 		case "skip":
-			placeholder = "set skip by n"
+			placeholder = "set step by n"
 			e.CharLimit = 5
 		}
-	case data.NATURALS, data.WHOLES:
+	case data.NATURALS, data.INTEGERS:
 		switch context {
 		case "start":
 			placeholder = "start from n"
 			e.CharLimit = 15
 		case "skip":
-			placeholder = "set skip by n"
+			placeholder = "set step by n"
 			e.CharLimit = 15
 		}
 	}
@@ -145,7 +142,7 @@ func (vh *ValueHandler) handleStartBtn(cv *data.Generator) {
 	switch seq {
 	case data.PRIMES, data.FIBS:
 		cv.Index = int(numVal) - 1
-	case data.NATURALS, data.WHOLES:
+	case data.NATURALS, data.INTEGERS:
 		cv.Displayed = numVal
 	}
 }

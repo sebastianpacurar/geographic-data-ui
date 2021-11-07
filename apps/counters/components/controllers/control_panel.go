@@ -36,7 +36,7 @@ func (cp *ControlPanel) Layout(gtx C, th *material.Theme) D {
 						Top:    unit.Dp(10),
 						Right:  unit.Dp(10),
 						Bottom: unit.Dp(10),
-						Left:   unit.Dp(15),
+						Left:   unit.Dp(20),
 					}.Layout(gtx, func(gtx C) D {
 						return cp.vh.Layout(gtx, th)
 					})

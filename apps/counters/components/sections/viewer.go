@@ -80,7 +80,7 @@ func (v *View) Layout(gtx C, th *material.Theme) D {
 						switch seq {
 						case data.PRIMES, data.FIBS:
 							val = strconv.FormatUint(cv.Cache[seq][cv.Index], 10)
-						case data.NATURALS, data.WHOLES:
+						case data.NATURALS, data.INTEGERS:
 							val = strconv.FormatUint(cv.Displayed, 10)
 						}
 						return material.H5(th, val).Layout(gtx)
