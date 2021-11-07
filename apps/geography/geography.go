@@ -32,7 +32,7 @@ func (app *Application) Overflow() []component.OverflowAction {
 
 func (app *Application) NavItem() component.NavItem {
 	return component.NavItem{
-		Name: "Geography - countries, state, statistics",
+		Name: "Geography - countries, states, statistics",
 	}
 }
 

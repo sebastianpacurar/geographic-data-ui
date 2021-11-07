@@ -36,22 +36,23 @@ func (app *Application) Overflow() []component.OverflowAction {
 
 func (app *Application) NavItem() component.NavItem {
 	return component.NavItem{
-		Name: "Counters - overly complicated ",
+		Name: "Counters - way too overly complicated counter",
 	}
 }
 
 func (app *Application) Layout(gtx C, th *material.Theme) D {
-	return layout.Flex{
-		Axis: layout.Vertical,
-	}.Layout(
-		gtx,
-		layout.Rigid(func(gtx C) D {
-			return g.Inset.Layout(gtx, func(gtx C) D {
-				return app.Top.Layout(gtx, th)
-			})
-		}),
-		layout.Flexed(1, func(gtx C) D {
-			return app.View.Layout(gtx, th)
-		}),
-	)
+	top := layout.Rigid(func(gtx C) D {
+		return layout.Inset{
+			Left:   g.DefaultMargin,
+			Right:  g.DefaultMargin,
+			Bottom: g.DefaultMargin,
+		}.Layout(gtx, func(gtx C) D {
+			return app.Top.Layout(gtx, th)
+		})
+	})
+	view := layout.Rigid(func(gtx C) D {
+		return app.View.Layout(gtx, th)
+	})
+
+	return layout.Flex{Axis: layout.Vertical}.Layout(gtx, top, view)
 }

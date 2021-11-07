@@ -7,7 +7,6 @@ import (
 )
 
 var (
-	MenuWidth         = unit.Dp(180)
 	CountersMenuWidth = unit.Dp(300)
 	DefaultMargin     = unit.Dp(10)
 	Colours           = map[string]color.NRGBA{

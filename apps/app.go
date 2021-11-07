@@ -103,10 +103,13 @@ func (r *Router) Layout(gtx C, th *material.Theme) D {
 	bar := layout.Rigid(func(gtx C) D {
 		return r.AppBar.Layout(gtx, th)
 	})
+
+	// lay the app bar first, then the content of the current application
 	layout.Flex{
 		Axis: layout.Vertical,
 	}.Layout(gtx, bar, content)
 
+	// lay the modal on top of other widgets, so it could have the highest z-index
 	r.ModalLayer.Layout(gtx, th)
 
 	return D{

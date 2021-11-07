@@ -23,49 +23,44 @@ type (
 
 func (inc *Incrementor) Layout(gtx C, th *material.Theme) D {
 	cv := data.CurrVals
-	return layout.Flex{
-		Axis:    layout.Horizontal,
-		Spacing: layout.SpaceEnd,
-	}.Layout(gtx,
 
-		// MinusButton
-		layout.Rigid(func(gtx C) D {
-			if inc.isMinusBtnDisabled(cv) {
-				gtx = gtx.Disabled()
-			}
-			for range inc.minusBtn.Clicks() {
-				inc.handleMinusBtn(cv)
-			}
-			return g.Inset.Layout(gtx,
-				material.IconButton(th, &inc.minusBtn, g.MinusIcon).Layout)
-		}),
-		g.SpacerX,
+	minusBtn := layout.Rigid(func(gtx C) D {
+		if inc.isMinusBtnDisabled(cv) {
+			gtx = gtx.Disabled()
+		}
+		for range inc.minusBtn.Clicks() {
+			inc.handleMinusBtn(cv)
+		}
+		return g.Inset.Layout(gtx,
+			material.IconButton(th, &inc.minusBtn, g.MinusIcon).Layout)
+	})
 
-		// Reset Button
-		layout.Rigid(func(gtx C) D {
-			if inc.isResetBtnDisabled(cv) {
-				gtx = gtx.Disabled()
-			}
-			for range inc.resetBtn.Clicks() {
-				inc.handleResetBtn(cv)
-			}
-			return g.Inset.Layout(gtx,
-				material.IconButton(th, &inc.resetBtn, g.RefreshIcon).Layout)
-		}),
+	resetBtn := layout.Rigid(func(gtx C) D {
+		if inc.isResetBtnDisabled(cv) {
+			gtx = gtx.Disabled()
+		}
+		for range inc.resetBtn.Clicks() {
+			inc.handleResetBtn(cv)
+		}
+		return g.Inset.Layout(gtx,
+			material.IconButton(th, &inc.resetBtn, g.RefreshIcon).Layout)
+	})
 
-		g.SpacerX,
+	plusBtn := layout.Rigid(func(gtx C) D {
+		if inc.isPlusBtnDisabled(cv) {
+			gtx = gtx.Disabled()
+		}
+		for range inc.plusBtn.Clicks() {
+			inc.handlePlusBtn(cv)
+		}
+		return g.Inset.Layout(gtx,
+			material.IconButton(th, &inc.plusBtn, g.PlusIcon).Layout)
+	})
 
-		// Plus Button
-		layout.Rigid(func(gtx C) D {
-			if inc.isPlusBtnDisabled(cv) {
-				gtx = gtx.Disabled()
-			}
-			for range inc.plusBtn.Clicks() {
-				inc.handlePlusBtn(cv)
-			}
-			return g.Inset.Layout(gtx,
-				material.IconButton(th, &inc.plusBtn, g.PlusIcon).Layout)
-		}),
+	// laying out minusBtn - space - resetBtn - space - plusBtn
+	// align them from the start
+	return layout.Flex{Spacing: layout.SpaceEnd}.Layout(gtx,
+		minusBtn, g.SpacerX, resetBtn, g.SpacerX, plusBtn,
 	)
 }
 
