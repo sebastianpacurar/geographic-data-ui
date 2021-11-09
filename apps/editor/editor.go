@@ -13,7 +13,7 @@ type (
 	D = layout.Dimensions
 
 	Application struct {
-		editor components.TextEditor
+		editor components.TextArea
 		*apps.Router
 	}
 )

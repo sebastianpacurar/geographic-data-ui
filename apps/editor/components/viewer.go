@@ -8,7 +8,6 @@ import (
 	"gioui.org/unit"
 	"gioui.org/widget"
 	"gioui.org/widget/material"
-	"gioui.org/x/component"
 )
 
 type (
@@ -16,83 +15,35 @@ type (
 	D = layout.Dimensions
 )
 
-type TextEditor struct {
-	inText  textInput
-	inNotes textInput
-}
-
-type Notes struct {
-	in   textInput
-	name string
-}
-
-type textInput struct {
-	component.TextField
-	isDisabled bool
+type TextArea struct {
+	field      widget.Editor
 	border     widget.Border
+	isDisabled bool
 }
 
-// InitTextFields - this sets the initial state of the fields
-func (te *TextEditor) InitTextFields() {
-	te.inText.Editor.SingleLine = false
-	te.inText.Alignment = layout.Alignment(text.Start)
-	te.inText.isDisabled = false
-	te.inNotes.Editor.SingleLine = false
-	te.inNotes.Alignment = layout.Alignment(text.Start)
-	te.inNotes.isDisabled = false
-}
+func (ta *TextArea) Layout(gtx C, th *material.Theme) D {
+	input := material.Editor(th, &ta.field, "Type your Thoughts...")
+	input.SelectionColor = g.Colours[color.TEXT_SELECTION]
+	ta.field.SingleLine = false
+	ta.field.Alignment = text.Start
+	ta.isDisabled = false
 
-// Layout - Still in progress!
-func (te *TextEditor) Layout(gtx C, th *material.Theme) D {
-	input := material.Editor(th, &te.inNotes.Editor, "Type your Thoughts...")
-
-	return layout.UniformInset(g.DefaultMargin).Layout(gtx, func(gtx C) D {
-		return layout.Flex{
-			Axis:      layout.Horizontal,
-			WeightSum: 2,
-		}.Layout(
-			gtx,
-			// Input Text
-			layout.Flexed(1, func(gtx C) D {
-				input.TextSize = unit.Sp(20)
-				input.HintColor = g.Colours[color.DARK_SLATE_GREY]
-				border := widget.Border{
-					Color:        g.Colours[color.GREY],
-					CornerRadius: unit.Dp(5),
-					Width:        unit.Px(2),
-				}
-				switch {
-				case te.inText.Editor.Focused():
-					border.Color = th.Palette.ContrastBg
-					border.Width = unit.Px(3)
-				}
-				return border.Layout(gtx, func(gtx C) D {
-					return layout.UniformInset(unit.Dp(8)).Layout(
-						gtx,
-						input.Layout,
-					)
-				})
-			}),
-			layout.Flexed(1, func(gtx C) D {
-				input.TextSize = unit.Sp(20)
-				input.HintColor = g.Colours[color.DARK_SLATE_GREY]
-				border := widget.Border{
-					Color:        g.Colours[color.GREY],
-					CornerRadius: unit.Dp(5),
-					Width:        unit.Px(2),
-				}
-				switch {
-				case te.inNotes.Editor.Focused():
-					border.Color = th.Palette.ContrastBg
-					border.Width = unit.Px(3)
-				}
-				return border.Layout(gtx, func(gtx C) D {
-					return layout.UniformInset(unit.Dp(8)).Layout(
-						gtx,
-						input.Layout,
-					)
-				})
-			}),
-		)
+	textArea := layout.Flexed(1, func(gtx C) D {
+		border := widget.Border{
+			Color:        g.Colours[color.GREY],
+			CornerRadius: unit.Dp(5),
+			Width:        unit.Px(2),
+		}
+		switch {
+		case ta.field.Focused():
+			border.Color = th.Palette.ContrastBg
+			border.Width = unit.Px(3)
+		}
+		return border.Layout(gtx, func(gtx C) D {
+			return layout.UniformInset(unit.Dp(8)).Layout(gtx, func(gtx C) D {
+				return input.Layout(gtx)
+			})
+		})
 	})
+	return layout.Flex{}.Layout(gtx, textArea)
 }

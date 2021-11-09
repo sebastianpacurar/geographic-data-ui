@@ -25,9 +25,7 @@ func (cp *ControlPanel) Layout(gtx C, th *material.Theme) D {
 			return bar
 		}),
 		layout.Stacked(func(gtx C) D {
-			return layout.Flex{
-				Axis: layout.Vertical,
-			}.Layout(gtx,
+			return layout.Flex{Axis: layout.Vertical}.Layout(gtx,
 
 				// STATS AREA STARTS HERE
 				/// Key - Value pair design for Stats
