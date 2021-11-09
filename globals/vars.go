@@ -24,6 +24,8 @@ var (
 		"black":           {A: 255},
 		"antique-white":   {R: 250, G: 235, B: 215, A: 255},
 		"aero-blue":       {R: 201, G: 255, B: 229, A: 255},
+
+		"text_selection": {R: 191, G: 255, B: 209, A: 255},
 	}
 	Inset   = layout.UniformInset(DefaultMargin)
 	SpacerX = layout.Rigid(

@@ -1,11 +1,5 @@
 package countries
 
-import (
-	"encoding/json"
-	"gioui-experiment/apps/geography/components/api"
-	"log"
-)
-
 var (
 	allCountries = &Countries{}
 	Data         = allCountries.List
@@ -72,19 +66,19 @@ type (
 	}
 )
 
-func (c *Countries) InitCountries() error {
-	if !c.IsCached {
-		data, err := api.FetchCountries("all")
-		if err != nil {
-			log.Fatalln("Error fetching data from RESTCountries API ", err.Error())
-			return err
-		}
-		err = json.Unmarshal(data, &Data)
-		if err != nil {
-			log.Fatalln("json Unmarshal RESTCountries response: ", err.Error())
-			return err
-		}
-		c.IsCached = true
-	}
-	return nil
-}
+//func (c *Countries) InitCountries() error {
+//	if !c.IsCached {
+//		data, err := api.FetchCountries("all")
+//		if err != nil {
+//			log.Fatalln("Error fetching data from RESTCountries API ", err.Error())
+//			return err
+//		}
+//		err = json.Unmarshal(data, &Data)
+//		if err != nil {
+//			log.Fatalln("json Unmarshal RESTCountries response: ", err.Error())
+//			return err
+//		}
+//		c.IsCached = true
+//	}
+//	return nil
+//}
