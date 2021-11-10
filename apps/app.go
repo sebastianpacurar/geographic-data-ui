@@ -26,6 +26,7 @@ type (
 		NavAnim component.VisibilityAnimation
 		*component.AppBar
 		*component.ModalLayer
+		NonModalDrawer bool
 	}
 )
 
@@ -78,19 +79,23 @@ func (r *Router) Layout(gtx C, th *material.Theme) D {
 	for _, event := range r.AppBar.Events(gtx) {
 		switch event.(type) {
 		case component.AppBarNavigationClicked:
-			r.ModalNavDrawer.Appear(gtx.Now)
-			r.NavAnim.Disappear(gtx.Now)
+			if r.NonModalDrawer {
+				r.NavAnim.ToggleVisibility(gtx.Now)
+			} else {
+				r.ModalNavDrawer.Appear(gtx.Now)
+				r.NavAnim.Disappear(gtx.Now)
+			}
 		}
 	}
+
 	if r.ModalNavDrawer.NavDestinationChanged() {
 		r.SwitchTo(r.ModalNavDrawer.CurrentNavDestination())
 	}
 
 	content := layout.Flexed(1, func(gtx C) D {
-		return layout.Flex{
-			Axis: layout.Horizontal,
-		}.Layout(gtx,
+		return layout.Flex{}.Layout(gtx,
 			layout.Rigid(func(gtx C) D {
+				gtx.Constraints.Max.X /= 4
 				return r.NavDrawer.Layout(gtx, th, &r.NavAnim)
 			}),
 			layout.Flexed(1, func(gtx C) D {
@@ -105,9 +110,7 @@ func (r *Router) Layout(gtx C, th *material.Theme) D {
 	})
 
 	// lay the app bar first, then the content of the current application
-	layout.Flex{
-		Axis: layout.Vertical,
-	}.Layout(gtx, bar, content)
+	layout.Flex{Axis: layout.Vertical}.Layout(gtx, bar, content)
 
 	// lay the modal on top of other widgets, so it could have the highest z-index
 	r.ModalLayer.Layout(gtx, th)
