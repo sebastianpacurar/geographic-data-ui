@@ -51,24 +51,11 @@ func (v *View) Layout(gtx C, th *material.Theme) D {
 				layout.Stacked(func(gtx C) D {
 					return layout.Stack{}.Layout(gtx,
 						layout.Expanded(func(gtx C) D {
-							clip.UniformRRect(f32.Rectangle{
+							defer clip.UniformRRect(f32.Rectangle{
 								Max: layout.FPt(image.Pt(gtx.Constraints.Max.X, 100)),
-							}, 0).Add(gtx.Ops)
+							}, 0).Push(gtx.Ops).Pop()
 							return D{}
 						}))
-
-					/// INCREMENTORS
-					///
-					//layout.Stacked(func(gtx C) D {
-					//	return layout.UniformInset(g.DefaultMargin).Layout(gtx, func(gtx C) D {
-					//		return layout.Flex{
-					//			Axis: layout.Horizontal,
-					//		}.Layout(gtx,
-					//			layout.Flexed(1, func(gtx C) D {
-					//				return v.inc.Layout(gtx, th)
-					//			}))
-					//	})
-					//}))
 				}),
 
 				/// DISPLAYED NUMBER
