@@ -1,4 +1,4 @@
-package controllers
+package control_panel
 
 import (
 	"fmt"
@@ -17,7 +17,6 @@ type (
 	ValueHandler struct {
 		startFrom
 		skipBy
-		resetTo
 	}
 
 	startFrom struct {
@@ -30,11 +29,6 @@ type (
 		textField component.TextField
 		btn       widget.Clickable
 		isValid   bool
-	}
-
-	resetTo struct {
-		textField component.TextField
-		btn       widget.Clickable
 	}
 )
 
@@ -98,7 +92,7 @@ func (vh *ValueHandler) InputBox(gtx C, th *material.Theme, e *component.TextFie
 	case data.PRIMES, data.FIBS:
 		switch context {
 		case "start":
-			placeholder = fmt.Sprintf("n-th %s num", seq[:len(seq)-1])
+			placeholder = fmt.Sprintf("n-th %s", seq[:len(seq)-1])
 			e.CharLimit = 5
 		case "skip":
 			placeholder = "set step by n"
