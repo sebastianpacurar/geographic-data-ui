@@ -10,12 +10,17 @@ import (
 	"gioui.org/widget/material"
 )
 
-type SequenceHandler struct {
-	toWhole   widget.Clickable
-	toNatural widget.Clickable
-	toPrime   widget.Clickable
-	toFib     widget.Clickable
-}
+type (
+	C = layout.Context
+	D = layout.Dimensions
+
+	SequenceHandler struct {
+		toWhole   widget.Clickable
+		toNatural widget.Clickable
+		toPrime   widget.Clickable
+		toFib     widget.Clickable
+	}
+)
 
 func (sh *SequenceHandler) Layout(gtx C, th *material.Theme) D {
 	cv := data.CurrVals

@@ -6,6 +6,7 @@ import (
 	"gioui-experiment/custom_themes/colors"
 	g "gioui-experiment/globals"
 	"gioui.org/layout"
+	"gioui.org/unit"
 	"gioui.org/widget"
 	"gioui.org/widget/material"
 	"gioui.org/x/component"
@@ -20,17 +21,21 @@ type (
 		Top     sections.Top
 		View    sections.View
 		dockBtn widget.Clickable
-		icon    *widget.Icon
 		btn     material.IconButtonStyle
+		icon    *widget.Icon
 		th      *material.Theme
 		*apps.Router
 	}
 )
 
 func New(router *apps.Router) *Application {
-	return &Application{
+	counterApp := &Application{
 		Router: router,
 	}
+
+	// TODO: add dynamic handling for the diclosers
+	//counterApp.View.ControlPanel.InitControllers()
+	return counterApp
 }
 
 func (app *Application) Actions() []component.AppBarAction {
@@ -40,7 +45,7 @@ func (app *Application) Actions() []component.AppBarAction {
 				Tag: &app.dockBtn,
 			},
 			Layout: func(gtx C, bg, fg color.NRGBA) D {
-				if app.dockBtn.Clicked() {
+				for range app.dockBtn.Clicks() {
 					app.NonModalDrawer = !app.NonModalDrawer
 				}
 				if app.NonModalDrawer {
@@ -48,12 +53,14 @@ func (app *Application) Actions() []component.AppBarAction {
 					app.btn = component.SimpleIconButton(bg, fg, &app.dockBtn, app.icon)
 					app.btn.Background = bg
 					app.btn.Color = g.Colours[colors.DARK_RED]
+					app.btn.Size = unit.Dp(24)
 					app.Router.NavAnim.Appear(gtx.Now)
 				} else {
 					app.icon = g.LockOpenedIcon
 					app.btn = component.SimpleIconButton(bg, fg, &app.dockBtn, app.icon)
 					app.btn.Background = bg
 					app.btn.Color = g.Colours[colors.SEA_GREEN]
+					app.btn.Size = unit.Dp(24)
 					app.Router.NavAnim.Disappear(gtx.Now)
 				}
 				return app.btn.Layout(gtx)

@@ -2,6 +2,7 @@ package sections
 
 import (
 	"gioui-experiment/apps/counters/components/controllers"
+	"gioui-experiment/apps/counters/components/controllers/control_panel"
 	"gioui-experiment/apps/counters/components/data"
 	"gioui-experiment/custom_themes/colors"
 	g "gioui-experiment/globals"
@@ -15,12 +16,16 @@ import (
 )
 
 type View struct {
-	inc controllers.Incrementor
-	cp  controllers.ControlPanel
+	inc          control_panel.Incrementor
+	ControlPanel controllers.ControlPanel
 }
 
 func (v *View) Layout(gtx C, th *material.Theme) D {
 	cv := data.CurrVals
+	cp := layout.Rigid(func(gtx C) D {
+		return v.ControlPanel.Layout(gtx, th)
+	})
+
 	size := image.Pt(gtx.Constraints.Max.X, gtx.Constraints.Max.Y)
 	return layout.Flex{
 		Axis: layout.Horizontal,
@@ -50,20 +55,20 @@ func (v *View) Layout(gtx C, th *material.Theme) D {
 								Max: layout.FPt(image.Pt(gtx.Constraints.Max.X, 100)),
 							}, 0).Add(gtx.Ops)
 							return D{}
-						}),
-
-						/// INCREMENTORS
-						///
-						layout.Stacked(func(gtx C) D {
-							return layout.UniformInset(g.DefaultMargin).Layout(gtx, func(gtx C) D {
-								return layout.Flex{
-									Axis: layout.Horizontal,
-								}.Layout(gtx,
-									layout.Flexed(1, func(gtx C) D {
-										return v.inc.Layout(gtx, th)
-									}))
-							})
 						}))
+
+					/// INCREMENTORS
+					///
+					//layout.Stacked(func(gtx C) D {
+					//	return layout.UniformInset(g.DefaultMargin).Layout(gtx, func(gtx C) D {
+					//		return layout.Flex{
+					//			Axis: layout.Horizontal,
+					//		}.Layout(gtx,
+					//			layout.Flexed(1, func(gtx C) D {
+					//				return v.inc.Layout(gtx, th)
+					//			}))
+					//	})
+					//}))
 				}),
 
 				/// DISPLAYED NUMBER
@@ -89,9 +94,7 @@ func (v *View) Layout(gtx C, th *material.Theme) D {
 		}),
 
 		///
-		/// RIGHT HAND PANEL IS RENDERED HERE
-		layout.Rigid(func(gtx C) D {
-			return v.cp.Layout(gtx, th)
-		}),
+		/// CONTROL PANEL IS RENDERED HERE
+		cp,
 	)
 }

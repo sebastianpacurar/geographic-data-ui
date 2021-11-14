@@ -3,7 +3,6 @@ package globals
 import "C"
 import (
 	"gioui.org/layout"
-	"gioui.org/op"
 	"gioui.org/op/clip"
 	"gioui.org/op/paint"
 	"math/rand"
@@ -17,8 +16,8 @@ import (
 )
 
 func ColoredArea(gtx layout.Context, size image.Point, color color.NRGBA) layout.Dimensions {
-	defer op.Save(gtx.Ops).Load()
-	clip.Rect{Max: size}.Add(gtx.Ops)
+	dims := image.Rectangle{Max: gtx.Constraints.Max}
+	defer clip.Rect(dims).Push(gtx.Ops).Pop()
 	paint.ColorOp{Color: color}.Add(gtx.Ops)
 	paint.PaintOp{}.Add(gtx.Ops)
 	return layout.Dimensions{Size: size}

@@ -1,4 +1,4 @@
-package controllers
+package control_panel
 
 import (
 	"gioui-experiment/apps/counters/components/data"
