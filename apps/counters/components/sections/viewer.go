@@ -6,9 +6,7 @@ import (
 	"gioui-experiment/apps/counters/components/data"
 	"gioui-experiment/custom_themes/colors"
 	g "gioui-experiment/globals"
-	"gioui.org/f32"
 	"gioui.org/layout"
-	"gioui.org/op/clip"
 	"gioui.org/unit"
 	"gioui.org/widget/material"
 	"image"
@@ -22,8 +20,30 @@ type View struct {
 
 func (v *View) Layout(gtx C, th *material.Theme) D {
 	cv := data.CurrVals
-	cp := layout.Rigid(func(gtx C) D {
+	seq := cv.GetActiveSequence()
+
+	/// CONTROL PANEL
+	controlPanel := layout.Rigid(func(gtx C) D {
 		return v.ControlPanel.Layout(gtx, th)
+	})
+
+	/// DISPLAYED NUMBER
+	displayedNumber := layout.Rigid(func(gtx C) D {
+		return layout.Inset{
+			Top:    unit.Dp(10),
+			Right:  unit.Dp(50),
+			Bottom: unit.Dp(20),
+			Left:   unit.Dp(50),
+		}.Layout(gtx, func(gtx C) D {
+			var val string
+			switch seq {
+			case data.PRIMES, data.FIBS:
+				val = strconv.FormatUint(cv.Cache[seq][cv.Index], 10)
+			case data.NATURALS, data.INTEGERS:
+				val = strconv.FormatUint(cv.Displayed, 10)
+			}
+			return material.H5(th, val).Layout(gtx)
+		})
 	})
 
 	size := image.Pt(gtx.Constraints.Max.X, gtx.Constraints.Max.Y)
@@ -46,42 +66,15 @@ func (v *View) Layout(gtx C, th *material.Theme) D {
 					return view
 				}),
 
-				/// 100 height BAR DISPLAYED ABOVE THE DISPLAYED NUMBER
-				///
 				layout.Stacked(func(gtx C) D {
-					return layout.Stack{}.Layout(gtx,
-						layout.Expanded(func(gtx C) D {
-							defer clip.UniformRRect(f32.Rectangle{
-								Max: layout.FPt(image.Pt(gtx.Constraints.Max.X, 100)),
-							}, 0).Push(gtx.Ops).Pop()
-							return D{}
-						}))
+					containerSize := image.Pt(gtx.Constraints.Max.X, gtx.Constraints.Max.Y)
+					gtx.Constraints = layout.Exact(gtx.Constraints.Constrain(containerSize))
+					return layout.Flex{Axis: layout.Vertical}.Layout(gtx,
+						displayedNumber,
+					)
 				}),
-
-				/// DISPLAYED NUMBER
-				///
-				layout.Stacked(func(gtx C) D {
-					return layout.Inset{
-						Top:    unit.Dp(80),
-						Right:  unit.Dp(50),
-						Bottom: unit.Dp(20),
-						Left:   unit.Dp(50),
-					}.Layout(gtx, func(gtx C) D {
-						var val string
-						seq := cv.GetActiveSequence()
-						switch seq {
-						case data.PRIMES, data.FIBS:
-							val = strconv.FormatUint(cv.Cache[seq][cv.Index], 10)
-						case data.NATURALS, data.INTEGERS:
-							val = strconv.FormatUint(cv.Displayed, 10)
-						}
-						return material.H5(th, val).Layout(gtx)
-					})
-				}))
+			)
 		}),
-
-		///
-		/// CONTROL PANEL IS RENDERED HERE
-		cp,
+		controlPanel,
 	)
 }
