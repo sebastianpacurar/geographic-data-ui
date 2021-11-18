@@ -54,14 +54,12 @@ func (app *Application) Actions() []component.AppBarAction {
 					app.btn.Background = bg
 					app.btn.Color = g.Colours[colors.DARK_RED]
 					app.btn.Size = unit.Dp(24)
-					app.Router.NavAnim.Appear(gtx.Now)
 				} else {
 					app.icon = g.LockOpenedIcon
 					app.btn = component.SimpleIconButton(bg, fg, &app.dockBtn, app.icon)
 					app.btn.Background = bg
 					app.btn.Color = g.Colours[colors.SEA_GREEN]
 					app.btn.Size = unit.Dp(24)
-					app.Router.NavAnim.Disappear(gtx.Now)
 				}
 				return app.btn.Layout(gtx)
 			},
