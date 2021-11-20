@@ -29,13 +29,9 @@ type (
 )
 
 func New(router *apps.Router) *Application {
-	counterApp := &Application{
+	return &Application{
 		Router: router,
 	}
-
-	// TODO: add dynamic handling for the diclosers
-	//counterApp.View.ControlPanel.InitControllers()
-	return counterApp
 }
 
 func (app *Application) Actions() []component.AppBarAction {

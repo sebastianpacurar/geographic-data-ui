@@ -3,6 +3,7 @@ package apps
 import (
 	g "gioui-experiment/globals"
 	"gioui.org/layout"
+	"gioui.org/unit"
 	"gioui.org/widget/material"
 	"gioui.org/x/component"
 	"time"
@@ -95,7 +96,7 @@ func (r *Router) Layout(gtx C, th *material.Theme) D {
 	content := layout.Flexed(1, func(gtx C) D {
 		return layout.Flex{}.Layout(gtx,
 			layout.Rigid(func(gtx C) D {
-				gtx.Constraints.Max.X /= 4
+				gtx.Constraints.Max.X = gtx.Px(unit.Dp(250))
 				return r.NavDrawer.Layout(gtx, th, &r.NavAnim)
 			}),
 			layout.Flexed(1, func(gtx C) D {

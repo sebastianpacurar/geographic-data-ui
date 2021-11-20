@@ -9,6 +9,7 @@ import (
 	"gioui.org/layout"
 	"gioui.org/unit"
 	"gioui.org/widget/material"
+	"gioui.org/x/component"
 	"image"
 	"strconv"
 )
@@ -46,6 +47,10 @@ func (v *View) Layout(gtx C, th *material.Theme) D {
 		})
 	})
 
+	divider := layout.Rigid(func(gtx C) D {
+		return component.Divider(th).Layout(gtx)
+	})
+
 	size := image.Pt(gtx.Constraints.Max.X, gtx.Constraints.Max.Y)
 	return layout.Flex{
 		Axis: layout.Horizontal,
@@ -75,6 +80,7 @@ func (v *View) Layout(gtx C, th *material.Theme) D {
 				}),
 			)
 		}),
+		divider,
 		controlPanel,
 	)
 }
