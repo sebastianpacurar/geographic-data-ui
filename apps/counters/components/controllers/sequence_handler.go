@@ -85,9 +85,5 @@ func (sh *SequenceHandler) Layout(gtx C, th *material.Theme) D {
 }
 
 func (sh *SequenceHandler) handleSequenceType(cv *data.Generator, target string) {
-	cv.Index = 0
-	cv.Step = 1
-	cv.Start = 1
-	cv.Displayed = 1
 	cv.SetActiveSequence(target)
 }

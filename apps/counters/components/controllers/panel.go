@@ -16,16 +16,19 @@ type (
 	ControlPanel struct {
 		controllers []Controller
 		list        widget.List
-		vh          control_panel.ValueHandler
-		inc         control_panel.Incrementor
-		display     control_panel.DisplayLayout
-		filters     control_panel.Filters
 
-		/// hardcoded in order to keep track of the specific current state
+		vh      control_panel.ValueHandler
+		inc     control_panel.Incrementor
+		display control_panel.DisplayLayout
+		filters control_panel.Filters
+		status  control_panel.Status
+
+		// hardcoded in order to keep track of the specific current state
 		incState     component.DiscloserState
 		vhState      component.DiscloserState
 		displayState component.DiscloserState
 		filtersState component.DiscloserState
+		statusState  component.DiscloserState
 	}
 
 	Controller struct {
@@ -106,6 +109,21 @@ func (cp *ControlPanel) Layout(gtx C, th *material.Theme) D {
 						func(gtx C) D {
 							return controllerInset.Layout(gtx, func(gtx C) D {
 								return cp.filters.Layout(gtx, th)
+							})
+						})
+				})
+				return cp.LayOutset(gtx, content, divider)
+			},
+		},
+		{
+			name: "Statistics",
+			layout: func(gtx C, c *Controller) D {
+				content := layout.Rigid(func(gtx C) D {
+					return component.SimpleDiscloser(th, &cp.statusState).Layout(gtx,
+						material.Body1(th, c.name).Layout,
+						func(gtx C) D {
+							return controllerInset.Layout(gtx, func(gtx C) D {
+								return cp.status.Layout(gtx, th)
 							})
 						})
 				})
