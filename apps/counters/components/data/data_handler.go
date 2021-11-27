@@ -5,12 +5,12 @@ import (
 )
 
 const (
-	PLIMIT = 1000
-	FLIMIT = 1000
+	PLIMIT = 3000
+	FLIMIT = 100
 
 	ONE = 1
 
-	INTEGERS = "wholes"
+	INTEGERS = "integers"
 	NATURALS = "naturals"
 	PRIMES   = "primes"
 	FIBS     = "fibs"
@@ -19,9 +19,35 @@ const (
 type (
 	Generator struct {
 		ActiveSeq map[string]bool
-		Displayed uint64
-		Index     int
 		Cache     map[string][]uint64
+		Naturals
+		Integers
+		Primes
+		Fibonacci
+	}
+
+	Primes struct {
+		Index int
+		Step  uint64
+		Start uint64
+		Stop  uint64
+	}
+
+	Fibonacci struct {
+		Index int
+		Step  uint64
+		Start uint64
+		Stop  uint64
+	}
+
+	Naturals struct {
+		Displayed uint64
+		Step      uint64
+		Start     uint64
+	}
+
+	Integers struct {
+		Displayed uint64
 		Step      uint64
 		Start     uint64
 	}
@@ -86,23 +112,6 @@ func (gen *Generator) genPrimes(length int) {
 			num += 2
 		}
 	}
-
-	//TODO: currently not working
-	//countCached := len(p.PCache)
-	//if length <= countCached {
-	//	return
-	//} else {
-	//	diff := length - countCached
-	//	startVal := countCached - 1
-	//	lastCached := p.PCache[startVal]
-	//	for diff >= 0 {
-	//		if isPrime(lastCached) {
-	//			p.PCache[startVal+1] = lastCached
-	//		}
-	//		lastCached++
-	//		diff--
-	//	}
-	//}
 }
 
 func getFibByIndex(n uint64) uint64 {
@@ -129,14 +138,29 @@ func (gen *Generator) genFibs(length int) {
 }
 
 var CurrVals = &Generator{
-	Displayed: ONE,
-	Step:      ONE,
-	Start:     ONE,
+	Cache: make(map[string][]uint64),
 	ActiveSeq: map[string]bool{
 		INTEGERS: true,
 		NATURALS: false,
 		PRIMES:   false,
 		FIBS:     false,
 	},
-	Cache: make(map[string][]uint64),
+	Primes: Primes{
+		Step:  ONE,
+		Start: ONE,
+	},
+	Fibonacci: Fibonacci{
+		Step:  ONE,
+		Start: ONE,
+	},
+	Naturals: Naturals{
+		Displayed: ONE,
+		Step:      ONE,
+		Start:     ONE,
+	},
+	Integers: Integers{
+		Displayed: ONE,
+		Step:      ONE,
+		Start:     ONE,
+	},
 }

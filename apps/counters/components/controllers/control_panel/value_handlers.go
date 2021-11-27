@@ -17,18 +17,22 @@ type (
 	ValueHandler struct {
 		startFrom
 		skipBy
+		stopAt
 	}
 
 	startFrom struct {
 		textField component.TextField
 		btn       widget.Clickable
-		isValid   bool
 	}
 
 	skipBy struct {
 		textField component.TextField
 		btn       widget.Clickable
-		isValid   bool
+	}
+
+	stopAt struct {
+		textField component.TextField
+		btn       widget.Clickable
 	}
 )
 
@@ -69,6 +73,28 @@ func (vh *ValueHandler) Layout(gtx C, th *material.Theme) D {
 		})
 	})
 
+	//TODO: temporary on hold
+	// start field
+	stopAtField := layout.Flexed(1, func(gtx C) D {
+		gtx = gtx.Disabled()
+		return vh.InputBox(gtx, th, &vh.stopAt.textField, cv, "stop")
+	})
+	//TODO: temporary on hold
+	// start button
+	stopAtBtn := layout.Flexed(1, func(gtx C) D {
+		gtx = gtx.Disabled()
+		field := vh.stopAt.textField
+		if field.IsErrored() || field.Len() == 0 {
+			gtx = gtx.Disabled()
+		}
+		for range vh.stopAt.btn.Clicks() {
+			vh.handleStopBtn(cv)
+		}
+		return g.Inset.Layout(gtx, func(C) D {
+			return material.Button(th, &vh.stopAt.btn, "on hold").Layout(gtx)
+		})
+	})
+
 	// lay startRow = horizontal layout for startFromField - startFromBtn
 	startRow := layout.Rigid(func(gtx C) D {
 		return layout.Flex{}.Layout(gtx, startFromField, startFromBtn)
@@ -79,9 +105,14 @@ func (vh *ValueHandler) Layout(gtx C, th *material.Theme) D {
 		return layout.Flex{}.Layout(gtx, skipByField, skipByBtn)
 	})
 
+	// lay stopRow = horizontal layout for stopAtField - stopAtBtn
+	stopRow := layout.Rigid(func(gtx C) D {
+		return layout.Flex{}.Layout(gtx, stopAtField, stopAtBtn)
+	})
+
 	// lay out startRow and skipRow vertically
 	return layout.Flex{Axis: layout.Vertical, Alignment: layout.Middle}.Layout(gtx,
-		startRow, skipRow,
+		startRow, skipRow, stopRow,
 	)
 }
 
@@ -134,15 +165,41 @@ func (vh *ValueHandler) handleStartBtn(cv *data.Generator) {
 	numVal, _ := strconv.ParseUint(val, 10, 64)
 	seq := cv.GetActiveSequence()
 	switch seq {
-	case data.PRIMES, data.FIBS:
-		cv.Index = int(numVal) - 1
-	case data.NATURALS, data.INTEGERS:
-		cv.Displayed = numVal
+	case data.PRIMES:
+		cv.Primes.Index = int(numVal) - 1
+	case data.FIBS:
+		cv.Fibonacci.Index = int(numVal) - 1
+	case data.NATURALS:
+		cv.Naturals.Displayed = numVal
+	case data.INTEGERS:
+		cv.Integers.Displayed = numVal
 	}
 }
 
 func (vh *ValueHandler) handleSkipBtn(cv *data.Generator) {
 	val := strings.TrimSpace(vh.skipBy.textField.Text())
 	numVal, _ := strconv.ParseUint(val, 10, 64)
-	cv.Step = numVal
+	seq := cv.GetActiveSequence()
+	switch seq {
+	case data.PRIMES:
+		cv.Primes.Step = numVal
+	case data.FIBS:
+		cv.Fibonacci.Step = numVal
+	case data.NATURALS:
+		cv.Naturals.Step = numVal
+	case data.INTEGERS:
+		cv.Integers.Step = numVal
+	}
+}
+
+func (vh *ValueHandler) handleStopBtn(cv *data.Generator) {
+	val := strings.TrimSpace(vh.stopAt.textField.Text())
+	numVal, _ := strconv.ParseUint(val, 10, 64)
+	seq := cv.GetActiveSequence()
+	switch seq {
+	case data.PRIMES:
+		cv.Primes.Stop = numVal
+	case data.FIBS:
+		cv.Fibonacci.Stop = numVal
+	}
 }
