@@ -16,9 +16,8 @@ type (
 )
 
 type TextArea struct {
-	field      widget.Editor
-	border     widget.Border
-	isDisabled bool
+	field  widget.Editor
+	border widget.Border
 }
 
 func (ta *TextArea) Layout(gtx C, th *material.Theme) D {
@@ -26,7 +25,6 @@ func (ta *TextArea) Layout(gtx C, th *material.Theme) D {
 	input.SelectionColor = g.Colours[color.TEXT_SELECTION]
 	ta.field.SingleLine = false
 	ta.field.Alignment = text.Start
-	ta.isDisabled = false
 
 	textArea := layout.Flexed(1, func(gtx C) D {
 		border := widget.Border{

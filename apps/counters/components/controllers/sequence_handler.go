@@ -31,8 +31,7 @@ func (sh *SequenceHandler) Layout(gtx C, th *material.Theme) D {
 		}
 		return custom_widgets.LabeledIconBtn{
 			Theme:      th,
-			BgColor:    g.Colours[color.DEEP_SKY_BLUE],
-			LabelColor: g.Colours[color.BLACK],
+			LabelColor: g.Colours[color.WHITE],
 			Button:     &sh.toWhole,
 			Label:      "Z",
 			Icon:       nil,
@@ -44,8 +43,7 @@ func (sh *SequenceHandler) Layout(gtx C, th *material.Theme) D {
 		}
 		return custom_widgets.LabeledIconBtn{
 			Theme:      th,
-			BgColor:    g.Colours[color.DEEP_SKY_BLUE],
-			LabelColor: g.Colours[color.BLACK],
+			LabelColor: g.Colours[color.WHITE],
 			Button:     &sh.toNatural,
 			Label:      "N",
 			Icon:       nil,
@@ -57,8 +55,7 @@ func (sh *SequenceHandler) Layout(gtx C, th *material.Theme) D {
 		}
 		return custom_widgets.LabeledIconBtn{
 			Theme:      th,
-			BgColor:    g.Colours[color.DEEP_SKY_BLUE],
-			LabelColor: g.Colours[color.BLACK],
+			LabelColor: g.Colours[color.WHITE],
 			Button:     &sh.toPrime,
 			Label:      "Primes",
 			Icon:       nil,
@@ -70,8 +67,7 @@ func (sh *SequenceHandler) Layout(gtx C, th *material.Theme) D {
 		}
 		return custom_widgets.LabeledIconBtn{
 			Theme:      th,
-			BgColor:    g.Colours[color.DEEP_SKY_BLUE],
-			LabelColor: g.Colours[color.BLACK],
+			LabelColor: g.Colours[color.WHITE],
 			Button:     &sh.toFib,
 			Label:      "Fibs",
 			Icon:       nil,

@@ -36,9 +36,9 @@ func Run(w *app.Window) error {
 	th := material.NewTheme(gofont.Collection())
 
 	router := application.NewRouter()
-	router.Register(0, counters.New(&router))
 	router.Register(1, editor.New(&router))
-	router.Register(2, geography.New(&router))
+	router.Register(2, counters.New(&router))
+	router.Register(3, geography.New(&router))
 
 	for event := range w.Events() {
 		switch event := event.(type) {
