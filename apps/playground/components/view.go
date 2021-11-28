@@ -1,7 +1,7 @@
 package components
 
 import (
-	"gioui-experiment/apps/counters/components/data"
+	"gioui-experiment/apps/playground/components/data"
 	"gioui.org/layout"
 	"gioui.org/unit"
 	"gioui.org/widget/material"

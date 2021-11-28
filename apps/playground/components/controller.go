@@ -1,7 +1,7 @@
 package components
 
 import (
-	"gioui-experiment/apps/counters/components/controllers"
+	"gioui-experiment/apps/playground/components/controllers"
 	"gioui.org/layout"
 	"gioui.org/unit"
 	"gioui.org/widget"
@@ -120,7 +120,7 @@ func (cp *ControlPanel) Layout(gtx C, th *material.Theme) D {
 			},
 		},
 		{
-			name: "Statistics",
+			name: "Sequences Status",
 			layout: func(gtx C, c *Controller) D {
 				content := layout.Rigid(func(gtx C) D {
 					return component.SimpleDiscloser(th, &cp.statusState).Layout(gtx,

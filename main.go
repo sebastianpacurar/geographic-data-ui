@@ -2,9 +2,9 @@ package main
 
 import (
 	application "gioui-experiment/apps"
-	"gioui-experiment/apps/counters"
 	"gioui-experiment/apps/editor"
 	"gioui-experiment/apps/geography"
+	"gioui-experiment/apps/playground"
 	"gioui.org/app"
 	"gioui.org/font/gofont"
 	"gioui.org/io/system"
@@ -36,8 +36,8 @@ func Run(w *app.Window) error {
 
 	router := application.NewRouter()
 	router.Register(1, editor.New(&router))
-	router.Register(2, counters.New(&router))
-	router.Register(3, geography.New(&router))
+	router.Register(2, geography.New(&router))
+	router.Register(3, playground.New(&router))
 
 	for {
 		select {
