@@ -7,7 +7,6 @@ import (
 	"gioui-experiment/apps/geography"
 	"gioui.org/app"
 	"gioui.org/font/gofont"
-	"gioui.org/io/key"
 	"gioui.org/io/system"
 	"gioui.org/layout"
 	"gioui.org/op"
@@ -40,20 +39,17 @@ func Run(w *app.Window) error {
 	router.Register(2, counters.New(&router))
 	router.Register(3, geography.New(&router))
 
-	for event := range w.Events() {
-		switch event := event.(type) {
-		case system.FrameEvent:
-			gtx := layout.NewContext(&ops, event)
-			router.Layout(gtx, th)
-			event.Frame(gtx.Ops)
-		case key.Event:
-			switch event.Name {
-			case key.NameEscape:
-				return nil
+	for {
+		select {
+		case e := <-w.Events():
+			switch e := e.(type) {
+			case system.FrameEvent:
+				gtx := layout.NewContext(&ops, e)
+				router.Layout(gtx, th)
+				e.Frame(gtx.Ops)
+			case system.DestroyEvent:
+				return e.Err
 			}
-		case system.DestroyEvent:
-			return event.Err
 		}
 	}
-	return nil
 }

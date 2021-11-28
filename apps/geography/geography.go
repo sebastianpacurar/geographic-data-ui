@@ -2,6 +2,7 @@ package geography
 
 import (
 	"gioui-experiment/apps"
+	"gioui-experiment/apps/geography/components"
 	"gioui-experiment/custom_themes/colors"
 	g "gioui-experiment/globals"
 	"gioui.org/layout"
@@ -20,6 +21,8 @@ type (
 		icon    *widget.Icon
 		btn     material.IconButtonStyle
 		th      *material.Theme
+		components.Geography
+		components.ControlPanel
 		*apps.Router
 	}
 )
@@ -67,13 +70,10 @@ func (app *Application) NavItem() component.NavItem {
 	}
 }
 
-func (app *Application) Layout(gtx C, th *material.Theme) D {
-	return layout.Flex{
-		Axis: layout.Vertical,
-	}.Layout(gtx,
-		layout.Rigid(func(gtx C) D {
-			test := material.H2(th, "Geography Application")
-			return test.Layout(gtx)
-		}),
-	)
+func (app *Application) LayoutView(th *material.Theme) layout.FlexChild {
+	return app.Geography.Layout(th)
+}
+
+func (app *Application) LayoutController(gtx C, th *material.Theme) D {
+	return app.ControlPanel.Layout(gtx, th)
 }

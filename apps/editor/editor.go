@@ -17,11 +17,12 @@ type (
 	D = layout.Dimensions
 
 	Application struct {
-		editor  components.TextArea
 		dockBtn widget.Clickable
 		icon    *widget.Icon
 		btn     material.IconButtonStyle
 		th      *material.Theme
+		components.TextArea
+		components.ControlPanel
 		*apps.Router
 	}
 )
@@ -69,6 +70,10 @@ func (app *Application) NavItem() component.NavItem {
 	}
 }
 
-func (app *Application) Layout(gtx C, th *material.Theme) D {
-	return app.editor.Layout(gtx, th)
+func (app *Application) LayoutView(th *material.Theme) layout.FlexChild {
+	return app.TextArea.Layout(th)
+}
+
+func (app *Application) LayoutController(gtx C, th *material.Theme) D {
+	return app.ControlPanel.Layout(gtx, th)
 }

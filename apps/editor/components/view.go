@@ -1,7 +1,7 @@
 package components
 
 import (
-	color "gioui-experiment/custom_themes/colors"
+	"gioui-experiment/custom_themes/colors"
 	g "gioui-experiment/globals"
 	"gioui.org/layout"
 	"gioui.org/text"
@@ -10,38 +10,35 @@ import (
 	"gioui.org/widget/material"
 )
 
-type (
-	C = layout.Context
-	D = layout.Dimensions
-)
-
 type TextArea struct {
 	field  widget.Editor
 	border widget.Border
 }
 
-func (ta *TextArea) Layout(gtx C, th *material.Theme) D {
+func (ta *TextArea) Layout(th *material.Theme) layout.FlexChild {
 	input := material.Editor(th, &ta.field, "Type your Thoughts...")
-	input.SelectionColor = g.Colours[color.TEXT_SELECTION]
+	input.SelectionColor = g.Colours[colors.TEXT_SELECTION]
 	ta.field.SingleLine = false
 	ta.field.Alignment = text.Start
 
-	textArea := layout.Flexed(1, func(gtx C) D {
+	return layout.Flexed(1, func(gtx C) D {
 		border := widget.Border{
-			Color:        g.Colours[color.GREY],
+			Color:        g.Colours[colors.GREY],
 			CornerRadius: unit.Dp(5),
 			Width:        unit.Px(2),
 		}
 		switch {
 		case ta.field.Focused():
 			border.Color = th.Palette.ContrastBg
-			border.Width = unit.Px(3)
+			border.Width = unit.Px(2)
 		}
-		return border.Layout(gtx, func(gtx C) D {
-			return layout.UniformInset(unit.Dp(8)).Layout(gtx, func(gtx C) D {
-				return input.Layout(gtx)
+
+		return g.Inset.Layout(gtx, func(gtx C) D {
+			return border.Layout(gtx, func(gtx C) D {
+				return layout.UniformInset(unit.Dp(8)).Layout(gtx, func(gtx C) D {
+					return input.Layout(gtx)
+				})
 			})
 		})
 	})
-	return layout.Flex{}.Layout(gtx, textArea)
 }

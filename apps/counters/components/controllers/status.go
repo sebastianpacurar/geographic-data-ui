@@ -1,4 +1,4 @@
-package control_panel
+package controllers
 
 import (
 	"gioui-experiment/apps/counters/components/data"
@@ -19,5 +19,5 @@ type Status struct {
 }
 
 func (s *Status) Layout(gtx C, th *material.Theme) D {
-	return D{}
+	return material.Body2(th, "In Progress").Layout(gtx)
 }
