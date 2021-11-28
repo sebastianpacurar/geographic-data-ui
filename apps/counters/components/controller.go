@@ -1,27 +1,27 @@
-package controllers
+package components
 
 import (
-	"gioui-experiment/apps/counters/components/controllers/control_panel"
-	"gioui-experiment/custom_themes/colors"
-	g "gioui-experiment/globals"
+	"gioui-experiment/apps/counters/components/controllers"
 	"gioui.org/layout"
 	"gioui.org/unit"
 	"gioui.org/widget"
 	"gioui.org/widget/material"
 	"gioui.org/x/component"
-	"image"
 )
 
 type (
+	C = layout.Context
+	D = layout.Dimensions
+
 	ControlPanel struct {
 		controllers []Controller
 		list        widget.List
 
-		vh      control_panel.ValueHandler
-		inc     control_panel.Incrementor
-		display control_panel.DisplayLayout
-		filters control_panel.Filters
-		status  control_panel.Status
+		vh      controllers.ValueHandler
+		inc     controllers.Incrementor
+		display controllers.DisplayLayout
+		filters controllers.Filters
+		status  controllers.Status
 
 		// hardcoded in order to keep track of the specific current state
 		incState     component.DiscloserState
@@ -70,6 +70,10 @@ func (cp *ControlPanel) Layout(gtx C, th *material.Theme) D {
 				return cp.LayOutset(gtx, content, divider)
 			},
 		},
+
+		//TODO: heads up on the Start and Step Values layout
+		// after opening the discloser the right side of the border goes out of frame
+		// closing the discloser causes the border to reposition accordingly
 		{
 			name: "Start and Step Values",
 			layout: func(gtx C, c *Controller) D {
@@ -132,19 +136,10 @@ func (cp *ControlPanel) Layout(gtx C, th *material.Theme) D {
 		},
 	}
 
-	return layout.Stack{Alignment: layout.NW}.Layout(gtx,
-		layout.Expanded(func(gtx C) D {
-			return g.ColoredArea(gtx, gtx.Constraints.Max, g.Colours[colors.AERO_BLUE])
-		}),
-		layout.Stacked(func(gtx C) D {
-			containerSize := image.Pt(gtx.Constraints.Max.X, gtx.Constraints.Max.Y)
-			gtx.Constraints = layout.Exact(gtx.Constraints.Constrain(containerSize))
-
-			// return a vertical list of (discloser, divider) groups, as ListElements
-			return material.List(th, &cp.list).Layout(gtx, len(cp.controllers), func(gtx C, i int) D {
-				return cp.controllers[i].layout(gtx, &cp.controllers[i])
-			})
-		}))
+	// return a vertical list of (discloser, divider) groups, as ListElements
+	return material.List(th, &cp.list).Layout(gtx, len(cp.controllers), func(gtx C, i int) D {
+		return cp.controllers[i].layout(gtx, &cp.controllers[i])
+	})
 }
 
 // LayOutset - wraps the discloser and divider in a vertical flex layout

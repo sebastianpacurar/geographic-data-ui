@@ -1,4 +1,4 @@
-package control_panel
+package controllers
 
 import (
 	"fmt"

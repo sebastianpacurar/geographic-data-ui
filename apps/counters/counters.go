@@ -2,7 +2,7 @@ package counters
 
 import (
 	"gioui-experiment/apps"
-	"gioui-experiment/apps/counters/components/sections"
+	"gioui-experiment/apps/counters/components"
 	"gioui-experiment/custom_themes/colors"
 	g "gioui-experiment/globals"
 	"gioui.org/layout"
@@ -18,12 +18,12 @@ type (
 	D = layout.Dimensions
 
 	Application struct {
-		Top     sections.Top
-		View    sections.View
 		dockBtn widget.Clickable
 		btn     material.IconButtonStyle
 		icon    *widget.Icon
 		th      *material.Theme
+		components.View
+		components.ControlPanel
 		*apps.Router
 	}
 )
@@ -73,19 +73,10 @@ func (app *Application) NavItem() component.NavItem {
 	}
 }
 
-func (app *Application) Layout(gtx C, th *material.Theme) D {
-	top := layout.Rigid(func(gtx C) D {
-		return layout.Inset{
-			Left:   g.DefaultMargin,
-			Right:  g.DefaultMargin,
-			Bottom: g.DefaultMargin,
-		}.Layout(gtx, func(gtx C) D {
-			return app.Top.Layout(gtx, th)
-		})
-	})
-	view := layout.Rigid(func(gtx C) D {
-		return app.View.Layout(gtx, th)
-	})
+func (app *Application) LayoutView(th *material.Theme) layout.FlexChild {
+	return app.View.Layout(th)
+}
 
-	return layout.Flex{Axis: layout.Vertical}.Layout(gtx, top, view)
+func (app *Application) LayoutController(gtx C, th *material.Theme) D {
+	return app.ControlPanel.Layout(gtx, th)
 }

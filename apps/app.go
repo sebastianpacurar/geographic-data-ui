@@ -1,11 +1,14 @@
 package apps
 
 import (
+	"gioui-experiment/custom_themes/colors"
 	g "gioui-experiment/globals"
 	"gioui.org/layout"
 	"gioui.org/unit"
+	"gioui.org/widget"
 	"gioui.org/widget/material"
 	"gioui.org/x/component"
+	"image"
 	"time"
 )
 
@@ -14,7 +17,8 @@ type (
 	D = layout.Dimensions
 
 	Application interface {
-		Layout(gtx C, th *material.Theme) D
+		LayoutView(th *material.Theme) layout.FlexChild
+		LayoutController(gtx C, th *material.Theme) D
 		Actions() []component.AppBarAction
 		Overflow() []component.OverflowAction
 		NavItem() component.NavItem
@@ -27,6 +31,7 @@ type (
 		NavAnim component.VisibilityAnimation
 		*component.AppBar
 		*component.ModalLayer
+		component.Resize
 		NonModalDrawer bool
 	}
 )
@@ -77,8 +82,8 @@ func (r *Router) SwitchTo(tag interface{}) {
 }
 
 func (r *Router) Layout(gtx C, th *material.Theme) D {
-	for _, event := range r.AppBar.Events(gtx) {
-		switch event.(type) {
+	for _, e := range r.AppBar.Events(gtx) {
+		switch e.(type) {
 		case component.AppBarNavigationClicked:
 			if r.NonModalDrawer {
 				r.NavAnim.ToggleVisibility(gtx.Now)
@@ -100,20 +105,74 @@ func (r *Router) Layout(gtx C, th *material.Theme) D {
 				return r.NavDrawer.Layout(gtx, th, &r.NavAnim)
 			}),
 			layout.Flexed(1, func(gtx C) D {
-				return g.Inset.Layout(gtx, func(gtx C) D {
-					return r.pages[r.current].Layout(gtx, th)
+				size := image.Pt(gtx.Constraints.Max.X, gtx.Constraints.Max.Y)
+
+				// view component
+				view := layout.Rigid(func(gtx C) D {
+					width := gtx.Constraints.Max.X - gtx.Px(g.CountersMenuWidth)
+					containerSize := image.Pt(width, gtx.Constraints.Max.Y)
+					gtx.Constraints = layout.Exact(gtx.Constraints.Constrain(containerSize))
+					return layout.Stack{}.Layout(gtx,
+						layout.Expanded(func(gtx C) D {
+							container := g.RColoredArea(
+								gtx,
+								gtx.Constraints.Constrain(size),
+								10,
+								g.Colours[colors.ANTIQUE_WHITE],
+							)
+							return container
+						}),
+						layout.Stacked(func(gtx C) D {
+							containerSize := image.Pt(gtx.Constraints.Max.X, gtx.Constraints.Max.Y)
+							gtx.Constraints = layout.Exact(gtx.Constraints.Constrain(containerSize))
+							return layout.Flex{Axis: layout.Vertical}.Layout(gtx,
+
+								r.pages[r.current].LayoutView(th),
+							)
+						}))
 				})
-			}),
-		)
+
+				// controller component
+				controller := layout.Rigid(func(gtx C) D {
+					return layout.Stack{Alignment: layout.NW}.Layout(gtx,
+						layout.Expanded(func(gtx C) D {
+							return g.RColoredArea(
+								gtx,
+								gtx.Constraints.Max,
+								float32(gtx.Px(unit.Dp(10))),
+								g.Colours[colors.AERO_BLUE],
+							)
+						}),
+						layout.Stacked(func(gtx C) D {
+							containerSize := image.Pt(gtx.Constraints.Max.X, gtx.Constraints.Max.Y)
+							gtx.Constraints = layout.Exact(gtx.Constraints.Constrain(containerSize))
+							border := widget.Border{
+								Color:        g.Colours[colors.SEA_GREEN],
+								CornerRadius: unit.Dp(10),
+								Width:        unit.Px(1),
+							}
+							return border.Layout(gtx, func(gtx C) D {
+								return layout.Inset{
+									Top:    unit.Dp(10),
+									Bottom: unit.Dp(10),
+								}.Layout(gtx, func(gtx C) D {
+									return r.pages[r.current].LayoutController(gtx, th)
+								})
+							})
+						}))
+				})
+
+				// lay out the view on the left side and the controller on the right side
+				return g.Inset.Layout(gtx, func(gtx C) D {
+					return layout.Flex{}.Layout(gtx, view, controller)
+				})
+			}))
 	})
 	bar := layout.Rigid(func(gtx C) D {
 		return r.AppBar.Layout(gtx, th)
 	})
 
-	// lay the app bar first, then the content of the current application
 	layout.Flex{Axis: layout.Vertical}.Layout(gtx, bar, content)
-
-	// lay the modal on top of other widgets, so it could have the highest z-index
 	r.ModalLayer.Layout(gtx, th)
 
 	return D{
