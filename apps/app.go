@@ -31,7 +31,6 @@ type (
 		NavAnim component.VisibilityAnimation
 		*component.AppBar
 		*component.ModalLayer
-		component.Resize
 		NonModalDrawer bool
 	}
 )
