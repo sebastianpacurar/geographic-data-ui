@@ -1,7 +1,7 @@
 package components
 
 import (
-	"gioui-experiment/apps/counters/components/controllers"
+	"gioui-experiment/apps/playground/components/controllers"
 	"gioui.org/layout"
 	"gioui.org/unit"
 	"gioui.org/widget"
@@ -17,11 +17,11 @@ type (
 		controllers []Controller
 		list        widget.List
 
-		vh      controllers.ValueHandler
-		inc     controllers.Incrementor
-		display controllers.DisplayLayout
-		filters controllers.Filters
-		status  controllers.Status
+		vh       controllers.ValueHandler
+		inc      controllers.Incrementor
+		sequence controllers.Sequence
+		filters  controllers.Filters
+		status   controllers.Status
 
 		// hardcoded in order to keep track of the specific current state
 		incState     component.DiscloserState
@@ -56,14 +56,14 @@ func (cp *ControlPanel) Layout(gtx C, th *material.Theme) D {
 	// every controller is a vertical flex which contains 2 rigids - discloser and the divider
 	cp.controllers = []Controller{
 		{
-			name: "Manual Incrementors",
+			name: "Sequence",
 			layout: func(gtx C, c *Controller) D {
 				content := layout.Rigid(func(gtx C) D {
-					return component.SimpleDiscloser(th, &cp.incState).Layout(gtx,
+					return component.SimpleDiscloser(th, &cp.displayState).Layout(gtx,
 						material.Body1(th, c.name).Layout,
 						func(gtx C) D {
 							return controllerInset.Layout(gtx, func(gtx C) D {
-								return cp.inc.Layout(gtx, th)
+								return cp.sequence.Layout(gtx, th)
 							})
 						})
 				})
@@ -90,21 +90,6 @@ func (cp *ControlPanel) Layout(gtx C, th *material.Theme) D {
 			},
 		},
 		{
-			name: "Display Layout",
-			layout: func(gtx C, c *Controller) D {
-				content := layout.Rigid(func(gtx C) D {
-					return component.SimpleDiscloser(th, &cp.displayState).Layout(gtx,
-						material.Body1(th, c.name).Layout,
-						func(gtx C) D {
-							return controllerInset.Layout(gtx, func(gtx C) D {
-								return cp.display.Layout(gtx, th)
-							})
-						})
-				})
-				return cp.LayOutset(gtx, content, divider)
-			},
-		},
-		{
 			name: "Filters",
 			layout: func(gtx C, c *Controller) D {
 				content := layout.Rigid(func(gtx C) D {
@@ -120,7 +105,22 @@ func (cp *ControlPanel) Layout(gtx C, th *material.Theme) D {
 			},
 		},
 		{
-			name: "Statistics",
+			name: "Manual Incrementors",
+			layout: func(gtx C, c *Controller) D {
+				content := layout.Rigid(func(gtx C) D {
+					return component.SimpleDiscloser(th, &cp.incState).Layout(gtx,
+						material.Body1(th, c.name).Layout,
+						func(gtx C) D {
+							return controllerInset.Layout(gtx, func(gtx C) D {
+								return cp.inc.Layout(gtx, th)
+							})
+						})
+				})
+				return cp.LayOutset(gtx, content, divider)
+			},
+		},
+		{
+			name: "Stats",
 			layout: func(gtx C, c *Controller) D {
 				content := layout.Rigid(func(gtx C) D {
 					return component.SimpleDiscloser(th, &cp.statusState).Layout(gtx,

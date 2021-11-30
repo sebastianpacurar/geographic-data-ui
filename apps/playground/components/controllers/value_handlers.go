@@ -2,7 +2,7 @@ package controllers
 
 import (
 	"fmt"
-	"gioui-experiment/apps/counters/components/data"
+	"gioui-experiment/apps/playground/components/data"
 	g "gioui-experiment/globals"
 	"gioui.org/layout"
 	"gioui.org/text"
@@ -74,13 +74,13 @@ func (vh *ValueHandler) Layout(gtx C, th *material.Theme) D {
 	})
 
 	//TODO: temporary on hold
-	// start field
+	// stop field
 	stopAtField := layout.Flexed(1, func(gtx C) D {
 		gtx = gtx.Disabled()
 		return vh.InputBox(gtx, th, &vh.stopAt.textField, cv, "stop")
 	})
 	//TODO: temporary on hold
-	// start button
+	// stop button
 	stopAtBtn := layout.Flexed(1, func(gtx C) D {
 		gtx = gtx.Disabled()
 		field := vh.stopAt.textField
@@ -95,23 +95,19 @@ func (vh *ValueHandler) Layout(gtx C, th *material.Theme) D {
 		})
 	})
 
-	// lay startRow = horizontal layout for startFromField - startFromBtn
 	startRow := layout.Rigid(func(gtx C) D {
 		return layout.Flex{}.Layout(gtx, startFromField, startFromBtn)
 	})
 
-	// lay skipRow = horizontal layout for skipByField - skipByBtn
 	skipRow := layout.Rigid(func(gtx C) D {
 		return layout.Flex{}.Layout(gtx, skipByField, skipByBtn)
 	})
 
-	// lay stopRow = horizontal layout for stopAtField - stopAtBtn
 	stopRow := layout.Rigid(func(gtx C) D {
 		return layout.Flex{}.Layout(gtx, stopAtField, stopAtBtn)
 	})
 
-	// lay out startRow and skipRow vertically
-	return layout.Flex{Axis: layout.Vertical, Alignment: layout.Middle}.Layout(gtx,
+	return layout.Flex{Axis: layout.Vertical}.Layout(gtx,
 		startRow, skipRow, stopRow,
 	)
 }

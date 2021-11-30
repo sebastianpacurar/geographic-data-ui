@@ -1,7 +1,7 @@
 package controllers
 
 import (
-	"gioui-experiment/apps/counters/components/data"
+	"gioui-experiment/apps/playground/components/data"
 	g "gioui-experiment/globals"
 	"gioui.org/layout"
 	"gioui.org/widget"
@@ -59,7 +59,7 @@ func (inc *Incrementor) Layout(gtx C, th *material.Theme) D {
 
 	// laying out minusBtn - space - resetBtn - space - plusBtn
 	// align them from the start
-	return layout.Flex{Spacing: layout.SpaceEnd}.Layout(gtx,
+	return layout.Flex{Spacing: layout.SpaceEvenly}.Layout(gtx,
 		minusBtn, g.SpacerX, resetBtn, g.SpacerX, plusBtn,
 	)
 }
