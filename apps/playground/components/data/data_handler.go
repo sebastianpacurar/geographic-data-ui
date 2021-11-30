@@ -69,14 +69,14 @@ func (gen *Generator) SetActiveSequence(active string) {
 			gen.ActiveSeq[k] = true
 
 			// generate primes and fibs only once, in case the cache is empty
-			if len(gen.Cache[k]) == 0 {
-				switch k {
-				case PRIMES:
-					gen.genPrimes(PLIMIT)
-				case FIBS:
-					gen.genFibs(FLIMIT)
-				}
-			}
+			//if len(gen.Cache[k]) == 0 {
+			//	switch k {
+			//	case PRIMES:
+			//		gen.genPrimes(PLIMIT)
+			//	case FIBS:
+			//		gen.genFibs(FLIMIT)
+			//	}
+			//}
 		} else {
 			gen.ActiveSeq[k] = false
 		}
@@ -96,8 +96,8 @@ func isPrime(n uint64) bool {
 	return true
 }
 
-// genPrimes - Generate Prime sequence
-func (gen *Generator) genPrimes(length int) {
+// GenPrimes - Generate Prime sequence
+func (gen *Generator) GenPrimes(length int) {
 	if len(gen.Cache[PRIMES]) == 0 {
 		gen.Cache[PRIMES] = make([]uint64, length)
 		gen.Cache[PRIMES][0] = 2
@@ -125,8 +125,8 @@ func getFibByIndex(n uint64) uint64 {
 	return n2 + n1
 }
 
-// genFibs - Generate Fibonacci sequence
-func (gen *Generator) genFibs(length int) {
+// GenFibs - Generate Fibonacci sequence
+func (gen *Generator) GenFibs(length int) {
 	if len(gen.Cache[FIBS]) == 0 {
 		gen.Cache[FIBS] = make([]uint64, length)
 		index := uint64(0)

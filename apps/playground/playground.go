@@ -1,8 +1,8 @@
-package counters
+package playground
 
 import (
 	"gioui-experiment/apps"
-	"gioui-experiment/apps/counters/components"
+	"gioui-experiment/apps/playground/components"
 	"gioui-experiment/custom_themes/colors"
 	g "gioui-experiment/globals"
 	"gioui.org/layout"
@@ -64,12 +64,14 @@ func (app *Application) Actions() []component.AppBarAction {
 }
 
 func (app *Application) Overflow() []component.OverflowAction {
-	return []component.OverflowAction{}
+	return []component.OverflowAction{
+		{Name: "Close Current Instance - dummy action"},
+	}
 }
 
 func (app *Application) NavItem() component.NavItem {
 	return component.NavItem{
-		Name: "Counters - way too overly complicated counter",
+		Name: "playground",
 	}
 }
 
