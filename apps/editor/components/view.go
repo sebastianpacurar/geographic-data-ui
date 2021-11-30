@@ -1,8 +1,8 @@
 package components
 
 import (
-	"gioui-experiment/custom_themes/colors"
 	g "gioui-experiment/globals"
+	"gioui-experiment/themes/colors"
 	"gioui.org/layout"
 	"gioui.org/text"
 	"gioui.org/unit"
