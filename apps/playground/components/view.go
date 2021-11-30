@@ -12,6 +12,14 @@ type View struct{}
 
 func (v *View) Layout(th *material.Theme) layout.FlexChild {
 	cv := data.CurrVals
+
+	//TODO find a better way and location to handle the Cache population
+	if len(cv.Cache[data.PRIMES]) == 0 {
+		cv.GenPrimes(data.PLIMIT)
+	}
+	if len(cv.Cache[data.FIBS]) == 0 {
+		cv.GenFibs(data.FLIMIT)
+	}
 	seq := cv.GetActiveSequence()
 
 	/// DISPLAYED NUMBER

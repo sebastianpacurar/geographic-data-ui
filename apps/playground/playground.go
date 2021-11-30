@@ -64,12 +64,14 @@ func (app *Application) Actions() []component.AppBarAction {
 }
 
 func (app *Application) Overflow() []component.OverflowAction {
-	return []component.OverflowAction{}
+	return []component.OverflowAction{
+		{Name: "Close Current Instance - dummy action"},
+	}
 }
 
 func (app *Application) NavItem() component.NavItem {
 	return component.NavItem{
-		Name: "playground - prolly broken af",
+		Name: "playground",
 	}
 }
 

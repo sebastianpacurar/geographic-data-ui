@@ -59,7 +59,7 @@ func (inc *Incrementor) Layout(gtx C, th *material.Theme) D {
 
 	// laying out minusBtn - space - resetBtn - space - plusBtn
 	// align them from the start
-	return layout.Flex{Spacing: layout.SpaceEnd}.Layout(gtx,
+	return layout.Flex{Spacing: layout.SpaceEvenly}.Layout(gtx,
 		minusBtn, g.SpacerX, resetBtn, g.SpacerX, plusBtn,
 	)
 }

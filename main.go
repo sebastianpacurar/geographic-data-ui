@@ -37,7 +37,7 @@ func Run(w *app.Window) error {
 	router := application.NewRouter()
 	router.Register(1, editor.New(&router))
 	router.Register(2, geography.New(&router))
-	router.Register(3, playground.New(&router))
+	router.Register("pg", playground.New(&router))
 
 	for {
 		select {
