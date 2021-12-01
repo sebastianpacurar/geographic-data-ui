@@ -1,8 +1,8 @@
 package apps
 
 import (
-	"gioui-experiment/custom_themes/colors"
 	g "gioui-experiment/globals"
+	"gioui-experiment/themes/colors"
 	"gioui.org/layout"
 	"gioui.org/unit"
 	"gioui.org/widget"
@@ -31,8 +31,8 @@ type (
 		NavAnim component.VisibilityAnimation
 		*component.AppBar
 		*component.ModalLayer
-		component.Resize
 		NonModalDrawer bool
+		shutDown       widget.Clickable
 	}
 )
 
@@ -99,6 +99,7 @@ func (r *Router) Layout(gtx C, th *material.Theme) D {
 	}
 
 	content := layout.Flexed(1, func(gtx C) D {
+		//r.SetActions([])
 		return layout.Flex{}.Layout(gtx,
 			layout.Rigid(func(gtx C) D {
 				gtx.Constraints.Max.X = gtx.Px(unit.Dp(250))
@@ -117,7 +118,7 @@ func (r *Router) Layout(gtx C, th *material.Theme) D {
 							container := g.RColoredArea(
 								gtx,
 								gtx.Constraints.Constrain(size),
-								10,
+								unit.Dp(10),
 								g.Colours[colors.ANTIQUE_WHITE],
 							)
 							return container
@@ -139,7 +140,7 @@ func (r *Router) Layout(gtx C, th *material.Theme) D {
 							return g.RColoredArea(
 								gtx,
 								gtx.Constraints.Max,
-								float32(gtx.Px(unit.Dp(10))),
+								unit.Dp(10),
 								g.Colours[colors.AERO_BLUE],
 							)
 						}),

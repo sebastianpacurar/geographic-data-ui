@@ -6,6 +6,7 @@ import (
 	"gioui.org/layout"
 	"gioui.org/op/clip"
 	"gioui.org/op/paint"
+	"gioui.org/unit"
 	"math/rand"
 	"time"
 
@@ -24,14 +25,14 @@ func ColoredArea(gtx layout.Context, size image.Point, color color.NRGBA) layout
 	return layout.Dimensions{Size: size}
 }
 
-func RColoredArea(gtx layout.Context, size image.Point, r float32, color color.NRGBA) layout.Dimensions {
+func RColoredArea(gtx layout.Context, size image.Point, r unit.Value, color color.NRGBA) layout.Dimensions {
 	bounds := f32.Rect(0, 0, float32(size.X), float32(size.Y))
 	defer clip.RRect{
 		Rect: bounds,
-		SE:   r,
-		SW:   r,
-		NW:   r,
-		NE:   r,
+		SE:   float32(gtx.Px(r)),
+		SW:   float32(gtx.Px(r)),
+		NW:   float32(gtx.Px(r)),
+		NE:   float32(gtx.Px(r)),
 	}.Push(gtx.Ops).Pop()
 	paint.ColorOp{Color: color}.Add(gtx.Ops)
 	paint.PaintOp{}.Add(gtx.Ops)

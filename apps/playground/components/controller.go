@@ -70,6 +70,21 @@ func (cp *ControlPanel) Layout(gtx C, th *material.Theme) D {
 				return cp.LayOutset(gtx, content, divider)
 			},
 		},
+		{
+			name: "Filters",
+			layout: func(gtx C, c *Controller) D {
+				content := layout.Rigid(func(gtx C) D {
+					return component.SimpleDiscloser(th, &cp.filtersState).Layout(gtx,
+						material.Body1(th, c.name).Layout,
+						func(gtx C) D {
+							return controllerInset.Layout(gtx, func(gtx C) D {
+								return cp.filters.Layout(gtx, th)
+							})
+						})
+				})
+				return cp.LayOutset(gtx, content, divider)
+			},
+		},
 
 		//TODO: heads up on the Start and Step Values layout
 		// after opening the discloser the right side of the border goes out of frame
@@ -83,21 +98,6 @@ func (cp *ControlPanel) Layout(gtx C, th *material.Theme) D {
 						func(gtx C) D {
 							return controllerInset.Layout(gtx, func(gtx C) D {
 								return cp.vh.Layout(gtx, th)
-							})
-						})
-				})
-				return cp.LayOutset(gtx, content, divider)
-			},
-		},
-		{
-			name: "Filters",
-			layout: func(gtx C, c *Controller) D {
-				content := layout.Rigid(func(gtx C) D {
-					return component.SimpleDiscloser(th, &cp.filtersState).Layout(gtx,
-						material.Body1(th, c.name).Layout,
-						func(gtx C) D {
-							return controllerInset.Layout(gtx, func(gtx C) D {
-								return cp.filters.Layout(gtx, th)
 							})
 						})
 				})

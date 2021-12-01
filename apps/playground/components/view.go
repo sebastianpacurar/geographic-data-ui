@@ -1,7 +1,7 @@
 package components
 
 import (
-	"gioui-experiment/apps/playground/components/data"
+	"gioui-experiment/apps/playground/components/data/counter"
 	"gioui.org/layout"
 	"gioui.org/unit"
 	"gioui.org/widget/material"
@@ -11,16 +11,16 @@ import (
 type View struct{}
 
 func (v *View) Layout(th *material.Theme) layout.FlexChild {
-	cv := data.CurrVals
+	pgv := counter.PgVals
 
 	//TODO find a better way and location to handle the Cache population
-	if len(cv.Cache[data.PRIMES]) == 0 {
-		cv.GenPrimes(data.PLIMIT)
+	if len(pgv.Cache[counter.PRIMES]) == 0 {
+		pgv.GenPrimes(counter.PLIMIT)
 	}
-	if len(cv.Cache[data.FIBS]) == 0 {
-		cv.GenFibs(data.FLIMIT)
+	if len(pgv.Cache[counter.FIBS]) == 0 {
+		pgv.GenFibs(counter.FLIMIT)
 	}
-	seq := cv.GetActiveSequence()
+	seq := pgv.GetActiveSequence()
 
 	/// DISPLAYED NUMBER
 	return layout.Rigid(func(gtx C) D {
@@ -32,14 +32,14 @@ func (v *View) Layout(th *material.Theme) layout.FlexChild {
 		}.Layout(gtx, func(gtx C) D {
 			var val string
 			switch seq {
-			case data.PRIMES:
-				val = strconv.FormatUint(cv.Cache[seq][cv.Primes.Index], 10)
-			case data.FIBS:
-				val = strconv.FormatUint(cv.Cache[seq][cv.Fibonacci.Index], 10)
-			case data.NATURALS:
-				val = strconv.FormatUint(cv.Naturals.Displayed, 10)
-			case data.INTEGERS:
-				val = strconv.FormatUint(cv.Integers.Displayed, 10)
+			case counter.PRIMES:
+				val = strconv.FormatUint(pgv.Cache[seq][pgv.Primes.Index], 10)
+			case counter.FIBS:
+				val = strconv.FormatUint(pgv.Cache[seq][pgv.Fibonacci.Index], 10)
+			case counter.NATURALS:
+				val = strconv.FormatUint(pgv.Naturals.Displayed, 10)
+			case counter.INTEGERS:
+				val = strconv.FormatUint(pgv.Integers.Displayed, 10)
 			}
 			return material.H5(th, val).Layout(gtx)
 		})
