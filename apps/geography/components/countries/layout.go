@@ -3,8 +3,8 @@ package countries
 import (
 	"fmt"
 	"gioui-experiment/apps/geography/components/countries/data"
-	"gioui-experiment/custom_themes/colors"
 	g "gioui-experiment/globals"
+	"gioui-experiment/themes/colors"
 	"gioui.org/layout"
 	"gioui.org/unit"
 	"gioui.org/widget"
