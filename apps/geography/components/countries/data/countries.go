@@ -39,6 +39,7 @@ type (
 		Demonyms       map[string]Demonym         `json:"demonyms"`
 		Population     int32                      `json:"population"`
 		StartOfWeek    string                     `json:"startOfWeek"`
+		Flag
 	}
 
 	Name struct {
