@@ -2,7 +2,7 @@ module gioui-experiment
 
 go 1.17
 
-require gioui.org v0.0.0-20211130133415-e5c040be1bf0
+require gioui.org v0.0.0-20211201165704-e6e69812af7f
 
 require (
 	gioui.org/cpu v0.0.0-20210817075930-8d6a761490d2 // indirect
