@@ -31,7 +31,6 @@ type (
 		NavAnim component.VisibilityAnimation
 		*component.AppBar
 		*component.ModalLayer
-		component.Resize
 		NonModalDrawer bool
 		shutDown       widget.Clickable
 	}
@@ -119,7 +118,7 @@ func (r *Router) Layout(gtx C, th *material.Theme) D {
 							container := g.RColoredArea(
 								gtx,
 								gtx.Constraints.Constrain(size),
-								10,
+								unit.Dp(10),
 								g.Colours[colors.ANTIQUE_WHITE],
 							)
 							return container
@@ -141,7 +140,7 @@ func (r *Router) Layout(gtx C, th *material.Theme) D {
 							return g.RColoredArea(
 								gtx,
 								gtx.Constraints.Max,
-								float32(gtx.Px(unit.Dp(10))),
+								unit.Dp(10),
 								g.Colours[colors.AERO_BLUE],
 							)
 						}),
