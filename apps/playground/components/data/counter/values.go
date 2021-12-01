@@ -1,11 +1,11 @@
-package data
+package counter
 
 import (
 	"math"
 )
 
 const (
-	PLIMIT = 3000
+	PLIMIT = 100000
 	FLIMIT = 100
 
 	ONE = 1
@@ -67,16 +67,6 @@ func (gen *Generator) SetActiveSequence(active string) {
 	for k := range gen.ActiveSeq {
 		if k == active {
 			gen.ActiveSeq[k] = true
-
-			// generate primes and fibs only once, in case the cache is empty
-			//if len(gen.Cache[k]) == 0 {
-			//	switch k {
-			//	case PRIMES:
-			//		gen.genPrimes(PLIMIT)
-			//	case FIBS:
-			//		gen.genFibs(FLIMIT)
-			//	}
-			//}
 		} else {
 			gen.ActiveSeq[k] = false
 		}
@@ -137,7 +127,7 @@ func (gen *Generator) GenFibs(length int) {
 	}
 }
 
-var CurrVals = &Generator{
+var PgVals = &Generator{
 	Cache: make(map[string][]uint64),
 	ActiveSeq: map[string]bool{
 		INTEGERS: true,

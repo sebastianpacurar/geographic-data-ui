@@ -1,7 +1,7 @@
 package controllers
 
 import (
-	"gioui-experiment/apps/playground/components/data"
+	"gioui-experiment/apps/playground/components/data/counter"
 	"gioui.org/layout"
 	"gioui.org/unit"
 	"gioui.org/widget/material"
@@ -10,7 +10,7 @@ import (
 )
 
 type Status struct {
-	data.Generator
+	counter.Generator
 	primesState   component.DiscloserState
 	fibsState     component.DiscloserState
 	naturalsState component.DiscloserState
@@ -20,14 +20,14 @@ type Status struct {
 // Layout - TODO: hardcoded due to UTTER LAZINESS
 // More "dynamics" to be added
 func (s *Status) Layout(gtx C, th *material.Theme) D {
-	cv := data.CurrVals
+	pgv := counter.PgVals
 
-	// TODO: rethink location of Caching population
-	if len(cv.Cache[data.PRIMES]) != data.PLIMIT {
-		s.GenPrimes(data.PLIMIT)
+	// TODO: rethink location of Cache population
+	if len(pgv.Cache[counter.PRIMES]) != counter.PLIMIT {
+		s.GenPrimes(counter.PLIMIT)
 	}
-	if len(cv.Cache[data.FIBS]) != data.FLIMIT {
-		s.GenFibs(data.FLIMIT)
+	if len(pgv.Cache[counter.FIBS]) != counter.FLIMIT {
+		s.GenFibs(counter.FLIMIT)
 	}
 
 	return layout.Flex{Axis: layout.Vertical}.Layout(gtx,
@@ -45,7 +45,7 @@ func (s *Status) Layout(gtx C, th *material.Theme) D {
 										return material.Body1(th, "Displayed").Layout(gtx)
 									}),
 									layout.Rigid(func(gtx C) D {
-										return material.Body1(th, strconv.FormatUint(cv.Integers.Displayed, 10)).Layout(gtx)
+										return material.Body1(th, strconv.FormatUint(pgv.Integers.Displayed, 10)).Layout(gtx)
 									}))
 							}),
 							layout.Rigid(func(gtx C) D {
@@ -54,7 +54,7 @@ func (s *Status) Layout(gtx C, th *material.Theme) D {
 										return material.Body1(th, "Start").Layout(gtx)
 									}),
 									layout.Rigid(func(gtx C) D {
-										return material.Body1(th, strconv.FormatUint(cv.Integers.Start, 10)).Layout(gtx)
+										return material.Body1(th, strconv.FormatUint(pgv.Integers.Start, 10)).Layout(gtx)
 									}))
 							}),
 							layout.Rigid(func(gtx C) D {
@@ -63,7 +63,7 @@ func (s *Status) Layout(gtx C, th *material.Theme) D {
 										return material.Body1(th, "Step").Layout(gtx)
 									}),
 									layout.Rigid(func(gtx C) D {
-										return material.Body1(th, strconv.FormatUint(cv.Integers.Step, 10)).Layout(gtx)
+										return material.Body1(th, strconv.FormatUint(pgv.Integers.Step, 10)).Layout(gtx)
 									}))
 							}),
 						)
@@ -87,7 +87,7 @@ func (s *Status) Layout(gtx C, th *material.Theme) D {
 										return material.Body1(th, "Displayed").Layout(gtx)
 									}),
 									layout.Rigid(func(gtx C) D {
-										return material.Body1(th, strconv.FormatUint(cv.Naturals.Displayed, 10)).Layout(gtx)
+										return material.Body1(th, strconv.FormatUint(pgv.Naturals.Displayed, 10)).Layout(gtx)
 									}))
 							}),
 							layout.Rigid(func(gtx C) D {
@@ -96,7 +96,7 @@ func (s *Status) Layout(gtx C, th *material.Theme) D {
 										return material.Body1(th, "Start").Layout(gtx)
 									}),
 									layout.Rigid(func(gtx C) D {
-										return material.Body1(th, strconv.FormatUint(cv.Naturals.Start, 10)).Layout(gtx)
+										return material.Body1(th, strconv.FormatUint(pgv.Naturals.Start, 10)).Layout(gtx)
 									}))
 							}),
 							layout.Rigid(func(gtx C) D {
@@ -105,7 +105,7 @@ func (s *Status) Layout(gtx C, th *material.Theme) D {
 										return material.Body1(th, "Step").Layout(gtx)
 									}),
 									layout.Rigid(func(gtx C) D {
-										return material.Body1(th, strconv.FormatUint(cv.Naturals.Step, 10)).Layout(gtx)
+										return material.Body1(th, strconv.FormatUint(pgv.Naturals.Step, 10)).Layout(gtx)
 									}))
 							}),
 						)
@@ -129,16 +129,27 @@ func (s *Status) Layout(gtx C, th *material.Theme) D {
 										return material.Body1(th, "Cached").Layout(gtx)
 									}),
 									layout.Rigid(func(gtx C) D {
-										return material.Body1(th, strconv.FormatUint(uint64(len(cv.Cache["primes"])), 10)).Layout(gtx)
+										return material.Body1(th, strconv.FormatUint(uint64(len(pgv.Cache["primes"])), 10)).Layout(gtx)
 									}))
 							}),
+
+							layout.Rigid(func(gtx C) D {
+								return layout.Flex{Spacing: layout.SpaceBetween}.Layout(gtx,
+									layout.Rigid(func(gtx C) D {
+										return material.Body1(th, "Position").Layout(gtx)
+									}),
+									layout.Rigid(func(gtx C) D {
+										return material.Body1(th, strconv.FormatInt(int64(pgv.Primes.Index+1), 10)).Layout(gtx)
+									}))
+							}),
+
 							layout.Rigid(func(gtx C) D {
 								return layout.Flex{Spacing: layout.SpaceBetween}.Layout(gtx,
 									layout.Rigid(func(gtx C) D {
 										return material.Body1(th, "Displayed").Layout(gtx)
 									}),
 									layout.Rigid(func(gtx C) D {
-										return material.Body1(th, strconv.FormatUint(cv.Cache["primes"][cv.Primes.Index], 10)).Layout(gtx)
+										return material.Body1(th, strconv.FormatUint(pgv.Cache["primes"][pgv.Primes.Index], 10)).Layout(gtx)
 									}))
 							}),
 							layout.Rigid(func(gtx C) D {
@@ -147,7 +158,7 @@ func (s *Status) Layout(gtx C, th *material.Theme) D {
 										return material.Body1(th, "Start").Layout(gtx)
 									}),
 									layout.Rigid(func(gtx C) D {
-										return material.Body1(th, strconv.FormatUint(cv.Primes.Start, 10)).Layout(gtx)
+										return material.Body1(th, strconv.FormatUint(pgv.Primes.Start, 10)).Layout(gtx)
 									}))
 							}),
 							layout.Rigid(func(gtx C) D {
@@ -156,7 +167,7 @@ func (s *Status) Layout(gtx C, th *material.Theme) D {
 										return material.Body1(th, "Step").Layout(gtx)
 									}),
 									layout.Rigid(func(gtx C) D {
-										return material.Body1(th, strconv.FormatUint(cv.Primes.Step, 10)).Layout(gtx)
+										return material.Body1(th, strconv.FormatUint(pgv.Primes.Step, 10)).Layout(gtx)
 									}))
 							}),
 						)
@@ -178,16 +189,27 @@ func (s *Status) Layout(gtx C, th *material.Theme) D {
 										return material.Body1(th, "Cached").Layout(gtx)
 									}),
 									layout.Rigid(func(gtx C) D {
-										return material.Body1(th, strconv.FormatUint(uint64(len(cv.Cache["fibs"])), 10)).Layout(gtx)
+										return material.Body1(th, strconv.FormatUint(uint64(len(pgv.Cache["fibs"])), 10)).Layout(gtx)
 									}))
 							}),
+
+							layout.Rigid(func(gtx C) D {
+								return layout.Flex{Spacing: layout.SpaceBetween}.Layout(gtx,
+									layout.Rigid(func(gtx C) D {
+										return material.Body1(th, "Position").Layout(gtx)
+									}),
+									layout.Rigid(func(gtx C) D {
+										return material.Body1(th, strconv.FormatInt(int64(pgv.Fibonacci.Index+1), 10)).Layout(gtx)
+									}))
+							}),
+
 							layout.Rigid(func(gtx C) D {
 								return layout.Flex{Spacing: layout.SpaceBetween}.Layout(gtx,
 									layout.Rigid(func(gtx C) D {
 										return material.Body1(th, "Displayed").Layout(gtx)
 									}),
 									layout.Rigid(func(gtx C) D {
-										return material.Body1(th, strconv.FormatUint(cv.Cache["fibs"][cv.Fibonacci.Index], 10)).Layout(gtx)
+										return material.Body1(th, strconv.FormatUint(pgv.Cache["fibs"][pgv.Fibonacci.Index], 10)).Layout(gtx)
 									}))
 							}),
 							layout.Rigid(func(gtx C) D {
@@ -196,7 +218,7 @@ func (s *Status) Layout(gtx C, th *material.Theme) D {
 										return material.Body1(th, "Start").Layout(gtx)
 									}),
 									layout.Rigid(func(gtx C) D {
-										return material.Body1(th, strconv.FormatUint(cv.Fibonacci.Start, 10)).Layout(gtx)
+										return material.Body1(th, strconv.FormatUint(pgv.Fibonacci.Start, 10)).Layout(gtx)
 									}))
 							}),
 							layout.Rigid(func(gtx C) D {
@@ -205,7 +227,7 @@ func (s *Status) Layout(gtx C, th *material.Theme) D {
 										return material.Body1(th, "Step").Layout(gtx)
 									}),
 									layout.Rigid(func(gtx C) D {
-										return material.Body1(th, strconv.FormatUint(cv.Fibonacci.Step, 10)).Layout(gtx)
+										return material.Body1(th, strconv.FormatUint(pgv.Fibonacci.Step, 10)).Layout(gtx)
 									}))
 							}),
 						)

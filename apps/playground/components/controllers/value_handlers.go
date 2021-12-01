@@ -2,7 +2,7 @@ package controllers
 
 import (
 	"fmt"
-	"gioui-experiment/apps/playground/components/data"
+	"gioui-experiment/apps/playground/components/data/counter"
 	g "gioui-experiment/globals"
 	"gioui.org/layout"
 	"gioui.org/text"
@@ -36,11 +36,12 @@ type (
 	}
 )
 
+// Layout TODO: this gets way too overly complicated. To Be Simplified!
 func (vh *ValueHandler) Layout(gtx C, th *material.Theme) D {
-	cv := data.CurrVals
+	pgv := counter.PgVals
 	// start field
 	startFromField := layout.Flexed(1, func(gtx C) D {
-		return vh.InputBox(gtx, th, &vh.startFrom.textField, cv, "start")
+		return vh.InputBox(gtx, th, &vh.startFrom.textField, pgv, "start")
 	})
 	// start button
 	startFromBtn := layout.Flexed(1, func(gtx C) D {
@@ -49,7 +50,7 @@ func (vh *ValueHandler) Layout(gtx C, th *material.Theme) D {
 			gtx = gtx.Disabled()
 		}
 		for range vh.startFrom.btn.Clicks() {
-			vh.handleStartBtn(cv)
+			vh.handleStartBtn(pgv)
 		}
 		return g.Inset.Layout(gtx, func(C) D {
 			return material.Button(th, &vh.startFrom.btn, "set start").Layout(gtx)
@@ -57,7 +58,7 @@ func (vh *ValueHandler) Layout(gtx C, th *material.Theme) D {
 	})
 	// skip (step) field
 	skipByField := layout.Flexed(1, func(gtx C) D {
-		return vh.InputBox(gtx, th, &vh.skipBy.textField, cv, "skip")
+		return vh.InputBox(gtx, th, &vh.skipBy.textField, pgv, "skip")
 	})
 	// skip (step) button
 	skipByBtn := layout.Flexed(1, func(gtx C) D {
@@ -66,7 +67,7 @@ func (vh *ValueHandler) Layout(gtx C, th *material.Theme) D {
 			gtx = gtx.Disabled()
 		}
 		for range vh.skipBy.btn.Clicks() {
-			vh.handleSkipBtn(cv)
+			vh.handleSkipBtn(pgv)
 		}
 		return g.Inset.Layout(gtx, func(C) D {
 			return material.Button(th, &vh.skipBy.btn, "set step").Layout(gtx)
@@ -77,7 +78,7 @@ func (vh *ValueHandler) Layout(gtx C, th *material.Theme) D {
 	// stop field
 	stopAtField := layout.Flexed(1, func(gtx C) D {
 		gtx = gtx.Disabled()
-		return vh.InputBox(gtx, th, &vh.stopAt.textField, cv, "stop")
+		return vh.InputBox(gtx, th, &vh.stopAt.textField, pgv, "stop")
 	})
 	//TODO: temporary on hold
 	// stop button
@@ -88,7 +89,7 @@ func (vh *ValueHandler) Layout(gtx C, th *material.Theme) D {
 			gtx = gtx.Disabled()
 		}
 		for range vh.stopAt.btn.Clicks() {
-			vh.handleStopBtn(cv)
+			vh.handleStopBtn(pgv)
 		}
 		return g.Inset.Layout(gtx, func(C) D {
 			return material.Button(th, &vh.stopAt.btn, "on hold").Layout(gtx)
@@ -112,11 +113,11 @@ func (vh *ValueHandler) Layout(gtx C, th *material.Theme) D {
 	)
 }
 
-func (vh *ValueHandler) InputBox(gtx C, th *material.Theme, e *component.TextField, cv *data.Generator, context string) D {
-	seq := cv.GetActiveSequence()
+func (vh *ValueHandler) InputBox(gtx C, th *material.Theme, e *component.TextField, pgv *counter.Generator, context string) D {
+	seq := pgv.GetActiveSequence()
 	var placeholder string
 	switch seq {
-	case data.PRIMES, data.FIBS:
+	case counter.PRIMES, counter.FIBS:
 		switch context {
 		case "start":
 			placeholder = fmt.Sprintf("n-th %s", seq[:len(seq)-1])
@@ -125,7 +126,7 @@ func (vh *ValueHandler) InputBox(gtx C, th *material.Theme, e *component.TextFie
 			placeholder = "set step by n"
 			e.CharLimit = 5
 		}
-	case data.NATURALS, data.INTEGERS:
+	case counter.NATURALS, counter.INTEGERS:
 		switch context {
 		case "start":
 			placeholder = "start from n"
@@ -156,46 +157,46 @@ func isNumeric(val string) bool {
 	}
 }
 
-func (vh *ValueHandler) handleStartBtn(cv *data.Generator) {
+func (vh *ValueHandler) handleStartBtn(pgv *counter.Generator) {
 	val := strings.TrimSpace(vh.startFrom.textField.Text())
 	numVal, _ := strconv.ParseUint(val, 10, 64)
-	seq := cv.GetActiveSequence()
+	seq := pgv.GetActiveSequence()
 	switch seq {
-	case data.PRIMES:
-		cv.Primes.Index = int(numVal) - 1
-	case data.FIBS:
-		cv.Fibonacci.Index = int(numVal) - 1
-	case data.NATURALS:
-		cv.Naturals.Displayed = numVal
-	case data.INTEGERS:
-		cv.Integers.Displayed = numVal
+	case counter.PRIMES:
+		pgv.Primes.Index = int(numVal) - 1
+	case counter.FIBS:
+		pgv.Fibonacci.Index = int(numVal) - 1
+	case counter.NATURALS:
+		pgv.Naturals.Displayed = numVal
+	case counter.INTEGERS:
+		pgv.Integers.Displayed = numVal
 	}
 }
 
-func (vh *ValueHandler) handleSkipBtn(cv *data.Generator) {
+func (vh *ValueHandler) handleSkipBtn(pgv *counter.Generator) {
 	val := strings.TrimSpace(vh.skipBy.textField.Text())
 	numVal, _ := strconv.ParseUint(val, 10, 64)
-	seq := cv.GetActiveSequence()
+	seq := pgv.GetActiveSequence()
 	switch seq {
-	case data.PRIMES:
-		cv.Primes.Step = numVal
-	case data.FIBS:
-		cv.Fibonacci.Step = numVal
-	case data.NATURALS:
-		cv.Naturals.Step = numVal
-	case data.INTEGERS:
-		cv.Integers.Step = numVal
+	case counter.PRIMES:
+		pgv.Primes.Step = numVal
+	case counter.FIBS:
+		pgv.Fibonacci.Step = numVal
+	case counter.NATURALS:
+		pgv.Naturals.Step = numVal
+	case counter.INTEGERS:
+		pgv.Integers.Step = numVal
 	}
 }
 
-func (vh *ValueHandler) handleStopBtn(cv *data.Generator) {
+func (vh *ValueHandler) handleStopBtn(pgv *counter.Generator) {
 	val := strings.TrimSpace(vh.stopAt.textField.Text())
 	numVal, _ := strconv.ParseUint(val, 10, 64)
-	seq := cv.GetActiveSequence()
+	seq := pgv.GetActiveSequence()
 	switch seq {
-	case data.PRIMES:
-		cv.Primes.Stop = numVal
-	case data.FIBS:
-		cv.Fibonacci.Stop = numVal
+	case counter.PRIMES:
+		pgv.Primes.Stop = numVal
+	case counter.FIBS:
+		pgv.Fibonacci.Stop = numVal
 	}
 }

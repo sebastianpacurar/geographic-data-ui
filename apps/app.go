@@ -1,8 +1,8 @@
 package apps
 
 import (
-	"gioui-experiment/custom_themes/colors"
 	g "gioui-experiment/globals"
+	"gioui-experiment/themes/colors"
 	"gioui.org/layout"
 	"gioui.org/unit"
 	"gioui.org/widget"
@@ -32,6 +32,7 @@ type (
 		*component.AppBar
 		*component.ModalLayer
 		NonModalDrawer bool
+		shutDown       widget.Clickable
 	}
 )
 
@@ -98,6 +99,7 @@ func (r *Router) Layout(gtx C, th *material.Theme) D {
 	}
 
 	content := layout.Flexed(1, func(gtx C) D {
+		//r.SetActions([])
 		return layout.Flex{}.Layout(gtx,
 			layout.Rigid(func(gtx C) D {
 				gtx.Constraints.Max.X = gtx.Px(unit.Dp(250))

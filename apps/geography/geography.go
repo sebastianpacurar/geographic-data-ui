@@ -3,8 +3,8 @@ package geography
 import (
 	"gioui-experiment/apps"
 	"gioui-experiment/apps/geography/components"
-	"gioui-experiment/custom_themes/colors"
 	g "gioui-experiment/globals"
+	"gioui-experiment/themes/colors"
 	"gioui.org/layout"
 	"gioui.org/widget"
 	"gioui.org/widget/material"
