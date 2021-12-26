@@ -6,8 +6,10 @@ import (
 	"gioui-experiment/apps/geography/components/countries/grid"
 	"gioui-experiment/apps/geography/components/countries/table"
 	"gioui.org/layout"
+	"gioui.org/unit"
 	"gioui.org/widget"
 	"gioui.org/widget/material"
+	"gioui.org/x/component"
 	"gioui.org/x/outlay"
 )
 
@@ -18,9 +20,19 @@ type (
 
 type (
 	Display struct {
+		// search
+		searchField component.TextField
+
+		// layout buttons
+		tableBtn widget.Clickable
+		gridBtn  widget.Clickable
+
+		// api data
+		data.Countries
+
+		// grid and table
 		grid.Card
 		cards []grid.Card
-		data.Countries
 		grid  outlay.GridWrap
 		list  widget.List
 		table table.Table
@@ -32,10 +44,11 @@ func (d *Display) Layout(gtx C, th *material.Theme) D {
 	if err != nil {
 		return material.H2(th, fmt.Sprintf("Error when fetching countries: %s", err)).Layout(gtx)
 	}
-	d.grid.Axis = layout.Horizontal
 	d.grid.Alignment = layout.End
 	d.list.Axis = layout.Vertical
 	d.list.Alignment = layout.Middle
+
+	d.searchField.SingleLine = true
 
 	// TODO: isolate in a gofile named "grid.go" or smthing
 	for i := range data.Data {
@@ -54,8 +67,43 @@ func (d *Display) Layout(gtx C, th *material.Theme) D {
 		})
 	}
 
-	// TABLE
-	return d.table.Layout(gtx, th)
+	return layout.Flex{Axis: layout.Vertical}.Layout(gtx,
+		layout.Rigid(func(gtx C) D {
+			return layout.Flex{}.Layout(gtx,
+				layout.Flexed(1, func(gtx C) D {
+					return d.searchField.Layout(gtx, th, "Search country")
+				}),
+
+				layout.Rigid(func(gtx C) D {
+					return layout.Flex{Alignment: layout.End}.Layout(gtx,
+						layout.Rigid(func(gtx C) D {
+							return layout.Inset{
+								Top:    unit.Dp(10),
+								Right:  unit.Dp(8),
+								Bottom: unit.Dp(8),
+								Left:   unit.Dp(8),
+							}.Layout(gtx, func(gtx C) D {
+								return material.Button(th, &d.tableBtn, "Table").Layout(gtx)
+							})
+						}),
+						layout.Rigid(func(gtx C) D {
+							return layout.Inset{
+								Top:    unit.Dp(10),
+								Right:  unit.Dp(10),
+								Bottom: unit.Dp(8),
+								Left:   unit.Dp(8),
+							}.Layout(gtx, func(gtx C) D {
+								return material.Button(th, &d.gridBtn, "Grid").Layout(gtx)
+							})
+						}))
+				}),
+			)
+		}),
+
+		// TABLE
+		layout.Rigid(func(gtx C) D {
+			return d.table.Layout(gtx, th)
+		}))
 
 	// GRID
 	// TODO: isolate in the same "grid.go" file

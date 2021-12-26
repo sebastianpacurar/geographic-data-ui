@@ -26,7 +26,7 @@ type (
 		cca2  string
 		cca3  string
 		ccn3  string
-		area  string
+		area  float64
 	}
 )
 
@@ -39,6 +39,7 @@ func (t *Table) Layout(gtx C, th *material.Theme) D {
 			cca2: data.Data[i].Cca2,
 			cca3: data.Data[i].Cca3,
 			ccn3: data.Data[i].Ccn3,
+			area: data.Data[i].Area,
 		})
 	}
 
@@ -117,7 +118,7 @@ func (t *Table) Layout(gtx C, th *material.Theme) D {
 							Left:   unit.Dp(2),
 						}.Layout(gtx, func(gtx C) D {
 							return layout.Center.Layout(gtx, func(gtx C) D {
-								return material.Body1(th, fmt.Sprintf("%.2f", data.Data[i].Area)).Layout(gtx)
+								return material.Body1(th, fmt.Sprintf("%.2f", t.rows[i].area)).Layout(gtx)
 							})
 						})
 					})
