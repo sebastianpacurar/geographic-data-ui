@@ -37,6 +37,7 @@ func (d *Display) Layout(gtx C, th *material.Theme) D {
 	d.list.Axis = layout.Vertical
 	d.list.Alignment = layout.Middle
 
+	// TODO: isolate in a gofile named "grid.go" or smthing
 	for i := range data.Data {
 		var capital string
 		if len(data.Data[i].Capital) >= 1 {
@@ -57,6 +58,7 @@ func (d *Display) Layout(gtx C, th *material.Theme) D {
 	return d.table.Layout(gtx, th)
 
 	// GRID
+	// TODO: isolate in the same "grid.go" file
 	//return material.List(th, &d.list).Layout(gtx, 1, func(gtx C, j int) D {
 	//	return d.grid.Layout(gtx, len(data.Data), func(gtx C, i int) D {
 	//		return g.Inset.Layout(gtx, func(gtx C) D {
@@ -66,6 +68,7 @@ func (d *Display) Layout(gtx C, th *material.Theme) D {
 	//})
 }
 
+// TODO: currently stuck
 //func (d *Display) processFlagFromURL(grid *grid) image.Image {
 //	r, re := http.Get(grid.flagSrc)
 //	if re != nil {
