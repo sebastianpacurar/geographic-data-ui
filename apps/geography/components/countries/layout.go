@@ -5,7 +5,6 @@ import (
 	"gioui-experiment/apps/geography/components/countries/data"
 	"gioui-experiment/apps/geography/components/countries/grid"
 	"gioui-experiment/apps/geography/components/countries/table"
-	g "gioui-experiment/globals"
 	"gioui.org/layout"
 	"gioui.org/widget"
 	"gioui.org/widget/material"
@@ -54,13 +53,17 @@ func (d *Display) Layout(gtx C, th *material.Theme) D {
 		})
 	}
 
-	return material.List(th, &d.list).Layout(gtx, 1, func(gtx C, j int) D {
-		return d.grid.Layout(gtx, len(data.Data), func(gtx C, i int) D {
-			return g.Inset.Layout(gtx, func(gtx C) D {
-				return d.LayCard(gtx, th, &d.cards[i])
-			})
-		})
-	})
+	// TABLE
+	return d.table.Layout(gtx, th)
+
+	// GRID
+	//return material.List(th, &d.list).Layout(gtx, 1, func(gtx C, j int) D {
+	//	return d.grid.Layout(gtx, len(data.Data), func(gtx C, i int) D {
+	//		return g.Inset.Layout(gtx, func(gtx C) D {
+	//			return d.LayCard(gtx, th, &d.cards[i])
+	//		})
+	//	})
+	//})
 }
 
 //func (d *Display) processFlagFromURL(grid *grid) image.Image {
