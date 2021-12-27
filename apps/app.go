@@ -35,7 +35,6 @@ type (
 		*component.AppBar
 		*component.ModalLayer
 		NonModalDrawer bool
-		shutDown       widget.Clickable
 		component.Resize
 	}
 )
@@ -59,6 +58,7 @@ func NewRouter() Router {
 		ModalNavDrawer: modalNav,
 		AppBar:         bar,
 		NavAnim:        na,
+		Resize:         component.Resize{Ratio: 0.65},
 	}
 }
 
@@ -111,12 +111,9 @@ func (r *Router) Layout(gtx C, th *material.Theme) D {
 			}),
 			layout.Flexed(1, func(gtx C) D {
 
-				// lay out the view on the left side and the controller on the right side
+				// lay out the view and controller with a resizer in between (65% of the screen belongs to the view)
 				return r.Resize.Layout(gtx,
 					func(gtx C) D {
-						width := gtx.Constraints.Max.X - gtx.Px(g.CountersMenuWidth)
-						containerSize := image.Pt(width, gtx.Constraints.Max.Y)
-						gtx.Constraints = layout.Exact(gtx.Constraints.Constrain(containerSize))
 						return layout.Stack{}.Layout(gtx,
 							layout.Expanded(func(gtx C) D {
 								container := g.ColoredArea(
@@ -134,15 +131,13 @@ func (r *Router) Layout(gtx C, th *material.Theme) D {
 								)
 							}))
 					},
+
 					func(gtx C) D {
-						width := gtx.Px(g.CountersMenuWidth)
-						containerSize := image.Pt(width, gtx.Constraints.Max.Y)
-						gtx.Constraints = layout.Exact(gtx.Constraints.Constrain(containerSize))
 						return layout.Stack{Alignment: layout.NW}.Layout(gtx,
 							layout.Expanded(func(gtx C) D {
 								return g.ColoredArea(
 									gtx,
-									gtx.Constraints.Constrain(containerSize),
+									gtx.Constraints.Max,
 									g.Colours[colors.AERO_BLUE],
 								)
 							}),
