@@ -10,7 +10,6 @@ import (
 	"gioui.org/widget"
 	"gioui.org/widget/material"
 	"gioui.org/x/component"
-	"gioui.org/x/outlay"
 )
 
 type (
@@ -27,45 +26,32 @@ type (
 		tableBtn widget.Clickable
 		gridBtn  widget.Clickable
 
+		// grid and table displays
+		grid  grid.Grid
+		table table.Table
+
+		// grid or table selected display
+		selected interface{}
+
 		// api data
 		data.Countries
 
-		// grid and table
-		grid.Card
-		cards []grid.Card
-		grid  outlay.GridWrap
-		list  widget.List
-		table table.Table
+		// slider
+		slider Slider
 	}
 )
 
 func (d *Display) Layout(gtx C, th *material.Theme) D {
 	err := d.InitCountries()
+	if d.selected == nil {
+		d.selected = d.grid
+	}
+
 	if err != nil {
 		return material.H2(th, fmt.Sprintf("Error when fetching countries: %s", err)).Layout(gtx)
 	}
-	d.grid.Alignment = layout.End
-	d.list.Axis = layout.Vertical
-	d.list.Alignment = layout.Middle
 
 	d.searchField.SingleLine = true
-
-	// TODO: isolate in a gofile named "grid.go" or smthing
-	for i := range data.Data {
-		var capital string
-		if len(data.Data[i].Capital) >= 1 {
-			capital = data.Data[i].Capital[0]
-		} else {
-			capital = "N/A"
-		}
-
-		d.cards = append(d.cards, grid.Card{
-			Name:    data.Data[i].Name.Common,
-			Capital: capital,
-			Cioc:    data.Data[i].Cioc,
-			FlagSrc: data.Data[i].FlagSrc.Png,
-		})
-	}
 
 	return layout.Flex{Axis: layout.Vertical}.Layout(gtx,
 		layout.Rigid(func(gtx C) D {
@@ -77,6 +63,14 @@ func (d *Display) Layout(gtx C, th *material.Theme) D {
 				layout.Rigid(func(gtx C) D {
 					return layout.Flex{Alignment: layout.End}.Layout(gtx,
 						layout.Rigid(func(gtx C) D {
+							if d.tableBtn.Clicked() {
+								d.selected = d.table
+								d.slider.PushRight()
+							}
+							switch d.selected.(type) {
+							case table.Table:
+								gtx = gtx.Disabled()
+							}
 							return layout.Inset{
 								Top:    unit.Dp(10),
 								Right:  unit.Dp(8),
@@ -86,7 +80,16 @@ func (d *Display) Layout(gtx C, th *material.Theme) D {
 								return material.Button(th, &d.tableBtn, "Table").Layout(gtx)
 							})
 						}),
+
 						layout.Rigid(func(gtx C) D {
+							if d.gridBtn.Clicked() {
+								d.selected = d.grid
+								d.slider.PushLeft()
+							}
+							switch d.selected.(type) {
+							case grid.Grid:
+								gtx = gtx.Disabled()
+							}
 							return layout.Inset{
 								Top:    unit.Dp(10),
 								Right:  unit.Dp(10),
@@ -100,20 +103,18 @@ func (d *Display) Layout(gtx C, th *material.Theme) D {
 			)
 		}),
 
-		// TABLE
+		// Selected display
 		layout.Rigid(func(gtx C) D {
-			return d.table.Layout(gtx, th)
+			return d.slider.Layout(gtx, func(gtx C) D {
+				switch d.selected.(type) {
+				case grid.Grid:
+					return d.grid.Layout(gtx, th)
+				case table.Table:
+					return d.table.Layout(gtx, th)
+				}
+				return D{}
+			})
 		}))
-
-	// GRID
-	// TODO: isolate in the same "grid.go" file
-	//return material.List(th, &d.list).Layout(gtx, 1, func(gtx C, j int) D {
-	//	return d.grid.Layout(gtx, len(data.Data), func(gtx C, i int) D {
-	//		return g.Inset.Layout(gtx, func(gtx C) D {
-	//			return d.LayCard(gtx, th, &d.cards[i])
-	//		})
-	//	})
-	//})
 }
 
 // TODO: currently stuck
