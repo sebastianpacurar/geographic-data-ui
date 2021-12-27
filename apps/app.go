@@ -4,11 +4,14 @@ import (
 	g "gioui-experiment/globals"
 	"gioui-experiment/themes/colors"
 	"gioui.org/layout"
+	"gioui.org/op/clip"
+	"gioui.org/op/paint"
 	"gioui.org/unit"
 	"gioui.org/widget"
 	"gioui.org/widget/material"
 	"gioui.org/x/component"
 	"image"
+	"image/color"
 	"time"
 )
 
@@ -33,6 +36,7 @@ type (
 		*component.ModalLayer
 		NonModalDrawer bool
 		shutDown       widget.Clickable
+		component.Resize
 	}
 )
 
@@ -106,69 +110,73 @@ func (r *Router) Layout(gtx C, th *material.Theme) D {
 				return r.NavDrawer.Layout(gtx, th, &r.NavAnim)
 			}),
 			layout.Flexed(1, func(gtx C) D {
-				size := image.Pt(gtx.Constraints.Max.X, gtx.Constraints.Max.Y)
-
-				// view component
-				view := layout.Rigid(func(gtx C) D {
-					width := gtx.Constraints.Max.X - gtx.Px(g.CountersMenuWidth)
-					containerSize := image.Pt(width, gtx.Constraints.Max.Y)
-					gtx.Constraints = layout.Exact(gtx.Constraints.Constrain(containerSize))
-					return layout.Stack{}.Layout(gtx,
-						layout.Expanded(func(gtx C) D {
-							container := g.RColoredArea(
-								gtx,
-								gtx.Constraints.Constrain(size),
-								unit.Dp(10),
-								g.Colours[colors.ANTIQUE_WHITE],
-							)
-							return container
-						}),
-						layout.Stacked(func(gtx C) D {
-							containerSize := image.Pt(gtx.Constraints.Max.X, gtx.Constraints.Max.Y)
-							gtx.Constraints = layout.Exact(gtx.Constraints.Constrain(containerSize))
-							return layout.Flex{Axis: layout.Vertical}.Layout(gtx,
-
-								r.pages[r.current].LayoutView(th),
-							)
-						}))
-				})
-
-				// controller component
-				controller := layout.Rigid(func(gtx C) D {
-					return layout.Stack{Alignment: layout.NW}.Layout(gtx,
-						layout.Expanded(func(gtx C) D {
-							return g.RColoredArea(
-								gtx,
-								gtx.Constraints.Max,
-								unit.Dp(10),
-								g.Colours[colors.AERO_BLUE],
-							)
-						}),
-						layout.Stacked(func(gtx C) D {
-							containerSize := image.Pt(gtx.Constraints.Max.X, gtx.Constraints.Max.Y)
-							gtx.Constraints = layout.Exact(gtx.Constraints.Constrain(containerSize))
-							border := widget.Border{
-								Color:        g.Colours[colors.SEA_GREEN],
-								CornerRadius: unit.Dp(10),
-								Width:        unit.Px(1),
-							}
-							return border.Layout(gtx, func(gtx C) D {
-								return layout.Inset{
-									Top:    unit.Dp(10),
-									Bottom: unit.Dp(10),
-								}.Layout(gtx, func(gtx C) D {
-									return r.pages[r.current].LayoutController(gtx, th)
-								})
-							})
-						}))
-				})
 
 				// lay out the view on the left side and the controller on the right side
-				return g.Inset.Layout(gtx, func(gtx C) D {
-					return layout.Flex{}.Layout(gtx, view, controller)
-				})
+				return r.Resize.Layout(gtx,
+					func(gtx C) D {
+						width := gtx.Constraints.Max.X - gtx.Px(g.CountersMenuWidth)
+						containerSize := image.Pt(width, gtx.Constraints.Max.Y)
+						gtx.Constraints = layout.Exact(gtx.Constraints.Constrain(containerSize))
+						return layout.Stack{}.Layout(gtx,
+							layout.Expanded(func(gtx C) D {
+								container := g.ColoredArea(
+									gtx,
+									gtx.Constraints.Max,
+									g.Colours[colors.ANTIQUE_WHITE],
+								)
+								return container
+							}),
+							layout.Stacked(func(gtx C) D {
+								containerSize := image.Pt(gtx.Constraints.Max.X, gtx.Constraints.Max.Y)
+								gtx.Constraints = layout.Exact(gtx.Constraints.Constrain(containerSize))
+								return layout.Flex{Axis: layout.Vertical}.Layout(gtx,
+									r.pages[r.current].LayoutView(th),
+								)
+							}))
+					},
+					func(gtx C) D {
+						width := gtx.Px(g.CountersMenuWidth)
+						containerSize := image.Pt(width, gtx.Constraints.Max.Y)
+						gtx.Constraints = layout.Exact(gtx.Constraints.Constrain(containerSize))
+						return layout.Stack{Alignment: layout.NW}.Layout(gtx,
+							layout.Expanded(func(gtx C) D {
+								return g.ColoredArea(
+									gtx,
+									gtx.Constraints.Constrain(containerSize),
+									g.Colours[colors.AERO_BLUE],
+								)
+							}),
+							layout.Stacked(func(gtx C) D {
+								containerSize := image.Pt(gtx.Constraints.Max.X, gtx.Constraints.Max.Y)
+								gtx.Constraints = layout.Exact(gtx.Constraints.Constrain(containerSize))
+								border := widget.Border{
+									Color: g.Colours[colors.SEA_GREEN],
+									Width: unit.Px(1),
+								}
+								return border.Layout(gtx, func(gtx C) D {
+									return layout.Inset{
+										Top:    unit.Dp(10),
+										Bottom: unit.Dp(10),
+									}.Layout(gtx, func(gtx C) D {
+										return r.pages[r.current].LayoutController(gtx, th)
+									})
+								})
+							}))
+					},
+
+					func(gtx C) D {
+						rect := image.Rectangle{
+							Max: image.Point{
+								X: gtx.Px(unit.Dp(6)),
+								Y: gtx.Constraints.Max.Y,
+							},
+						}
+						paint.FillShape(gtx.Ops, color.NRGBA{A: 200}, clip.Rect(rect).Op())
+						return D{Size: rect.Max}
+					})
 			}))
 	})
+
 	bar := layout.Rigid(func(gtx C) D {
 		return r.AppBar.Layout(gtx, th, "desc", "desc")
 	})
