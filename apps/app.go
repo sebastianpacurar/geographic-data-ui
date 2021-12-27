@@ -170,7 +170,7 @@ func (r *Router) Layout(gtx C, th *material.Theme) D {
 			}))
 	})
 	bar := layout.Rigid(func(gtx C) D {
-		return r.AppBar.Layout(gtx, th)
+		return r.AppBar.Layout(gtx, th, "desc", "desc")
 	})
 
 	layout.Flex{Axis: layout.Vertical}.Layout(gtx, bar, content)

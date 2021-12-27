@@ -3,13 +3,13 @@ package countries
 import (
 	"fmt"
 	"gioui-experiment/apps/geography/components/countries/data"
-	g "gioui-experiment/globals"
-	"gioui-experiment/themes/colors"
+	"gioui-experiment/apps/geography/components/countries/grid"
+	"gioui-experiment/apps/geography/components/countries/table"
 	"gioui.org/layout"
 	"gioui.org/unit"
 	"gioui.org/widget"
 	"gioui.org/widget/material"
-	"image"
+	"gioui.org/x/component"
 )
 
 type (
@@ -19,93 +19,130 @@ type (
 
 type (
 	Display struct {
-		table
-		cards []card
+		// search
+		searchField component.TextField
+
+		// layout buttons
+		tableBtn widget.Clickable
+		gridBtn  widget.Clickable
+
+		// grid and table displays
+		grid  grid.Grid
+		table table.Table
+
+		// grid or table selected display
+		selected interface{}
+
+		// api data
 		data.Countries
-	}
 
-	table struct {
-		rowList, columnList widget.List
-		rows                []tableRow
-	}
-
-	tableRow struct {
-		name  string
-		list  widget.List
-		cells []tableCell
-	}
-
-	tableCell struct {
-		name   string
-		border widget.Border
-		layout func(gtx C) D
-	}
-
-	card struct {
-		name, capital string
-		flag          image.Image
+		// slider
+		slider Slider
 	}
 )
 
-func (d *Display) LayCard(gtx C, th *material.Theme, country *card) D {
-	size := image.Pt(300, 300)
-	gtx.Constraints = layout.Exact(gtx.Constraints.Constrain(size))
-	return layout.Stack{}.Layout(gtx,
-		layout.Expanded(func(gtx C) D {
-			return widget.Border{
-				Color:        g.Colours[colors.GREY],
-				CornerRadius: unit.Dp(18),
-				Width:        unit.Px(2),
-			}.Layout(gtx, func(gtx C) D {
-				return g.RColoredArea(gtx,
-					size,
-					unit.Dp(18),
-					g.Colours[colors.WHITE],
-				)
-			})
-		}),
-		layout.Stacked(func(gtx C) D {
-			gtx.Constraints = layout.Exact(gtx.Constraints.Constrain(size))
-			return layout.Flex{Axis: layout.Vertical, Spacing: layout.SpaceAround}.Layout(gtx,
-				layout.Rigid(func(gtx C) D {
-					return layout.Flex{}.Layout(gtx,
-						layout.Flexed(1, func(gtx C) D {
-							return layout.Center.Layout(gtx, func(gtx C) D {
-								return material.Body2(th, country.name).Layout(gtx)
-							})
-						}),
-					)
-				}))
-
-			//TODO: use image.Decode directly from the request
-			//flag processing
-			//layout.Rigid(func(gtx C) D {
-			//	imgOp := paint.NewImageOp(country.flag)
-			//	return layout.Flex{}.Layout(gtx,
-			//		layout.Flexed(1, func(gtx C) D {
-			//			return
-			//		}))
-			//	)
-			//}))
-		}))
-
-}
-
 func (d *Display) Layout(gtx C, th *material.Theme) D {
 	err := d.InitCountries()
+	if d.selected == nil {
+		d.selected = d.grid
+	}
+
 	if err != nil {
 		return material.H2(th, fmt.Sprintf("Error when fetching countries: %s", err)).Layout(gtx)
 	}
 
-	for i := range data.Data {
-		d.cards = append(d.cards, card{
-			name: data.Data[i].Name.Common,
-			//flag: data.Data[i].Flag.Png
-		})
-	}
+	d.searchField.SingleLine = true
 
-	d.table.rowList.Axis = layout.Vertical
-	return material.List(th, &d.table.rowList).Layout(gtx, len(data.Data), func(gtx C, rowIndex int) D {
-		return d.LayCard(gtx, th, &d.cards[rowIndex])
-	})
+	return layout.Flex{Axis: layout.Vertical}.Layout(gtx,
+		layout.Rigid(func(gtx C) D {
+			return layout.Flex{}.Layout(gtx,
+				layout.Flexed(1, func(gtx C) D {
+					return d.searchField.Layout(gtx, th, "Search country")
+				}),
+
+				layout.Rigid(func(gtx C) D {
+					return layout.Flex{Alignment: layout.End}.Layout(gtx,
+						layout.Rigid(func(gtx C) D {
+							if d.tableBtn.Clicked() {
+								d.selected = d.table
+								d.slider.PushRight()
+							}
+							switch d.selected.(type) {
+							case table.Table:
+								gtx = gtx.Disabled()
+							}
+							return layout.Inset{
+								Top:    unit.Dp(10),
+								Right:  unit.Dp(8),
+								Bottom: unit.Dp(8),
+								Left:   unit.Dp(8),
+							}.Layout(gtx, func(gtx C) D {
+								return material.Button(th, &d.tableBtn, "Table").Layout(gtx)
+							})
+						}),
+
+						layout.Rigid(func(gtx C) D {
+							if d.gridBtn.Clicked() {
+								d.selected = d.grid
+								d.slider.PushLeft()
+							}
+							switch d.selected.(type) {
+							case grid.Grid:
+								gtx = gtx.Disabled()
+							}
+							return layout.Inset{
+								Top:    unit.Dp(10),
+								Right:  unit.Dp(10),
+								Bottom: unit.Dp(8),
+								Left:   unit.Dp(8),
+							}.Layout(gtx, func(gtx C) D {
+								return material.Button(th, &d.gridBtn, "Grid").Layout(gtx)
+							})
+						}))
+				}),
+			)
+		}),
+
+		// Selected display
+		layout.Rigid(func(gtx C) D {
+			return d.slider.Layout(gtx, func(gtx C) D {
+				switch d.selected.(type) {
+				case grid.Grid:
+					return d.grid.Layout(gtx, th)
+				case table.Table:
+					return d.table.Layout(gtx, th)
+				}
+				return D{}
+			})
+		}))
 }
+
+// TODO: currently stuck
+//func (d *Display) processFlagFromURL(grid *grid) image.Image {
+//	r, re := http.Get(grid.flagSrc)
+//	if re != nil {
+//		path := "apps/geography/components/countries/assets/placeholders/no_flag.png"
+//		f, fe := os.Open(path)
+//		if fe != nil {
+//			log.Fatalln("error when opening no_flag.png")
+//		}
+//		defer func(f *os.File) {
+//			err := f.Close()
+//			if err != nil {
+//				log.Fatalln("error closing the no_flag.png reader")
+//			}
+//		}(f)
+//
+//		res, _ := png.Decode(f)
+//		return res
+//	}
+//	defer func(Body io.ReadCloser) {
+//		err := Body.Close()
+//		if err != nil {
+//			log.Fatalln(fmt.Sprintf("error when closing response body reader for %s", grid.name))
+//		}
+//	}(r.Body)
+//
+//	res, _ := png.Decode(r.Body)
+//	return res
+//}

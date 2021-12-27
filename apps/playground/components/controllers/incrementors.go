@@ -32,7 +32,7 @@ func (inc *Incrementor) Layout(gtx C, th *material.Theme) D {
 			inc.handleMinusBtn(pgv)
 		}
 		return g.Inset.Layout(gtx,
-			material.IconButton(th, &inc.minusBtn, g.MinusIcon).Layout)
+			material.IconButton(th, &inc.minusBtn, g.MinusIcon, "desc").Layout)
 	})
 
 	resetBtn := layout.Rigid(func(gtx C) D {
@@ -43,7 +43,7 @@ func (inc *Incrementor) Layout(gtx C, th *material.Theme) D {
 			inc.handleResetBtn(pgv)
 		}
 		return g.Inset.Layout(gtx,
-			material.IconButton(th, &inc.resetBtn, g.RefreshIcon).Layout)
+			material.IconButton(th, &inc.resetBtn, g.RefreshIcon, "desc").Layout)
 	})
 
 	plusBtn := layout.Rigid(func(gtx C) D {
@@ -54,7 +54,7 @@ func (inc *Incrementor) Layout(gtx C, th *material.Theme) D {
 			inc.handlePlusBtn(pgv)
 		}
 		return g.Inset.Layout(gtx,
-			material.IconButton(th, &inc.plusBtn, g.PlusIcon).Layout)
+			material.IconButton(th, &inc.plusBtn, g.PlusIcon, "desc").Layout)
 	})
 
 	// laying out minusBtn - space - resetBtn - space - plusBtn
