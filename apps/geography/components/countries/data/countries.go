@@ -7,8 +7,10 @@ import (
 )
 
 var (
-	allCountries = &Countries{}
-	Data         = allCountries.List
+	allCountries    = &Countries{}
+	cachedCountries = &Countries{}
+	Data            = allCountries.List
+	Cached          = cachedCountries.List
 )
 
 type (
@@ -82,7 +84,12 @@ func (c *Countries) InitCountries() error {
 		}
 		err = json.Unmarshal(data, &Data)
 		if err != nil {
-			log.Fatalln("json Unmarshal RESTCountries response: ", err.Error())
+			log.Fatalln("json Unmarshal RESTCountries for mutable: ", err.Error())
+			return err
+		}
+		err = json.Unmarshal(data, &Cached)
+		if err != nil {
+			log.Fatalln("json Unmarshal RESTCountries for cached: ", err.Error())
 			return err
 		}
 		c.IsCached = true

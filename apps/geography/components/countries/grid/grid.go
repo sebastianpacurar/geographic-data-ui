@@ -18,6 +18,8 @@ type (
 )
 
 func (gr *Grid) Layout(gtx C, th *material.Theme) D {
+	gr.cards = make([]Card, 0)
+
 	gr.Alignment = layout.End
 	gr.list.Axis = layout.Vertical
 	gr.list.Alignment = layout.Middle
@@ -29,7 +31,6 @@ func (gr *Grid) Layout(gtx C, th *material.Theme) D {
 		} else {
 			capital = "N/A"
 		}
-
 		gr.cards = append(gr.cards, Card{
 			Name:    data.Data[i].Name.Common,
 			Capital: capital,

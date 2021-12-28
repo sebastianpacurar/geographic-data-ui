@@ -10,6 +10,7 @@ import (
 	"gioui.org/widget"
 	"gioui.org/widget/material"
 	"gioui.org/x/component"
+	"strings"
 )
 
 type (
@@ -21,6 +22,7 @@ type (
 	Display struct {
 		// search
 		searchField component.TextField
+		currentStr  string
 
 		// layout buttons
 		tableBtn widget.Clickable
@@ -44,7 +46,7 @@ type (
 func (d *Display) Layout(gtx C, th *material.Theme) D {
 	err := d.InitCountries()
 	if d.selected == nil {
-		d.selected = d.grid
+		d.selected = d.table
 	}
 
 	if err != nil {
@@ -55,56 +57,67 @@ func (d *Display) Layout(gtx C, th *material.Theme) D {
 
 	return layout.Flex{Axis: layout.Vertical}.Layout(gtx,
 		layout.Rigid(func(gtx C) D {
-			return layout.Flex{}.Layout(gtx,
-				layout.Flexed(1, func(gtx C) D {
-					return d.searchField.Layout(gtx, th, "Search country")
-				}),
 
+			// search field
+			search := layout.Flexed(1, func(gtx C) D {
+				return d.searchField.Layout(gtx, th, "Search country")
+			})
+
+			// table button
+			tblBtn := layout.Rigid(func(gtx C) D {
+				if d.tableBtn.Clicked() {
+					d.selected = d.table
+					d.slider.PushRight()
+				}
+				switch d.selected.(type) {
+				case table.Table:
+					gtx = gtx.Disabled()
+				}
+				return layout.Inset{
+					Top:    unit.Dp(10),
+					Right:  unit.Dp(8),
+					Bottom: unit.Dp(8),
+					Left:   unit.Dp(8),
+				}.Layout(gtx, func(gtx C) D {
+					return material.Button(th, &d.tableBtn, "Table").Layout(gtx)
+				})
+			})
+
+			// grid button
+			grdBtn := layout.Rigid(func(gtx C) D {
+				if d.gridBtn.Clicked() {
+					d.selected = d.grid
+					d.slider.PushLeft()
+				}
+				switch d.selected.(type) {
+				case grid.Grid:
+					gtx = gtx.Disabled()
+				}
+				return layout.Inset{
+					Top:    unit.Dp(10),
+					Right:  unit.Dp(10),
+					Bottom: unit.Dp(8),
+					Left:   unit.Dp(8),
+				}.Layout(gtx, func(gtx C) D {
+					return material.Button(th, &d.gridBtn, "Grid").Layout(gtx)
+				})
+			})
+
+			return layout.Flex{}.Layout(gtx,
+				search,
 				layout.Rigid(func(gtx C) D {
 					return layout.Flex{Alignment: layout.End}.Layout(gtx,
-						layout.Rigid(func(gtx C) D {
-							if d.tableBtn.Clicked() {
-								d.selected = d.table
-								d.slider.PushRight()
-							}
-							switch d.selected.(type) {
-							case table.Table:
-								gtx = gtx.Disabled()
-							}
-							return layout.Inset{
-								Top:    unit.Dp(10),
-								Right:  unit.Dp(8),
-								Bottom: unit.Dp(8),
-								Left:   unit.Dp(8),
-							}.Layout(gtx, func(gtx C) D {
-								return material.Button(th, &d.tableBtn, "Table").Layout(gtx)
-							})
-						}),
-
-						layout.Rigid(func(gtx C) D {
-							if d.gridBtn.Clicked() {
-								d.selected = d.grid
-								d.slider.PushLeft()
-							}
-							switch d.selected.(type) {
-							case grid.Grid:
-								gtx = gtx.Disabled()
-							}
-							return layout.Inset{
-								Top:    unit.Dp(10),
-								Right:  unit.Dp(10),
-								Bottom: unit.Dp(8),
-								Left:   unit.Dp(8),
-							}.Layout(gtx, func(gtx C) D {
-								return material.Button(th, &d.gridBtn, "Grid").Layout(gtx)
-							})
-						}))
-				}),
-			)
+						tblBtn,
+						grdBtn,
+					)
+				}))
 		}),
 
 		// Selected display
 		layout.Rigid(func(gtx C) D {
+
+			// filter by search
+			d.filterData()
 			return d.slider.Layout(gtx, func(gtx C) D {
 				switch d.selected.(type) {
 				case grid.Grid:
@@ -115,6 +128,21 @@ func (d *Display) Layout(gtx C, th *material.Theme) D {
 				return D{}
 			})
 		}))
+}
+
+// filterData - filter countries based on data.Data and data.Cached manipulation
+func (d *Display) filterData() {
+	data.Data = make([]data.Country, 0)
+	if d.searchField.Len() > 0 {
+		for i := range data.Cached {
+			if strings.HasPrefix(strings.ToLower(data.Cached[i].Name.Common), strings.ToLower(d.searchField.Text())) {
+				data.Data = append(data.Data, data.Cached[i])
+			}
+		}
+		d.currentStr = d.searchField.Text()
+	} else if d.searchField.Len() == 0 {
+		data.Data = data.Cached
+	}
 }
 
 // TODO: currently stuck
