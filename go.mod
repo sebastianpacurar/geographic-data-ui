@@ -2,7 +2,7 @@ module gioui-experiment
 
 go 1.17
 
-require gioui.org v0.0.0-20211201162354-9a5298914282
+require gioui.org v0.0.0-20211226092054-3a20330d8213
 
 require (
 	gioui.org/cpu v0.0.0-20210817075930-8d6a761490d2 // indirect
@@ -11,8 +11,8 @@ require (
 )
 
 require (
-	gioui.org/x v0.0.0-20211201170442-0eb3fcddb9ec
-	golang.org/x/exp v0.0.0-20211129234152-8a230f1f7d7a
-	golang.org/x/sys v0.0.0-20211124211545-fe61309f8881 // indirect
+	gioui.org/x v0.0.0-20211220145358-cf2b1f072816
+	golang.org/x/exp v0.0.0-20211221223016-e29036178569
+	golang.org/x/sys v0.0.0-20211216021012-1d35b9e2eb4e // indirect
 	golang.org/x/text v0.3.7 // indirect
 )
