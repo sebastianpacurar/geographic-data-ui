@@ -32,6 +32,7 @@ type (
 
 // Layout -  TODO: Mockup - in progress
 func (t *Table) Layout(gtx C, th *material.Theme) D {
+	t.rows = make([]row, 0)
 
 	for i := range data.Data {
 		t.rows = append(t.rows, row{
