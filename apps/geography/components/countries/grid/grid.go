@@ -1,6 +1,7 @@
 package grid
 
 import (
+	"fmt"
 	"gioui-experiment/apps/geography/components/countries/data"
 	g "gioui-experiment/globals"
 	"gioui.org/layout"
@@ -42,6 +43,14 @@ func (gr *Grid) Layout(gtx C, th *material.Theme) D {
 	return material.List(th, &gr.list).Layout(gtx, 1, func(gtx C, j int) D {
 		return gr.GridWrap.Layout(gtx, len(data.Data), func(gtx C, i int) D {
 			var content D
+
+			if gr.cards[i].Click.Clicked() {
+				fmt.Println(fmt.Sprintf("%s", gr.cards[i].Name))
+			}
+
+			if gr.cards[i].Click.Hovered() {
+				data.Data[i].Hovered = !data.Data[i].Hovered
+			}
 
 			if gr.cards[i].Active {
 				content = g.Inset.Layout(gtx, func(gtx C) D {

@@ -9,6 +9,7 @@ import (
 	"gioui.org/unit"
 	"gioui.org/widget"
 	"gioui.org/widget/material"
+	"image"
 )
 
 type (
@@ -80,14 +81,14 @@ func (t *Table) Layout(gtx C, th *material.Theme) D {
 								Bottom: unit.Dp(2),
 								Left:   unit.Dp(2),
 							}.Layout(gtx, func(gtx C) D {
-								return layout.Stack{}.Layout(gtx,
+								return layout.Stack{Alignment: layout.Center}.Layout(gtx,
 
 									layout.Expanded(func(gtx C) D {
-										return g.ColoredArea(gtx, gtx.Constraints.Min, rowColor)
+										return g.ColoredArea(gtx, image.Pt(gtx.Constraints.Max.X, gtx.Constraints.Min.Y), rowColor)
 									}),
 
 									layout.Stacked(func(gtx C) D {
-										return layout.Center.Layout(gtx, material.Body1(th, t.rows[i].name).Layout)
+										return material.Body1(th, t.rows[i].name).Layout(gtx)
 									}))
 							})
 						})
@@ -100,14 +101,14 @@ func (t *Table) Layout(gtx C, th *material.Theme) D {
 								Bottom: unit.Dp(2),
 								Left:   unit.Dp(2),
 							}.Layout(gtx, func(gtx C) D {
-								return layout.Stack{}.Layout(gtx,
+								return layout.Stack{Alignment: layout.Center}.Layout(gtx,
 
 									layout.Expanded(func(gtx C) D {
-										return g.ColoredArea(gtx, gtx.Constraints.Min, rowColor)
+										return g.ColoredArea(gtx, image.Pt(gtx.Constraints.Max.X, gtx.Constraints.Min.Y), rowColor)
 									}),
 
 									layout.Stacked(func(gtx C) D {
-										return layout.Center.Layout(gtx, material.Body1(th, t.rows[i].cca2).Layout)
+										return material.Body1(th, t.rows[i].cca2).Layout(gtx)
 									}))
 							})
 						})
@@ -119,14 +120,14 @@ func (t *Table) Layout(gtx C, th *material.Theme) D {
 								Bottom: unit.Dp(2),
 								Left:   unit.Dp(2),
 							}.Layout(gtx, func(gtx C) D {
-								return layout.Stack{}.Layout(gtx,
+								return layout.Stack{Alignment: layout.Center}.Layout(gtx,
 
 									layout.Expanded(func(gtx C) D {
-										return g.ColoredArea(gtx, gtx.Constraints.Min, rowColor)
+										return g.ColoredArea(gtx, image.Pt(gtx.Constraints.Max.X, gtx.Constraints.Min.Y), rowColor)
 									}),
 
 									layout.Stacked(func(gtx C) D {
-										return layout.Center.Layout(gtx, material.Body1(th, t.rows[i].cca3).Layout)
+										return material.Body1(th, t.rows[i].cca3).Layout(gtx)
 									}))
 							})
 						})
@@ -138,14 +139,14 @@ func (t *Table) Layout(gtx C, th *material.Theme) D {
 								Bottom: unit.Dp(2),
 								Left:   unit.Dp(2),
 							}.Layout(gtx, func(gtx C) D {
-								return layout.Stack{}.Layout(gtx,
+								return layout.Stack{Alignment: layout.Center}.Layout(gtx,
 
 									layout.Expanded(func(gtx C) D {
-										return g.ColoredArea(gtx, gtx.Constraints.Min, rowColor)
+										return g.ColoredArea(gtx, image.Pt(gtx.Constraints.Max.X, gtx.Constraints.Min.Y), rowColor)
 									}),
 
 									layout.Stacked(func(gtx C) D {
-										return layout.Center.Layout(gtx, material.Body1(th, t.rows[i].ccn3).Layout)
+										return material.Body1(th, t.rows[i].ccn3).Layout(gtx)
 									}))
 							})
 						})
@@ -157,14 +158,14 @@ func (t *Table) Layout(gtx C, th *material.Theme) D {
 								Bottom: unit.Dp(2),
 								Left:   unit.Dp(2),
 							}.Layout(gtx, func(gtx C) D {
-								return layout.Stack{}.Layout(gtx,
+								return layout.Stack{Alignment: layout.N}.Layout(gtx,
 
 									layout.Expanded(func(gtx C) D {
-										return g.ColoredArea(gtx, gtx.Constraints.Min, rowColor)
+										return g.ColoredArea(gtx, image.Pt(gtx.Constraints.Max.X, gtx.Constraints.Min.Y), rowColor)
 									}),
 
 									layout.Stacked(func(gtx C) D {
-										return layout.Center.Layout(gtx, material.Body1(th, fmt.Sprintf("%.2f", t.rows[i].area)).Layout)
+										return material.Body1(th, fmt.Sprintf("%.2f", t.rows[i].area)).Layout(gtx)
 									}))
 							})
 						})

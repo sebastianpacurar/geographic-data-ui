@@ -20,21 +20,19 @@ type (
 )
 
 func (cd *CountryDetails) Layout(gtx C, th *material.Theme) D {
+	var content D
+
 	for i := range data.Data {
 		if data.Data[i].Hovered {
-			//TODO: fix
-			//cd.Hovered = &data.Data[i]
-			//fmt.Println(cd.Hovered)
-			//break
+			content = layout.Flex{Axis: layout.Vertical}.Layout(gtx,
+				layout.Rigid(func(gtx C) D {
+					return layout.Inset{
+						Bottom: unit.Dp(5),
+					}.Layout(gtx, func(gtx C) D {
+						return material.Body1(th, "test").Layout(gtx)
+					})
+				}))
 		}
 	}
-	//data.Data
-	return layout.Flex{Axis: layout.Vertical}.Layout(gtx,
-		layout.Rigid(func(gtx C) D {
-			return layout.Inset{
-				Bottom: unit.Dp(5),
-			}.Layout(gtx, func(gtx C) D {
-				return material.Body1(th, "test").Layout(gtx)
-			})
-		}))
+	return content
 }

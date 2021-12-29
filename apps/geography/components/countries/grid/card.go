@@ -1,7 +1,6 @@
 package grid
 
 import (
-	"fmt"
 	g "gioui-experiment/globals"
 	"gioui-experiment/themes/colors"
 	"gioui.org/layout"
@@ -35,15 +34,8 @@ func (c *Card) LayCard(gtx C, th *material.Theme, card *Card) D {
 				area := material.Clickable(gtx, &card.Click, func(gtx C) D {
 					cardColor := g.Colours[colors.WHITE]
 
-					if card.Click.Clicked() {
-						fmt.Println(fmt.Sprintf("%s", card.Name))
-					}
-
 					if card.Click.Hovered() {
-						//c.cd.Hovered =
 						cardColor = g.Colours[colors.AERO_BLUE]
-					} else if !card.Click.Hovered() {
-						c.Hovered = false
 					}
 
 					return g.RColoredArea(gtx, size, unit.Dp(10), cardColor)
