@@ -43,6 +43,8 @@ type (
 
 		// Active - used for search rows/cards
 		Active bool
+		// Hovered - used for CP
+		Hovered bool
 	}
 
 	Name struct {

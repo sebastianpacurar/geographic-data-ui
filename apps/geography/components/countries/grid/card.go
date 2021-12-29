@@ -13,11 +13,12 @@ import (
 
 type (
 	Card struct {
-		Name   string
-		Cca2   string
-		Active bool
-		Click  widget.Clickable
-		flag   image.Image
+		Name    string
+		Cca2    string
+		Active  bool
+		Hovered bool
+		Click   widget.Clickable
+		flag    image.Image
 	}
 )
 
@@ -39,7 +40,10 @@ func (c *Card) LayCard(gtx C, th *material.Theme, card *Card) D {
 					}
 
 					if card.Click.Hovered() {
+						//c.cd.Hovered =
 						cardColor = g.Colours[colors.AERO_BLUE]
+					} else if !card.Click.Hovered() {
+						c.Hovered = false
 					}
 
 					return g.RColoredArea(gtx, size, unit.Dp(10), cardColor)

@@ -17,8 +17,8 @@ type (
 		controllers []Controller
 		list        widget.List
 
-		test      controllers.TestController
-		testState component.DiscloserState
+		countryDetails controllers.CountryDetails
+		detailsState   component.DiscloserState
 	}
 
 	Controller struct {
@@ -46,14 +46,14 @@ func (cp *ControlPanel) Layout(gtx C, th *material.Theme) D {
 	// every controller is a vertical flex which contains 2 rigids - discloser and the divider
 	cp.controllers = []Controller{
 		{
-			name: "Test 1 - geography control",
+			name: "Country Details",
 			layout: func(gtx C, c *Controller) D {
 				content := layout.Rigid(func(gtx C) D {
-					return component.SimpleDiscloser(th, &cp.testState).Layout(gtx,
+					return component.SimpleDiscloser(th, &cp.detailsState).Layout(gtx,
 						material.Body1(th, c.name).Layout,
 						func(gtx C) D {
 							return controllerInset.Layout(gtx, func(gtx C) D {
-								return cp.test.Layout(gtx, th)
+								return cp.countryDetails.Layout(gtx, th)
 							})
 						})
 				})
