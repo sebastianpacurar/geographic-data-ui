@@ -62,8 +62,16 @@ func (t *Table) Layout(gtx C, th *material.Theme) D {
 	return material.List(th, &t.list).Layout(gtx, len(data.Data), func(gtx C, i int) D {
 		return material.Clickable(gtx, &t.rows[i].click, func(gtx C) D {
 			var content D
+			rowColor := g.Colours[colors.ANTIQUE_WHITE]
 
 			if t.rows[i].active {
+				if t.rows[i].click.Clicked() {
+					fmt.Println(fmt.Sprintf("%s is clicked", t.rows[i].name))
+				}
+
+				if t.rows[i].click.Hovered() {
+					rowColor = g.Colours[colors.WHITE]
+				}
 
 				content = layout.Flex{}.Layout(gtx,
 					layout.Flexed(4, func(gtx C) D {
@@ -73,12 +81,19 @@ func (t *Table) Layout(gtx C, th *material.Theme) D {
 								Bottom: unit.Dp(2),
 								Left:   unit.Dp(2),
 							}.Layout(gtx, func(gtx C) D {
-								return layout.Center.Layout(gtx, func(gtx C) D {
-									return material.Body1(th, t.rows[i].name).Layout(gtx)
-								})
+								return layout.Stack{}.Layout(gtx,
+
+									layout.Expanded(func(gtx C) D {
+										return g.ColoredArea(gtx, gtx.Constraints.Min, rowColor)
+									}),
+
+									layout.Stacked(func(gtx C) D {
+										return layout.Center.Layout(gtx, material.Body1(th, t.rows[i].name).Layout)
+									}))
 							})
 						})
 					}),
+
 					layout.Flexed(1, func(gtx C) D {
 						return border.Layout(gtx, func(gtx C) D {
 							return layout.Inset{
@@ -132,10 +147,6 @@ func (t *Table) Layout(gtx C, th *material.Theme) D {
 						})
 					}),
 				)
-			}
-
-			if t.rows[i].click.Clicked() {
-				fmt.Println(fmt.Sprintf("%s is clicked", t.rows[i].name))
 			}
 
 			return content
