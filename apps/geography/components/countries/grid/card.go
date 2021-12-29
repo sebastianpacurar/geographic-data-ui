@@ -32,16 +32,17 @@ func (c *Card) LayCard(gtx C, th *material.Theme, card *Card) D {
 				Width:        unit.Px(2),
 			}.Layout(gtx, func(gtx C) D {
 				area := material.Clickable(gtx, &card.Click, func(gtx C) D {
+					cardColor := g.Colours[colors.WHITE]
 
 					if card.Click.Clicked() {
 						fmt.Println(fmt.Sprintf("%s", card.Name))
 					}
 
-					return g.RColoredArea(gtx,
-						size,
-						unit.Dp(10),
-						g.Colours[colors.WHITE],
-					)
+					if card.Click.Hovered() {
+						cardColor = g.Colours[colors.AERO_BLUE]
+					}
+
+					return g.RColoredArea(gtx, size, unit.Dp(10), cardColor)
 				})
 				return area
 			})
