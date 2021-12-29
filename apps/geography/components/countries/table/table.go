@@ -21,26 +21,26 @@ type (
 	}
 
 	row struct {
-		click widget.Clickable
-		name  string
-		cca2  string
-		cca3  string
-		ccn3  string
-		area  float64
+		click  widget.Clickable
+		name   string
+		cca2   string
+		cca3   string
+		ccn3   string
+		area   float64
+		active bool
 	}
 )
 
 // Layout -  TODO: Mockup - in progress
 func (t *Table) Layout(gtx C, th *material.Theme) D {
-	t.rows = make([]row, 0)
-
 	for i := range data.Data {
 		t.rows = append(t.rows, row{
-			name: data.Data[i].Name.Common,
-			cca2: data.Data[i].Cca2,
-			cca3: data.Data[i].Cca3,
-			ccn3: data.Data[i].Ccn3,
-			area: data.Data[i].Area,
+			name:   data.Data[i].Name.Common,
+			cca2:   data.Data[i].Cca2,
+			cca3:   data.Data[i].Cca3,
+			ccn3:   data.Data[i].Ccn3,
+			area:   data.Data[i].Area,
+			active: data.Data[i].Active,
 		})
 	}
 

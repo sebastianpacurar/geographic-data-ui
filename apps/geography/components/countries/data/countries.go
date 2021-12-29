@@ -7,10 +7,8 @@ import (
 )
 
 var (
-	allCountries    = &Countries{}
-	cachedCountries = &Countries{}
-	Data            = allCountries.List
-	Cached          = cachedCountries.List
+	allCountries = &Countries{}
+	Data         = allCountries.List
 )
 
 type (
@@ -42,6 +40,9 @@ type (
 		Population     int32                      `json:"population"`
 		StartOfWeek    string                     `json:"startOfWeek"`
 		FlagSrc        Flag                       `json:"flags"`
+
+		// Active - used for search rows/cards
+		Active bool
 	}
 
 	Name struct {
@@ -85,11 +86,6 @@ func (c *Countries) InitCountries() error {
 		err = json.Unmarshal(data, &Data)
 		if err != nil {
 			log.Fatalln("json Unmarshal RESTCountries for mutable: ", err.Error())
-			return err
-		}
-		err = json.Unmarshal(data, &Cached)
-		if err != nil {
-			log.Fatalln("json Unmarshal RESTCountries for cached: ", err.Error())
 			return err
 		}
 		c.IsCached = true

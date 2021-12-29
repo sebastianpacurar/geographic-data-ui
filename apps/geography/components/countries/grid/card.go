@@ -13,11 +13,11 @@ import (
 
 type (
 	Card struct {
-		Name, Capital string
-		Cioc, FlagSrc string
-		clicked       bool
-		Click         widget.Clickable
-		flag          image.Image
+		Name   string
+		Cca2   string
+		Active bool
+		Click  widget.Clickable
+		flag   image.Image
 	}
 )
 
@@ -28,7 +28,7 @@ func (c *Card) LayCard(gtx C, th *material.Theme, card *Card) D {
 		layout.Expanded(func(gtx C) D {
 			return widget.Border{
 				Color:        g.Colours[colors.GREY],
-				CornerRadius: unit.Dp(18),
+				CornerRadius: unit.Dp(2),
 				Width:        unit.Px(2),
 			}.Layout(gtx, func(gtx C) D {
 				area := material.Clickable(gtx, &card.Click, func(gtx C) D {
@@ -39,7 +39,7 @@ func (c *Card) LayCard(gtx C, th *material.Theme, card *Card) D {
 
 					return g.RColoredArea(gtx,
 						size,
-						unit.Dp(18),
+						unit.Dp(10),
 						g.Colours[colors.WHITE],
 					)
 				})
@@ -69,7 +69,7 @@ func (c *Card) LayCard(gtx C, th *material.Theme, card *Card) D {
 						return layout.Flex{}.Layout(gtx,
 							layout.Flexed(1, func(gtx C) D {
 								return layout.Center.Layout(gtx, func(gtx C) D {
-									return material.Body2(th, card.Capital).Layout(gtx)
+									return material.Body2(th, card.Cca2).Layout(gtx)
 								})
 							}))
 					}))

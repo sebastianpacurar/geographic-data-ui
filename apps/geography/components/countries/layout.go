@@ -23,6 +23,8 @@ type (
 		// search
 		searchField component.TextField
 		currentStr  string
+		// used for empty search field
+		refilled bool
 
 		// layout buttons
 		tableBtn widget.Clickable
@@ -34,6 +36,7 @@ type (
 
 		// grid or table selected display
 		selected interface{}
+		loaded   bool
 
 		// api data
 		data.Countries
@@ -54,6 +57,14 @@ func (d *Display) Layout(gtx C, th *material.Theme) D {
 	}
 
 	d.searchField.SingleLine = true
+
+	// run only once during lifetime
+	if !d.loaded {
+		for i := range data.Data {
+			data.Data[i].Active = true
+		}
+		d.loaded = true
+	}
 
 	return layout.Flex{Axis: layout.Vertical}.Layout(gtx,
 		layout.Rigid(func(gtx C) D {
@@ -115,8 +126,6 @@ func (d *Display) Layout(gtx C, th *material.Theme) D {
 
 		// Selected display
 		layout.Rigid(func(gtx C) D {
-
-			// filter by search
 			d.filterData()
 			return d.slider.Layout(gtx, func(gtx C) D {
 				switch d.selected.(type) {
@@ -132,16 +141,22 @@ func (d *Display) Layout(gtx C, th *material.Theme) D {
 
 // filterData - filter countries based on data.Data and data.Cached manipulation
 func (d *Display) filterData() {
-	data.Data = make([]data.Country, 0)
-	if d.searchField.Len() > 0 {
-		for i := range data.Cached {
-			if strings.HasPrefix(strings.ToLower(data.Cached[i].Name.Common), strings.ToLower(d.searchField.Text())) {
-				data.Data = append(data.Data, data.Cached[i])
+	if d.currentStr != d.searchField.Text() {
+		if d.searchField.Len() > 0 {
+			for i := range data.Data {
+				if strings.HasPrefix(strings.ToLower(data.Data[i].Name.Common), strings.ToLower(d.searchField.Text())) {
+					data.Data[i].Active = true
+				} else {
+					data.Data[i].Active = false
+				}
 			}
+			d.currentStr = d.searchField.Text()
+		} else if d.searchField.Len() == 0 {
+			for i := range data.Data {
+				data.Data[i].Active = true
+			}
+			d.currentStr = d.searchField.Text()
 		}
-		d.currentStr = d.searchField.Text()
-	} else if d.searchField.Len() == 0 {
-		data.Data = data.Cached
 	}
 }
 

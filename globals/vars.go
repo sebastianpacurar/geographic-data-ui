@@ -7,9 +7,8 @@ import (
 )
 
 var (
-	CountersMenuWidth = unit.Dp(400)
-	DefaultMargin     = unit.Dp(10)
-	Colours           = map[string]color.NRGBA{
+	DefaultMargin = unit.Dp(10)
+	Colours       = map[string]color.NRGBA{
 		"red":             {R: 255, A: 255},
 		"dark-red":        {R: 139, A: 255},
 		"blue":            {B: 255, A: 255},
