@@ -12,8 +12,7 @@ import (
 
 func ColoredArea(gtx layout.Context, size image.Point, color color.NRGBA) layout.Dimensions {
 	dims := image.Rectangle{Max: gtx.Constraints.Max}
-	defer clip.Rect(dims).Push(gtx.Ops).Pop()
-	paint.Fill(gtx.Ops, color)
+	paint.FillShape(gtx.Ops, color, clip.Rect(dims).Op())
 	return layout.Dimensions{Size: size}
 }
 

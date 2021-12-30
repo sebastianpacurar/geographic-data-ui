@@ -23,6 +23,8 @@ var (
 		"black":           {A: 255},
 		"antique-white":   {R: 250, G: 235, B: 215, A: 255},
 		"aero-blue":       {R: 201, G: 255, B: 229, A: 255},
+		"light-salmon":    {R: 255, G: 207, B: 188, A: 255},
+		"nyanza":          {R: 233, G: 255, B: 219, A: 255},
 
 		"text_selection": {R: 191, G: 255, B: 209, A: 255},
 	}

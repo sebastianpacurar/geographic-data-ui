@@ -12,40 +12,32 @@ import (
 )
 
 type (
-	C = layout.Context
-	D = layout.Dimensions
-
-	CountryDetails struct {
-		cards      []grid.Card
-		list       widget.List
-		isSelected data.Country
+	HoveredDetails struct {
+		cards []grid.Card
+		list  widget.List
 	}
 )
 
-func (cd *CountryDetails) Layout(gtx C, th *material.Theme) D {
+func (hd *HoveredDetails) Layout(gtx C, th *material.Theme) D {
 	var content D
 
 	for i := range data.Data {
-		if data.Data[i].Selected {
-			cd.isSelected = data.Data[i]
+		if data.Data[i].Hovered {
+			content = layout.Flex{Axis: layout.Vertical}.Layout(gtx,
+				layout.Rigid(func(gtx C) D {
+					return layout.Inset{
+						Bottom: unit.Dp(5),
+					}.Layout(gtx, func(gtx C) D {
+						return hd.LayData(gtx, th, data.Data[i])
+					})
+				}))
 		}
 	}
-	if cd.isSelected.Name.Common != "" {
-		content = layout.Flex{Axis: layout.Vertical}.Layout(gtx,
-			layout.Rigid(func(gtx C) D {
-				return layout.Inset{
-					Bottom: unit.Dp(5),
-				}.Layout(gtx, func(gtx C) D {
-					return cd.LayData(gtx, th, cd.isSelected)
-				})
-			}))
-	}
-
 	return content
 }
 
 // LayData - Lays all details about the hovered country in the CP
-func (cd *CountryDetails) LayData(gtx C, th *material.Theme, country data.Country) D {
+func (hd *HoveredDetails) LayData(gtx C, th *material.Theme, country data.Country) D {
 	return layout.Flex{Axis: layout.Vertical}.Layout(gtx,
 		layout.Rigid(component.DividerSubheadingText(th, "Name").Layout),
 		layout.Rigid(material.Body1(th, country.Name.Common).Layout),
@@ -106,5 +98,9 @@ func (cd *CountryDetails) LayData(gtx C, th *material.Theme, country data.Countr
 			return material.Body1(th, res).Layout(gtx)
 		}),
 		layout.Rigid(component.Divider(th).Layout),
+
+		layout.Rigid(material.Body1(th, country.Status).Layout),
+		layout.Rigid(material.Body1(th, country.Currencies.Name).Layout),
+		layout.Rigid(material.Body1(th, country.Currencies.Symbol).Layout),
 	)
 }

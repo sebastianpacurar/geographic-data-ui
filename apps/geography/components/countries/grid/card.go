@@ -1,7 +1,6 @@
 package grid
 
 import (
-	"fmt"
 	g "gioui-experiment/globals"
 	"gioui-experiment/themes/colors"
 	"gioui.org/layout"
@@ -14,12 +13,13 @@ import (
 
 type (
 	Card struct {
-		Name    string
-		Cca2    string
-		Active  bool
-		Hovered bool
-		Click   widget.Clickable
-		flag    image.Image
+		Name     string
+		Cca2     string
+		Active   bool
+		Hovered  bool
+		Selected bool
+		Click    widget.Clickable
+		flag     image.Image
 
 		// menu - triggered by right click
 		menu            component.MenuState
@@ -30,18 +30,25 @@ type (
 		isMenuTriggered bool
 
 		// menu options
-		selectBtn widget.Clickable
+		selectBtn   widget.Clickable
+		deselectBtn widget.Clickable
 	}
 )
 
-func (c *Card) LayCard(gtx C, th *material.Theme, card *Card) D {
-	size := image.Pt(250, 350)
+func (c *Card) LayCard(gtx C, th *material.Theme) D {
+	size := image.Pt(200, 275)
 	gtx.Constraints = layout.Exact(gtx.Constraints.Constrain(size))
 
 	if !c.isMenuTriggered {
+		lbl := "Select"
+		btn := &c.selectBtn
+		if c.Selected {
+			lbl = "Deselect"
+			btn = &c.deselectBtn
+		}
 		c.menu = component.MenuState{
 			Options: []func(gtx C) D{
-				component.MenuItem(th, &card.selectBtn, "Select").Layout,
+				component.MenuItem(th, btn, lbl).Layout,
 			},
 		}
 	}
@@ -53,15 +60,17 @@ func (c *Card) LayCard(gtx C, th *material.Theme, card *Card) D {
 				Width:        unit.Px(2),
 			}.Layout(gtx, func(gtx C) D {
 
-				if card.selectBtn.Clicked() {
-					fmt.Println(fmt.Sprintf("%s is selected", card.Name))
-				}
-
-				area := material.Clickable(gtx, &card.Click, func(gtx C) D {
+				area := material.Clickable(gtx, &c.Click, func(gtx C) D {
 					cardColor := g.Colours[colors.WHITE]
 
-					if card.Click.Hovered() {
+					if c.Selected {
 						cardColor = g.Colours[colors.AERO_BLUE]
+					}
+
+					if c.Click.Hovered() && !c.Selected {
+						cardColor = g.Colours[colors.NYANZA]
+					} else if c.Click.Hovered() && c.Selected {
+						cardColor = g.Colours[colors.LIGHT_SALMON]
 					}
 
 					return g.RColoredArea(gtx, size, 10, cardColor)
@@ -79,7 +88,7 @@ func (c *Card) LayCard(gtx C, th *material.Theme, card *Card) D {
 						return layout.Flex{}.Layout(gtx,
 							layout.Flexed(1, func(gtx C) D {
 								return layout.Center.Layout(gtx, func(gtx C) D {
-									return material.Body2(th, card.Name).Layout(gtx)
+									return material.Body2(th, c.Name).Layout(gtx)
 								})
 							}),
 						)
@@ -92,13 +101,14 @@ func (c *Card) LayCard(gtx C, th *material.Theme, card *Card) D {
 						return layout.Flex{}.Layout(gtx,
 							layout.Flexed(1, func(gtx C) D {
 								return layout.Center.Layout(gtx, func(gtx C) D {
-									return material.Body2(th, card.Cca2).Layout(gtx)
+									return material.Body2(th, c.Cca2).Layout(gtx)
 								})
 							}))
 					}))
 			})
 		}),
 
+		// this returns the menu
 		layout.Expanded(func(gtx C) D {
 			return c.ctxArea.Layout(gtx, func(gtx C) D {
 				gtx.Constraints.Min = image.Point{}

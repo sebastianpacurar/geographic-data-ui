@@ -17,8 +17,11 @@ type (
 		controllers []Controller
 		list        widget.List
 
-		countryDetails controllers.CountryDetails
-		detailsState   component.DiscloserState
+		CDetails controllers.CountryDetails
+		HDetails controllers.HoveredDetails
+
+		CDState component.DiscloserState
+		HDState component.DiscloserState
 	}
 
 	Controller struct {
@@ -49,11 +52,26 @@ func (cp *ControlPanel) Layout(gtx C, th *material.Theme) D {
 			name: "Country Details",
 			layout: func(gtx C, c *Controller) D {
 				content := layout.Rigid(func(gtx C) D {
-					return component.SimpleDiscloser(th, &cp.detailsState).Layout(gtx,
+					return component.SimpleDiscloser(th, &cp.CDState).Layout(gtx,
 						material.Body1(th, c.name).Layout,
 						func(gtx C) D {
 							return controllerInset.Layout(gtx, func(gtx C) D {
-								return cp.countryDetails.Layout(gtx, th)
+								return cp.CDetails.Layout(gtx, th)
+							})
+						})
+				})
+				return cp.LayOutset(gtx, content, divider)
+			},
+		},
+		{
+			name: "Hovered Country Details",
+			layout: func(gtx C, c *Controller) D {
+				content := layout.Rigid(func(gtx C) D {
+					return component.SimpleDiscloser(th, &cp.HDState).Layout(gtx,
+						material.Body1(th, c.name).Layout,
+						func(gtx C) D {
+							return controllerInset.Layout(gtx, func(gtx C) D {
+								return cp.HDetails.Layout(gtx, th)
 							})
 						})
 				})

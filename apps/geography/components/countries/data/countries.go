@@ -45,6 +45,8 @@ type (
 		Active bool
 		// Hovered - used for CP
 		Hovered bool
+		// Selected - used for CP
+		Selected bool
 	}
 
 	Name struct {
