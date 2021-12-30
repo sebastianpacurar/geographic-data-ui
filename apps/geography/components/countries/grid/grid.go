@@ -11,6 +11,9 @@ import (
 )
 
 type (
+	C = layout.Context
+	D = layout.Dimensions
+
 	Grid struct {
 		cards []Card
 		list  widget.List
@@ -40,7 +43,7 @@ func (gr *Grid) Layout(gtx C, th *material.Theme) D {
 		}
 	}
 
-	return material.List(th, &gr.list).Layout(gtx, 1, func(gtx C, j int) D {
+	return material.List(th, &gr.list).Layout(gtx, 1, func(gtx C, _ int) D {
 		return gr.GridWrap.Layout(gtx, len(data.Data), func(gtx C, i int) D {
 			var content D
 
@@ -49,7 +52,9 @@ func (gr *Grid) Layout(gtx C, th *material.Theme) D {
 			}
 
 			if gr.cards[i].Click.Hovered() {
-				data.Data[i].Hovered = !data.Data[i].Hovered
+				data.Data[i].Hovered = true
+			} else {
+				data.Data[i].Hovered = false
 			}
 
 			if gr.cards[i].Active {

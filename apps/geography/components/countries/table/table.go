@@ -71,6 +71,9 @@ func (t *Table) Layout(gtx C, th *material.Theme) D {
 
 				if t.rows[i].click.Hovered() {
 					rowColor = g.Colours[colors.WHITE]
+					data.Data[i].Hovered = true
+				} else {
+					data.Data[i].Hovered = false
 				}
 
 				content = layout.Flex{}.Layout(gtx,
