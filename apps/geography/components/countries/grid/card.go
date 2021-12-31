@@ -23,15 +23,13 @@ type (
 
 		// menu - triggered by right click
 		menu            component.MenuState
-		list            widget.List
-		menuList        layout.List
-		menuListStates  []component.ContextArea
 		ctxArea         component.ContextArea
 		isMenuTriggered bool
 
 		// menu options
-		selectBtn   widget.Clickable
-		deselectBtn widget.Clickable
+		selectBtn     widget.Clickable
+		deselectBtn   widget.Clickable
+		copyToClipBtn widget.Clickable
 	}
 )
 
@@ -49,6 +47,7 @@ func (c *Card) LayCard(gtx C, th *material.Theme) D {
 		c.menu = component.MenuState{
 			Options: []func(gtx C) D{
 				component.MenuItem(th, btn, lbl).Layout,
+				component.MenuItem(th, &c.copyToClipBtn, "Copy as JSON").Layout,
 			},
 		}
 	}

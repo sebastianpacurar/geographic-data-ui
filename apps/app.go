@@ -34,8 +34,10 @@ type (
 		NavAnim component.VisibilityAnimation
 		*component.AppBar
 		*component.ModalLayer
-		NonModalDrawer bool
 		component.Resize
+
+		// currently using only undocked drawer
+		//NonModalDrawer bool
 	}
 )
 
@@ -89,12 +91,12 @@ func (r *Router) Layout(gtx C, th *material.Theme) D {
 	for _, e := range r.AppBar.Events(gtx) {
 		switch e.(type) {
 		case component.AppBarNavigationClicked:
-			if r.NonModalDrawer {
-				r.NavAnim.ToggleVisibility(gtx.Now)
-			} else {
-				r.ModalNavDrawer.Appear(gtx.Now)
-				r.NavAnim.Disappear(gtx.Now)
-			}
+			// TODO: not needed for now
+			//if r.NonModalDrawer {
+			//	r.NavAnim.ToggleVisibility(gtx.Now)
+			//} else {
+			r.ModalNavDrawer.Appear(gtx.Now)
+			r.NavAnim.Disappear(gtx.Now)
 		}
 	}
 

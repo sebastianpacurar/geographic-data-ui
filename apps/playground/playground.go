@@ -3,14 +3,10 @@ package playground
 import (
 	"gioui-experiment/apps"
 	"gioui-experiment/apps/playground/components"
-	g "gioui-experiment/globals"
-	"gioui-experiment/themes/colors"
 	"gioui.org/layout"
-	"gioui.org/unit"
 	"gioui.org/widget"
 	"gioui.org/widget/material"
 	"gioui.org/x/component"
-	"image/color"
 )
 
 type (
@@ -36,30 +32,31 @@ func New(router *apps.Router) *Application {
 
 func (app *Application) Actions() []component.AppBarAction {
 	return []component.AppBarAction{
-		{
-			OverflowAction: component.OverflowAction{
-				Tag: &app.dockBtn,
-			},
-			Layout: func(gtx C, bg, fg color.NRGBA) D {
-				for range app.dockBtn.Clicks() {
-					app.NonModalDrawer = !app.NonModalDrawer
-				}
-				if app.NonModalDrawer {
-					app.icon = g.LockCLosedIcon
-					app.btn = component.SimpleIconButton(bg, fg, &app.dockBtn, app.icon)
-					app.btn.Background = bg
-					app.btn.Color = g.Colours[colors.DARK_RED]
-					app.btn.Size = unit.Dp(24)
-				} else {
-					app.icon = g.LockOpenedIcon
-					app.btn = component.SimpleIconButton(bg, fg, &app.dockBtn, app.icon)
-					app.btn.Background = bg
-					app.btn.Color = g.Colours[colors.SEA_GREEN]
-					app.btn.Size = unit.Dp(24)
-				}
-				return app.btn.Layout(gtx)
-			},
-		},
+		// TODO: think what to do with this only on PG
+		//{
+		//	OverflowAction: component.OverflowAction{
+		//		Tag: &app.dockBtn,
+		//	},
+		//	Layout: func(gtx C, bg, fg color.NRGBA) D {
+		//		for range app.dockBtn.Clicks() {
+		//			app.NonModalDrawer = !app.NonModalDrawer
+		//		}
+		//		if app.NonModalDrawer {
+		//			app.icon = g.LockCLosedIcon
+		//			app.btn = component.SimpleIconButton(bg, fg, &app.dockBtn, app.icon)
+		//			app.btn.Background = bg
+		//			app.btn.Color = g.Colours[colors.DARK_RED]
+		//			app.btn.Size = unit.Dp(24)
+		//		} else {
+		//			app.icon = g.LockOpenedIcon
+		//			app.btn = component.SimpleIconButton(bg, fg, &app.dockBtn, app.icon)
+		//			app.btn.Background = bg
+		//			app.btn.Color = g.Colours[colors.SEA_GREEN]
+		//			app.btn.Size = unit.Dp(24)
+		//		}
+		//		return app.btn.Layout(gtx)
+		//	},
+		//},
 	}
 }
 

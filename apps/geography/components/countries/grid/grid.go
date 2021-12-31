@@ -1,8 +1,10 @@
 package grid
 
 import (
+	"encoding/json"
 	"gioui-experiment/apps/geography/components/countries/data"
 	g "gioui-experiment/globals"
+	"gioui.org/io/clipboard"
 	"gioui.org/layout"
 	"gioui.org/widget"
 	"gioui.org/widget/material"
@@ -49,6 +51,14 @@ func (gr *Grid) Layout(gtx C, th *material.Theme) D {
 	return material.List(th, &gr.list).Layout(gtx, 1, func(gtx C, _ int) D {
 		return gr.wrap.Layout(gtx, len(data.Data), func(gtx C, i int) D {
 			var content D
+
+			// copy only this specific card
+			if gr.cards[i].copyToClipBtn.Clicked() {
+				res, _ := json.MarshalIndent(data.Data[i], "", "\t")
+				clipboard.WriteOp{
+					Text: string(res),
+				}.Add(gtx.Ops)
+			}
 
 			if gr.cards[i].selectBtn.Clicked() {
 				data.Data[i].Selected = true

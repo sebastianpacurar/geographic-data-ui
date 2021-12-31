@@ -23,13 +23,14 @@ type (
 	}
 
 	row struct {
-		click  widget.Clickable
-		name   string
-		cca2   string
-		cca3   string
-		ccn3   string
-		area   float64
-		active bool
+		click    widget.Clickable
+		name     string
+		cca2     string
+		cca3     string
+		ccn3     string
+		area     float64
+		active   bool
+		selected bool
 	}
 )
 
@@ -64,14 +65,26 @@ func (t *Table) Layout(gtx C, th *material.Theme) D {
 			var content D
 			rowColor := g.Colours[colors.ANTIQUE_WHITE]
 
+			if t.rows[i].selected {
+				rowColor = g.Colours[colors.AERO_BLUE]
+			}
+
 			if t.rows[i].active {
 				if t.rows[i].click.Clicked() {
-					fmt.Println(fmt.Sprintf("%s is clicked", t.rows[i].name))
+					if t.rows[i].selected {
+						t.rows[i].selected = false
+					} else {
+						t.rows[i].selected = true
+					}
 				}
 
 				if t.rows[i].click.Hovered() {
-					rowColor = g.Colours[colors.WHITE]
 					data.Data[i].Hovered = true
+					if !t.rows[i].selected {
+						rowColor = g.Colours[colors.NYANZA]
+					} else {
+						rowColor = g.Colours[colors.LIGHT_SALMON]
+					}
 				} else {
 					data.Data[i].Hovered = false
 				}

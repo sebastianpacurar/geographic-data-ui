@@ -2,8 +2,11 @@ package data
 
 import (
 	"encoding/json"
-	"gioui-experiment/apps/geography/components/api"
+	"fmt"
+	"io"
+	"io/ioutil"
 	"log"
+	"net/http"
 )
 
 var (
@@ -82,7 +85,7 @@ type (
 
 func (c *Countries) InitCountries() error {
 	if !c.IsCached {
-		data, err := api.FetchCountries("all")
+		data, err := c.fetchCountries("all")
 		if err != nil {
 			log.Fatalln("error fetching data from RESTCountries API ", err.Error())
 			return err
@@ -97,33 +100,23 @@ func (c *Countries) InitCountries() error {
 	return nil
 }
 
-//func (c *Countries) FlagSrcToPNG(url, srcName string) {
-//	if _, err := os.Stat(fmt.Sprintf("/flags/%s.png", srcName)); err != nil {
-//		r, re := http.Get(url)
-//		if re != nil {
-//			log.Fatalln(fmt.Sprintf("error fetching the image of %s", srcName))
-//		}
-//		defer func(Body io.ReadCloser) {
-//			err := Body.Close()
-//			if err != nil {
-//				log.Fatalln(fmt.Sprintf("error when closing response body reader for %s", srcName))
-//			}
-//		}(r.Body)
-//
-//		f, fe := os.Create(fmt.Sprintf("/FlagSrcs/%s.png", srcName))
-//		if fe != nil {
-//			log.Fatalln(fmt.Sprintf("error when creating country FlagSrc PNG as %s.png", srcName))
-//		}
-//		defer func(f *os.File) {
-//			err := f.Close()
-//			if err != nil {
-//				log.Fatalln(fmt.Sprintf("error when closing the file creation process: %s", err.Error()))
-//			}
-//		}(f)
-//
-//		_, err := io.Copy(f, r.Body)
-//		if err != nil {
-//			log.Fatal(fmt.Sprintf("error when copying the bytes to png file: %s", err.Error()))
-//		}
-//	}
-//}
+func (c *Countries) fetchCountries(location string) ([]byte, error) {
+	URL := fmt.Sprintf("https://restcountries.com/v3.1/%s", location)
+	res, err := http.Get(URL)
+	if err != nil {
+		log.Fatalln(fmt.Sprintf("http.Get(\"%s\") failed: ", URL), err.Error())
+		return []byte{}, err
+	}
+	defer func(Body io.ReadCloser) {
+		err = Body.Close()
+		if err != nil {
+			log.Fatalln("error at deferred func, at the end: ", err.Error())
+		}
+	}(res.Body)
+	body, err := ioutil.ReadAll(res.Body)
+	if err != nil {
+		log.Fatalln("error at res.Body reading: ", err.Error())
+		return []byte{}, err
+	}
+	return body, nil
+}
