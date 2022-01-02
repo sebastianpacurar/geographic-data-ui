@@ -21,7 +21,6 @@ type (
 		Click    widget.Clickable
 		flag     image.Image
 
-		// menu - triggered by right click
 		menu            component.MenuState
 		ctxArea         component.ContextArea
 		isMenuTriggered bool
@@ -44,9 +43,18 @@ func (c *Card) LayCard(gtx C, th *material.Theme) D {
 			lbl = "Deselect"
 			btn = &c.deselectBtn
 		}
+		var item component.MenuItemStyle
+		item.LabelInset = layout.Inset{
+			Top:    unit.Dp(5),
+			Right:  unit.Dp(5),
+			Bottom: unit.Dp(5),
+			Left:   unit.Dp(5),
+		}
+		item = component.MenuItem(th, btn, lbl)
+
 		c.menu = component.MenuState{
 			Options: []func(gtx C) D{
-				component.MenuItem(th, btn, lbl).Layout,
+				item.Layout,
 				component.MenuItem(th, &c.copyToClipBtn, "Copy as JSON").Layout,
 			},
 		}
@@ -93,10 +101,7 @@ func (c *Card) LayCard(gtx C, th *material.Theme) D {
 						)
 					}),
 
-					// TODO: fix this or find a workaround
-					// (capital area) country flag (temporary broken)
 					layout.Rigid(func(gtx C) D {
-						//country.flag = d.processFlagFromURL(country)
 						return layout.Flex{}.Layout(gtx,
 							layout.Flexed(1, func(gtx C) D {
 								return layout.Center.Layout(gtx, func(gtx C) D {
@@ -107,12 +112,10 @@ func (c *Card) LayCard(gtx C, th *material.Theme) D {
 			})
 		}),
 
-		// this returns the menu
 		layout.Expanded(func(gtx C) D {
 			return c.ctxArea.Layout(gtx, func(gtx C) D {
 				gtx.Constraints.Min = image.Point{}
 				return component.Menu(th, &c.menu).Layout(gtx)
 			})
-		}),
-	)
+		}))
 }

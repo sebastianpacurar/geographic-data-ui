@@ -8,18 +8,41 @@ import (
 	"gioui.org/unit"
 	"gioui.org/widget"
 	"gioui.org/widget/material"
+	"gioui.org/x/component"
+	"image"
 )
 
 type TextArea struct {
-	field  widget.Editor
-	border widget.Border
+	field widget.Editor
+
+	menu            component.MenuState
+	ctxArea         component.ContextArea
+	isMenuTriggered bool
+
+	// menu options
+	pasteBtn widget.Clickable
 }
 
 func (ta *TextArea) Layout(th *material.Theme) layout.FlexChild {
-	input := material.Editor(th, &ta.field, "Type your Thoughts...")
-	input.SelectionColor = g.Colours[colors.TEXT_SELECTION]
+
 	ta.field.SingleLine = false
 	ta.field.Alignment = text.Start
+
+	if !ta.isMenuTriggered {
+		var item component.MenuItemStyle
+		item.LabelInset = layout.Inset{
+			Top:    unit.Dp(5),
+			Right:  unit.Dp(5),
+			Bottom: unit.Dp(5),
+			Left:   unit.Dp(5),
+		}
+		item = component.MenuItem(th, &ta.pasteBtn, "Paste")
+		ta.menu = component.MenuState{
+			Options: []func(gtx C) D{
+				item.Layout,
+			},
+		}
+	}
 
 	return layout.Flexed(1, func(gtx C) D {
 		border := widget.Border{
@@ -34,11 +57,27 @@ func (ta *TextArea) Layout(th *material.Theme) layout.FlexChild {
 		}
 
 		return g.Inset.Layout(gtx, func(gtx C) D {
-			return border.Layout(gtx, func(gtx C) D {
-				return layout.UniformInset(unit.Dp(8)).Layout(gtx, func(gtx C) D {
-					return input.Layout(gtx)
-				})
-			})
+			return layout.Stack{}.Layout(gtx,
+				layout.Stacked(func(gtx C) D {
+					gtx.Constraints = layout.Exact(gtx.Constraints.Constrain(gtx.Constraints.Max))
+					return border.Layout(gtx, func(gtx C) D {
+						return layout.UniformInset(unit.Dp(8)).Layout(gtx, func(gtx C) D {
+							ed := material.Editor(th, &ta.field, "Type your Thoughts...")
+							ed.SelectionColor = g.Colours[colors.TEXT_SELECTION]
+
+							if ta.pasteBtn.Clicked() {
+								ed.Editor.SetText(g.ClipBoardVal)
+							}
+							return ed.Layout(gtx)
+						})
+					})
+				}),
+				layout.Expanded(func(gtx C) D {
+					return ta.ctxArea.Layout(gtx, func(gtx C) D {
+						gtx.Constraints.Min = image.Point{}
+						return component.Menu(th, &ta.menu).Layout(gtx)
+					})
+				}))
 		})
 	})
 }

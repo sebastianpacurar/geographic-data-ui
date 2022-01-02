@@ -35,7 +35,6 @@ func (gr *Grid) Layout(gtx C, th *material.Theme) D {
 				Name:     data.Data[i].Name.Common,
 				Cca2:     data.Data[i].Cca2,
 				Active:   data.Data[i].Active,
-				Hovered:  data.Data[i].Hovered,
 				Selected: data.Data[i].Selected,
 			})
 		}
@@ -43,7 +42,6 @@ func (gr *Grid) Layout(gtx C, th *material.Theme) D {
 	} else {
 		for i := range data.Data {
 			gr.cards[i].Active = data.Data[i].Active
-			gr.cards[i].Hovered = data.Data[i].Hovered
 			gr.cards[i].Selected = data.Data[i].Selected
 		}
 	}
@@ -58,18 +56,13 @@ func (gr *Grid) Layout(gtx C, th *material.Theme) D {
 				clipboard.WriteOp{
 					Text: string(res),
 				}.Add(gtx.Ops)
+				g.ClipBoardVal = string(res)
 			}
 
 			if gr.cards[i].selectBtn.Clicked() {
 				data.Data[i].Selected = true
 			} else if gr.cards[i].deselectBtn.Clicked() {
 				data.Data[i].Selected = false
-			}
-
-			if gr.cards[i].Click.Hovered() {
-				data.Data[i].Hovered = true
-			} else {
-				data.Data[i].Hovered = false
 			}
 
 			if gr.cards[i].Active {

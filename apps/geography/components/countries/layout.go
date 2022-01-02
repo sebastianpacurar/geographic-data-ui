@@ -93,9 +93,7 @@ func (d *Display) Layout(gtx C, th *material.Theme) D {
 					Right:  unit.Dp(8),
 					Bottom: unit.Dp(8),
 					Left:   unit.Dp(8),
-				}.Layout(gtx, func(gtx C) D {
-					return material.Button(th, &d.tableBtn, "Table").Layout(gtx)
-				})
+				}.Layout(gtx, material.Button(th, &d.tableBtn, "Table").Layout)
 			})
 
 			// grid button
@@ -113,9 +111,7 @@ func (d *Display) Layout(gtx C, th *material.Theme) D {
 					Right:  unit.Dp(8),
 					Bottom: unit.Dp(8),
 					Left:   unit.Dp(8),
-				}.Layout(gtx, func(gtx C) D {
-					return material.Button(th, &d.gridBtn, "Grid").Layout(gtx)
-				})
+				}.Layout(gtx, material.Button(th, &d.gridBtn, "Grid").Layout)
 			})
 
 			//Export to excel button
@@ -128,9 +124,10 @@ func (d *Display) Layout(gtx C, th *material.Theme) D {
 					xlsx.SetActiveSheet(1)
 
 					for i := range columns {
+						excelRow := 1
 						for j := range data.Data {
 							// write only displayed rows/cards related countries
-							if data.Data[i].Active {
+							if data.Data[j].Active {
 								res := ""
 								switch columns[i] {
 								case "A":
@@ -170,10 +167,11 @@ func (d *Display) Layout(gtx C, th *material.Theme) D {
 								case "L":
 									res = string(data.Data[j].Population)
 								}
-								if err := xlsx.SetCellValue("Countries", columns[i]+strconv.Itoa(j+1), res); err != nil {
+								if err := xlsx.SetCellValue("Countries", columns[i]+strconv.Itoa(excelRow), res); err != nil {
 									log.Fatalln(err)
 								}
 							}
+							excelRow += 1
 						}
 					}
 					if err := xlsx.SaveAs("./apps/geography/output/Countries.xlsx"); err != nil {

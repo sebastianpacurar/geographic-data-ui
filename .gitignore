@@ -1,1 +1,4 @@
 /.idea
+
+# gio output
+/apps/geography/output/*

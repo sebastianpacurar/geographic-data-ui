@@ -90,20 +90,19 @@ func (t *Table) Layout(gtx C, th *material.Theme) D {
 					if t.rows[i].click.Clicked() {
 						if t.rows[i].selected {
 							t.rows[i].selected = false
+							data.Data[i].Selected = false
 						} else {
 							t.rows[i].selected = true
+							data.Data[i].Selected = true
 						}
 					}
 
 					if t.rows[i].click.Hovered() {
-						data.Data[i].Hovered = true
 						if !t.rows[i].selected {
 							rowColor = g.Colours[colors.NYANZA]
 						} else {
 							rowColor = g.Colours[colors.LIGHT_SALMON]
 						}
-					} else {
-						data.Data[i].Hovered = false
 					}
 
 					content = layout.Flex{}.Layout(gtx,

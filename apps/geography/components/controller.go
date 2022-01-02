@@ -17,11 +17,11 @@ type (
 		controllers []Controller
 		list        widget.List
 
-		CDetails controllers.CountryDetails
-		HDetails controllers.HoveredDetails
+		CDetails   controllers.CountryDetails
+		SCountries controllers.SelectedCountries
 
 		CDState component.DiscloserState
-		HDState component.DiscloserState
+		SCState component.DiscloserState
 	}
 
 	Controller struct {
@@ -49,6 +49,21 @@ func (cp *ControlPanel) Layout(gtx C, th *material.Theme) D {
 	// every controller is a vertical flex which contains 2 rigids - discloser and the divider
 	cp.controllers = []Controller{
 		{
+			name: "Selected Countries",
+			layout: func(gtx C, c *Controller) D {
+				content := layout.Rigid(func(gtx C) D {
+					return component.SimpleDiscloser(th, &cp.SCState).Layout(gtx,
+						material.Body1(th, c.name).Layout,
+						func(gtx C) D {
+							return controllerInset.Layout(gtx, func(gtx C) D {
+								return cp.SCountries.Layout(gtx, th)
+							})
+						})
+				})
+				return cp.LayOutset(gtx, content, divider)
+			},
+		},
+		{
 			name: "Country Details",
 			layout: func(gtx C, c *Controller) D {
 				content := layout.Rigid(func(gtx C) D {
@@ -57,21 +72,6 @@ func (cp *ControlPanel) Layout(gtx C, th *material.Theme) D {
 						func(gtx C) D {
 							return controllerInset.Layout(gtx, func(gtx C) D {
 								return cp.CDetails.Layout(gtx, th)
-							})
-						})
-				})
-				return cp.LayOutset(gtx, content, divider)
-			},
-		},
-		{
-			name: "Hovered Country Details",
-			layout: func(gtx C, c *Controller) D {
-				content := layout.Rigid(func(gtx C) D {
-					return component.SimpleDiscloser(th, &cp.HDState).Layout(gtx,
-						material.Body1(th, c.name).Layout,
-						func(gtx C) D {
-							return controllerInset.Layout(gtx, func(gtx C) D {
-								return cp.HDetails.Layout(gtx, th)
 							})
 						})
 				})

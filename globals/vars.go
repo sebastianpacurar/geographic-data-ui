@@ -7,6 +7,7 @@ import (
 )
 
 var (
+	ClipBoardVal  string
 	DefaultMargin = unit.Dp(10)
 	Colours       = map[string]color.NRGBA{
 		"red":             {R: 255, A: 255},
