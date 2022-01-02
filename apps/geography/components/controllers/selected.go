@@ -8,54 +8,67 @@ import (
 	"gioui.org/unit"
 	"gioui.org/widget"
 	"gioui.org/widget/material"
+	"gioui.org/x/outlay"
 )
 
 type (
 	SelectedCountries struct {
-		list widget.List
-		tabs []tab
+		pills []pill
+		list  widget.List
+		api   data.Countries
+		wrap  outlay.GridWrap
+		count int
 	}
 
-	tab struct {
-		selected data.Country
-		click    widget.Clickable
+	pill struct {
+		name    string
+		content data.Country
+		click   widget.Clickable
 	}
 )
 
 func (sc *SelectedCountries) Layout(gtx C, th *material.Theme) D {
-	sc.list.Alignment = layout.Middle
-
-	for i := range data.Data {
-		if data.Data[i].Selected {
-			sc.tabs = append(sc.tabs, tab{
-				selected: data.Data[i],
-			})
+	// avoid continuous reiteration
+	selectedCount := sc.api.GetSelectedCount()
+	if sc.count != selectedCount {
+		selected := sc.api.GetSelected()
+		sc.pills = make([]pill, selectedCount)
+		for i := range sc.pills {
+			sc.pills[i].name = selected[i].Name.Common
+			sc.pills[i].content = selected[i]
 		}
+		sc.count = selectedCount
 	}
 
 	return layout.Flex{}.Layout(gtx,
 		layout.Rigid(func(gtx C) D {
-			border := widget.Border{
-				Color: g.Colours[colors.GREY],
-				Width: unit.Dp(2),
-			}
-			return layout.Inset{
-				Bottom: unit.Dp(5),
-			}.Layout(gtx, func(gtx C) D {
-				return material.List(th, &sc.list).Layout(gtx, len(sc.tabs), func(gtx C, i int) D {
-					return border.Layout(gtx, func(gtx C) D {
-						return layout.Inset{
-							Top:    unit.Dp(3),
-							Right:  unit.Dp(3),
-							Bottom: unit.Dp(3),
-							Left:   unit.Dp(3),
-						}.Layout(gtx, func(gtx C) D {
-							return material.Clickable(gtx, &sc.tabs[i].click, func(gtx C) D {
-								return material.Body1(th, sc.tabs[i].selected.Name.Common).Layout(gtx)
+			return sc.wrap.Layout(gtx, sc.count, func(gtx C, i int) D {
+				var area D
+				area = layout.Inset{
+					Top:    unit.Dp(4),
+					Right:  unit.Dp(2),
+					Bottom: unit.Dp(4),
+					Left:   unit.Dp(2),
+				}.Layout(gtx, func(gtx C) D {
+					return material.Clickable(gtx, &sc.pills[i].click, func(gtx C) D {
+						border := widget.Border{
+							Color:        g.Colours[colors.GREY],
+							CornerRadius: unit.Dp(4),
+							Width:        unit.Dp(2),
+						}
+						return border.Layout(gtx, func(gtx C) D {
+							return layout.Inset{
+								Top:    unit.Dp(5),
+								Right:  unit.Dp(5),
+								Bottom: unit.Dp(5),
+								Left:   unit.Dp(5),
+							}.Layout(gtx, func(gtx C) D {
+								return material.Body1(th, sc.pills[i].name).Layout(gtx)
 							})
 						})
 					})
 				})
+				return area
 			})
 		}))
 }

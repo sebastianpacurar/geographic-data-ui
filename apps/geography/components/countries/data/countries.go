@@ -81,6 +81,26 @@ type (
 	}
 )
 
+func (c *Countries) GetSelected() []Country {
+	res := make([]Country, 0)
+	for i := range Data {
+		if Data[i].Selected {
+			res = append(res, Data[i])
+		}
+	}
+	return res
+}
+
+func (c *Countries) GetSelectedCount() int {
+	count := 0
+	for i := range Data {
+		if Data[i].Selected {
+			count++
+		}
+	}
+	return count
+}
+
 func (c *Countries) InitCountries() error {
 	if !c.IsCached {
 		data, err := c.fetchCountries("all")
