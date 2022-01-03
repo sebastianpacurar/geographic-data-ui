@@ -14,6 +14,7 @@ import (
 
 type TextArea struct {
 	field widget.Editor
+	list  widget.List
 
 	menu            component.MenuState
 	ctxArea         component.ContextArea
@@ -24,7 +25,7 @@ type TextArea struct {
 }
 
 func (ta *TextArea) Layout(th *material.Theme) layout.FlexChild {
-
+	ta.list.Axis = layout.Vertical
 	ta.field.SingleLine = false
 	ta.field.Alignment = text.Start
 
@@ -61,14 +62,16 @@ func (ta *TextArea) Layout(th *material.Theme) layout.FlexChild {
 				layout.Stacked(func(gtx C) D {
 					gtx.Constraints = layout.Exact(gtx.Constraints.Constrain(gtx.Constraints.Max))
 					return border.Layout(gtx, func(gtx C) D {
-						return layout.UniformInset(unit.Dp(8)).Layout(gtx, func(gtx C) D {
-							ed := material.Editor(th, &ta.field, "Type your Thoughts...")
-							ed.SelectionColor = g.Colours[colors.TEXT_SELECTION]
+						return material.List(th, &ta.list).Layout(gtx, 1, func(gtx C, _ int) D {
+							return layout.UniformInset(unit.Dp(8)).Layout(gtx, func(gtx C) D {
+								ed := material.Editor(th, &ta.field, "Type your Thoughts...")
+								ed.SelectionColor = g.Colours[colors.TEXT_SELECTION]
 
-							if ta.pasteBtn.Clicked() {
-								ed.Editor.SetText(g.ClipBoardVal)
-							}
-							return ed.Layout(gtx)
+								if ta.pasteBtn.Clicked() {
+									ed.Editor.SetText(g.ClipBoardVal)
+								}
+								return ed.Layout(gtx)
+							})
 						})
 					})
 				}),

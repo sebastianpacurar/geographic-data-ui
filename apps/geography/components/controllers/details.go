@@ -3,7 +3,6 @@ package controllers
 import (
 	"fmt"
 	"gioui-experiment/apps/geography/components/countries/data"
-	"gioui-experiment/apps/geography/components/countries/grid"
 	"gioui.org/layout"
 	"gioui.org/unit"
 	"gioui.org/widget"
@@ -16,9 +15,8 @@ type (
 	D = layout.Dimensions
 
 	CountryDetails struct {
-		cards      []grid.Card
-		list       widget.List
-		isSelected data.Country
+		viewed data.Country
+		list   widget.List
 	}
 )
 
@@ -27,16 +25,16 @@ func (cd *CountryDetails) Layout(gtx C, th *material.Theme) D {
 
 	for i := range data.Data {
 		if data.Data[i].IsCPViewed {
-			cd.isSelected = data.Data[i]
+			cd.viewed = data.Data[i]
 		}
 	}
-	if cd.isSelected.Name.Common != "" {
+	if cd.viewed.Name.Common != "" {
 		content = layout.Flex{Axis: layout.Vertical}.Layout(gtx,
 			layout.Rigid(func(gtx C) D {
 				return layout.Inset{
 					Bottom: unit.Dp(5),
 				}.Layout(gtx, func(gtx C) D {
-					return cd.LayData(gtx, th, cd.isSelected)
+					return cd.LayData(gtx, th, cd.viewed)
 				})
 			}))
 	}
