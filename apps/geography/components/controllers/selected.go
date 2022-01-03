@@ -21,13 +21,15 @@ type (
 	}
 
 	pill struct {
-		name    string
-		content data.Country
-		click   widget.Clickable
+		name     string
+		content  data.Country
+		click    widget.Clickable
+		deselect widget.Clickable
 	}
 )
 
 func (sc *SelectedCountries) Layout(gtx C, th *material.Theme) D {
+
 	// avoid continuous reiteration
 	selectedCount := sc.api.GetSelectedCount()
 	if sc.count != selectedCount {
@@ -43,6 +45,27 @@ func (sc *SelectedCountries) Layout(gtx C, th *material.Theme) D {
 	return layout.Flex{}.Layout(gtx,
 		layout.Rigid(func(gtx C) D {
 			return sc.wrap.Layout(gtx, sc.count, func(gtx C, i int) D {
+
+				if sc.pills[i].deselect.Clicked() {
+					name := sc.pills[i].name
+					for i := range data.Data {
+						if data.Data[i].Name.Common == name {
+							data.Data[i].Selected = false
+						}
+					}
+				}
+
+				if sc.pills[i].click.Clicked() {
+					name := sc.pills[i].name
+					for i := range data.Data {
+						if data.Data[i].Name.Common == name {
+							data.Data[i].IsCPViewed = true
+						} else {
+							data.Data[i].IsCPViewed = false
+						}
+					}
+				}
+
 				var area D
 				area = layout.Inset{
 					Top:    unit.Dp(4),
@@ -50,22 +73,31 @@ func (sc *SelectedCountries) Layout(gtx C, th *material.Theme) D {
 					Bottom: unit.Dp(4),
 					Left:   unit.Dp(2),
 				}.Layout(gtx, func(gtx C) D {
-					return material.Clickable(gtx, &sc.pills[i].click, func(gtx C) D {
-						border := widget.Border{
-							Color:        g.Colours[colors.GREY],
-							CornerRadius: unit.Dp(4),
-							Width:        unit.Dp(2),
-						}
-						return border.Layout(gtx, func(gtx C) D {
-							return layout.Inset{
-								Top:    unit.Dp(5),
-								Right:  unit.Dp(5),
-								Bottom: unit.Dp(5),
-								Left:   unit.Dp(5),
-							}.Layout(gtx, func(gtx C) D {
-								return material.Body1(th, sc.pills[i].name).Layout(gtx)
-							})
-						})
+					border := widget.Border{
+						Color:        g.Colours[colors.GREY],
+						CornerRadius: unit.Dp(1),
+						Width:        unit.Px(1),
+					}
+					return border.Layout(gtx, func(gtx C) D {
+						return layout.Flex{Spacing: layout.SpaceBetween}.Layout(gtx,
+							layout.Rigid(func(gtx C) D {
+								var btn material.ButtonStyle
+								btn = material.Button(th, &sc.pills[i].click, sc.pills[i].content.Name.Common)
+								btn.CornerRadius = unit.Dp(10)
+								btn.Background = g.Colours[colors.AERO_BLUE]
+								btn.Color = g.Colours[colors.BLACK]
+								btn.TextSize = th.TextSize.Scale(14.0 / 16.0)
+								return btn.Layout(gtx)
+							}),
+							layout.Rigid(func(gtx C) D {
+								var btn material.ButtonStyle
+								btn = material.Button(th, &sc.pills[i].deselect, "X")
+								btn.CornerRadius = unit.Dp(0)
+								btn.Background = g.Colours[colors.FLAME_RED]
+								btn.Color = g.Colours[colors.WHITE]
+								btn.TextSize = th.TextSize.Scale(14.0 / 16.0)
+								return btn.Layout(gtx)
+							}))
 					})
 				})
 				return area

@@ -38,6 +38,8 @@ type (
 		population   int32
 		active       bool
 		selected     bool
+		isCPViewed   bool
+		isViewed     bool
 		crossSize    int
 	}
 )
@@ -63,12 +65,17 @@ func (t *Table) Layout(gtx C, th *material.Theme) D {
 				area:         data.Data[i].Area,
 				population:   data.Data[i].Population,
 				active:       data.Data[i].Active,
+				selected:     data.Data[i].Selected,
+				isCPViewed:   data.Data[i].IsCPViewed,
+				isViewed:     data.Data[i].IsViewed,
 			})
 		}
 		t.loaded = true
 	} else {
 		for i := range data.Data {
 			t.rows[i].active = data.Data[i].Active
+			t.rows[i].selected = data.Data[i].Selected
+			t.rows[i].isCPViewed = data.Data[i].IsCPViewed
 		}
 	}
 	border := widget.Border{
@@ -89,10 +96,8 @@ func (t *Table) Layout(gtx C, th *material.Theme) D {
 				if t.rows[i].active {
 					if t.rows[i].click.Clicked() {
 						if t.rows[i].selected {
-							t.rows[i].selected = false
 							data.Data[i].Selected = false
 						} else {
-							t.rows[i].selected = true
 							data.Data[i].Selected = true
 						}
 					}

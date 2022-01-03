@@ -39,3 +39,8 @@ var ExcelExportIcon = func() *widget.Icon {
 	icon, _ := widget.NewIcon(icons.FileFileDownload)
 	return icon
 }()
+
+var CloseIcon = func() *widget.Icon {
+	icon, _ := widget.NewIcon(icons.NavigationClose)
+	return icon
+}()

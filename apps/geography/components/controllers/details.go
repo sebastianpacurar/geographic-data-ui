@@ -26,7 +26,7 @@ func (cd *CountryDetails) Layout(gtx C, th *material.Theme) D {
 	var content D
 
 	for i := range data.Data {
-		if data.Data[i].Selected {
+		if data.Data[i].IsCPViewed {
 			cd.isSelected = data.Data[i]
 		}
 	}

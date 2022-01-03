@@ -2,6 +2,7 @@ package colors
 
 const (
 	DARK_RED      = "dark-red"
+	FLAME_RED     = "flame-red"
 	SEA_GREEN     = "sea-green"
 	DEEP_SKY_BLUE = "deep-sky-blue"
 	GREY          = "grey"

@@ -12,6 +12,7 @@ var (
 	Colours       = map[string]color.NRGBA{
 		"red":             {R: 255, A: 255},
 		"dark-red":        {R: 139, A: 255},
+		"flame-red":       {R: 220, G: 85, B: 44, A: 255},
 		"blue":            {B: 255, A: 255},
 		"green":           {G: 255, A: 255},
 		"dark-green":      {G: 180, A: 255},

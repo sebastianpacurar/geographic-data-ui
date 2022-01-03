@@ -63,21 +63,21 @@ func (cp *ControlPanel) Layout(gtx C, th *material.Theme) D {
 				return cp.LayOutset(gtx, content, divider)
 			},
 		},
-		//{
-		//	name: "Country Details",
-		//	layout: func(gtx C, c *Controller) D {
-		//		content := layout.Rigid(func(gtx C) D {
-		//			return component.SimpleDiscloser(th, &cp.CDState).Layout(gtx,
-		//				material.Body1(th, c.name).Layout,
-		//				func(gtx C) D {
-		//					return controllerInset.Layout(gtx, func(gtx C) D {
-		//						return cp.CDetails.Layout(gtx, th)
-		//					})
-		//				})
-		//		})
-		//		return cp.LayOutset(gtx, content, divider)
-		//	},
-		//},
+		{
+			name: "Country Details",
+			layout: func(gtx C, c *Controller) D {
+				content := layout.Rigid(func(gtx C) D {
+					return component.SimpleDiscloser(th, &cp.CDState).Layout(gtx,
+						material.Body1(th, c.name).Layout,
+						func(gtx C) D {
+							return controllerInset.Layout(gtx, func(gtx C) D {
+								return cp.CDetails.Layout(gtx, th)
+							})
+						})
+				})
+				return cp.LayOutset(gtx, content, divider)
+			},
+		},
 	}
 
 	// return a vertical list of (discloser, divider) groups, as ListElements
