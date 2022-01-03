@@ -1,7 +1,7 @@
-package components
+package editor
 
 import (
-	"gioui-experiment/apps/editor/components/controllers"
+	"gioui-experiment/apps/editor/controllers"
 	"gioui.org/layout"
 	"gioui.org/unit"
 	"gioui.org/widget"
@@ -10,9 +10,6 @@ import (
 )
 
 type (
-	C = layout.Context
-	D = layout.Dimensions
-
 	ControlPanel struct {
 		controllers []Controller
 		list        widget.List

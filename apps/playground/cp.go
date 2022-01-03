@@ -1,7 +1,7 @@
-package components
+package playground
 
 import (
-	"gioui-experiment/apps/playground/components/controllers"
+	controllers2 "gioui-experiment/apps/playground/controllers"
 	"gioui.org/layout"
 	"gioui.org/unit"
 	"gioui.org/widget"
@@ -10,18 +10,15 @@ import (
 )
 
 type (
-	C = layout.Context
-	D = layout.Dimensions
-
 	ControlPanel struct {
 		controllers []Controller
 		list        widget.List
 
-		vh       controllers.ValueHandler
-		inc      controllers.Incrementor
-		sequence controllers.Sequence
-		filters  controllers.Filters
-		status   controllers.Status
+		vh       controllers2.ValueHandler
+		inc      controllers2.Incrementor
+		sequence controllers2.Sequence
+		filters  controllers2.Filters
+		status   controllers2.Status
 
 		// hardcoded in order to keep track of the specific current state
 		incState     component.DiscloserState

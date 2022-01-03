@@ -2,7 +2,7 @@ package grid
 
 import (
 	"encoding/json"
-	"gioui-experiment/apps/geography/components/countries/data"
+	"gioui-experiment/apps/geography/data"
 	g "gioui-experiment/globals"
 	"gioui.org/io/clipboard"
 	"gioui.org/layout"
@@ -57,6 +57,10 @@ func (gr *Grid) Layout(gtx C, th *material.Theme) D {
 					Text: string(res),
 				}.Add(gtx.Ops)
 				g.ClipBoardVal = string(res)
+			}
+
+			if gr.cards[i].Click.Clicked() {
+				//apps.Router{}
 			}
 
 			if gr.cards[i].selectBtn.Clicked() {

@@ -1,7 +1,7 @@
-package components
+package geography
 
 import (
-	"gioui-experiment/apps/geography/components/controllers"
+	controllers2 "gioui-experiment/apps/geography/controllers"
 	"gioui.org/layout"
 	"gioui.org/unit"
 	"gioui.org/widget"
@@ -10,15 +10,12 @@ import (
 )
 
 type (
-	C = layout.Context
-	D = layout.Dimensions
-
 	ControlPanel struct {
 		controllers []Controller
 		list        widget.List
 
-		CDetails   controllers.CountryDetails
-		SCountries controllers.SelectedCountries
+		CDetails   controllers2.CountryDetails
+		SCountries controllers2.SelectedCountries
 
 		CDState component.DiscloserState
 		SCState component.DiscloserState

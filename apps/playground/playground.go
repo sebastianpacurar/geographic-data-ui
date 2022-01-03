@@ -2,11 +2,12 @@ package playground
 
 import (
 	"gioui-experiment/apps"
-	"gioui-experiment/apps/playground/components"
+	"gioui-experiment/apps/playground/data/counter"
 	"gioui.org/layout"
-	"gioui.org/widget"
+	"gioui.org/unit"
 	"gioui.org/widget/material"
 	"gioui.org/x/component"
+	"strconv"
 )
 
 type (
@@ -14,12 +15,11 @@ type (
 	D = layout.Dimensions
 
 	Application struct {
-		dockBtn widget.Clickable
-		btn     material.IconButtonStyle
-		icon    *widget.Icon
-		th      *material.Theme
-		components.View
-		components.ControlPanel
+		//dockBtn widget.Clickable
+		//btn     material.IconButtonStyle
+		//icon    *widget.Icon
+		th *material.Theme
+		ControlPanel
 		*apps.Router
 	}
 )
@@ -72,8 +72,38 @@ func (app *Application) NavItem() component.NavItem {
 	}
 }
 
-func (app *Application) LayoutView(th *material.Theme) layout.FlexChild {
-	return app.View.Layout(th)
+func (app *Application) LayoutView(gtx C, th *material.Theme) D {
+	pgv := counter.PgVals
+
+	//TODO find a better way and location to handle the Cache population
+	if len(pgv.Cache[counter.PRIMES]) == 0 {
+		pgv.GenPrimes(counter.PLIMIT)
+	}
+	if len(pgv.Cache[counter.FIBS]) == 0 {
+		pgv.GenFibs(counter.FLIMIT)
+	}
+	seq := pgv.GetActiveSequence()
+
+	/// DISPLAYED NUMBER
+	return layout.Inset{
+		Top:    unit.Dp(10),
+		Right:  unit.Dp(50),
+		Bottom: unit.Dp(20),
+		Left:   unit.Dp(50),
+	}.Layout(gtx, func(gtx C) D {
+		var val string
+		switch seq {
+		case counter.PRIMES:
+			val = strconv.FormatUint(pgv.Cache[seq][pgv.Primes.Index], 10)
+		case counter.FIBS:
+			val = strconv.FormatUint(pgv.Cache[seq][pgv.Fibonacci.Index], 10)
+		case counter.NATURALS:
+			val = strconv.FormatUint(pgv.Naturals.Displayed, 10)
+		case counter.INTEGERS:
+			val = strconv.FormatUint(pgv.Integers.Displayed, 10)
+		}
+		return material.H5(th, val).Layout(gtx)
+	})
 }
 
 func (app *Application) LayoutController(gtx C, th *material.Theme) D {

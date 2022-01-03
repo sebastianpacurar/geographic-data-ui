@@ -134,20 +134,22 @@ func (c *Countries) InitCountries() error {
 			log.Fatalln("json Unmarshal RESTCountries for mutable: ", err)
 			return err
 		}
-
-		for i := range AllFlags {
-			err := c.SaveFlagsToFile(AllFlags[i].Flag.Png, AllFlags[i].Name)
-			if err != nil {
-				return err
-			}
-		}
-
 		c.IsCached = true
 	}
 	return nil
 }
 
-func (c *Countries) SaveFlagsToFile(url, name string) error {
+func (c *Countries) SaveAllFlags() error {
+	for i := range AllFlags {
+		err := c.CopyFlagToFile(AllFlags[i].Flag.Png, AllFlags[i].Name)
+		if err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+func (c *Countries) CopyFlagToFile(url, name string) error {
 	response, e := http.Get(url)
 	if e != nil {
 		log.Fatalln(e)
@@ -181,7 +183,7 @@ func (c *Countries) fetchFlags() ([]byte, error) {
 	URL := fmt.Sprintf("https://restcountries.com/v2/all")
 	res, err := http.Get(URL)
 	if err != nil {
-		log.Fatalln(err)
+		log.Fatalln(fmt.Sprintf("http.Get(\"%s\") failed: %s", URL, err))
 		return []byte{}, err
 	}
 	defer func(Body io.ReadCloser) {
@@ -202,7 +204,7 @@ func (c *Countries) fetchCountries(location string) ([]byte, error) {
 	URL := fmt.Sprintf("https://restcountries.com/v3.1/%s", location)
 	res, err := http.Get(URL)
 	if err != nil {
-		log.Fatalln(fmt.Sprintf("http.Get(\"%s\") failed: ", URL))
+		log.Fatalln(fmt.Sprintf("http.Get(\"%s\") failed: %s", URL, err))
 		return []byte{}, err
 	}
 	defer func(Body io.ReadCloser) {

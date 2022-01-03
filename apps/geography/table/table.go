@@ -1,8 +1,7 @@
 package table
 
 import (
-	"fmt"
-	"gioui-experiment/apps/geography/components/countries/data"
+	"gioui-experiment/apps/geography/data"
 	"gioui.org/layout"
 	"gioui.org/widget"
 	"gioui.org/widget/material"
@@ -59,7 +58,6 @@ func (t *Table) Layout(gtx C, th *material.Theme) D {
 		return material.List(th, &t.rowList).Layout(gtx, len(data.Data), func(gtx C, i int) D {
 			if t.rows[i].Active {
 				if t.rows[i].Click.Clicked() {
-					fmt.Println(t.rows[i].Name)
 					if t.rows[i].Selected {
 						data.Data[i].Selected = false
 					} else {

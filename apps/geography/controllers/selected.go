@@ -1,7 +1,7 @@
 package controllers
 
 import (
-	"gioui-experiment/apps/geography/components/countries/data"
+	"gioui-experiment/apps/geography/data"
 	g "gioui-experiment/globals"
 	"gioui-experiment/themes/colors"
 	"gioui.org/layout"

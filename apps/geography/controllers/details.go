@@ -2,7 +2,7 @@ package controllers
 
 import (
 	"fmt"
-	"gioui-experiment/apps/geography/components/countries/data"
+	"gioui-experiment/apps/geography/data"
 	"gioui.org/layout"
 	"gioui.org/unit"
 	"gioui.org/widget"

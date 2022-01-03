@@ -20,7 +20,7 @@ type (
 	D = layout.Dimensions
 
 	Application interface {
-		LayoutView(th *material.Theme) layout.FlexChild
+		LayoutView(gtx C, th *material.Theme) D
 		LayoutController(gtx C, th *material.Theme) D
 		Actions() []component.AppBarAction
 		Overflow() []component.OverflowAction
@@ -129,8 +129,9 @@ func (r *Router) Layout(gtx C, th *material.Theme) D {
 								containerSize := image.Pt(gtx.Constraints.Max.X, gtx.Constraints.Max.Y)
 								gtx.Constraints = layout.Exact(gtx.Constraints.Constrain(containerSize))
 								return layout.Flex{Axis: layout.Vertical}.Layout(gtx,
-									r.pages[r.current].LayoutView(th),
-								)
+									layout.Rigid(func(gtx C) D {
+										return r.pages[r.current].LayoutView(gtx, th)
+									}))
 							}))
 					},
 

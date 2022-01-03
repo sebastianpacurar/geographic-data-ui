@@ -1,7 +1,7 @@
 package controllers
 
 import (
-	"gioui-experiment/apps/playground/components/data/counter"
+	"gioui-experiment/apps/playground/data/counter"
 	g "gioui-experiment/globals"
 	"gioui.org/layout"
 	"gioui.org/widget"
