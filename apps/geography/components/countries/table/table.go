@@ -3,13 +3,9 @@ package table
 import (
 	"fmt"
 	"gioui-experiment/apps/geography/components/countries/data"
-	g "gioui-experiment/globals"
-	"gioui-experiment/themes/colors"
 	"gioui.org/layout"
-	"gioui.org/unit"
 	"gioui.org/widget"
 	"gioui.org/widget/material"
-	"image"
 )
 
 type (
@@ -17,30 +13,10 @@ type (
 	D = layout.Dimensions
 
 	Table struct {
-		rows       []row
+		rows       []Row
 		rowList    widget.List
 		columnList widget.List
 		loaded     bool
-	}
-
-	row struct {
-		click        widget.Clickable
-		name         string
-		officialName string
-		capital      []string
-		independent  bool
-		status       string
-		unMember     bool
-		cca2         string
-		cca3         string
-		ccn3         string
-		area         float64
-		population   int32
-		active       bool
-		selected     bool
-		isCPViewed   bool
-		isViewed     bool
-		crossSize    int
 	}
 )
 
@@ -52,280 +28,46 @@ func (t *Table) Layout(gtx C, th *material.Theme) D {
 
 	if !t.loaded {
 		for i := range data.Data {
-			t.rows = append(t.rows, row{
-				name:         data.Data[i].Name.Common,
-				officialName: data.Data[i].Name.Official,
-				capital:      data.Data[i].Capital,
-				independent:  data.Data[i].Independent,
-				status:       data.Data[i].Status,
-				unMember:     data.Data[i].UNMember,
-				cca2:         data.Data[i].Cca2,
-				cca3:         data.Data[i].Cca3,
-				ccn3:         data.Data[i].Ccn3,
-				area:         data.Data[i].Area,
-				population:   data.Data[i].Population,
-				active:       data.Data[i].Active,
-				selected:     data.Data[i].Selected,
-				isCPViewed:   data.Data[i].IsCPViewed,
-				isViewed:     data.Data[i].IsViewed,
+			t.rows = append(t.rows, Row{
+				Name:         data.Data[i].Name.Common,
+				OfficialName: data.Data[i].Name.Official,
+				Capital:      data.Data[i].Capital,
+				Independent:  data.Data[i].Independent,
+				Status:       data.Data[i].Status,
+				UNMember:     data.Data[i].UNMember,
+				Cca2:         data.Data[i].Cca2,
+				Cca3:         data.Data[i].Cca3,
+				Ccn3:         data.Data[i].Ccn3,
+				Area:         data.Data[i].Area,
+				Population:   data.Data[i].Population,
+				Active:       data.Data[i].Active,
+				Selected:     data.Data[i].Selected,
+				IsCPViewed:   data.Data[i].IsCPViewed,
+				IsViewed:     data.Data[i].IsViewed,
 			})
 		}
 		t.loaded = true
 	} else {
 		for i := range data.Data {
-			t.rows[i].active = data.Data[i].Active
-			t.rows[i].selected = data.Data[i].Selected
-			t.rows[i].isCPViewed = data.Data[i].IsCPViewed
+			t.rows[i].Active = data.Data[i].Active
+			t.rows[i].Selected = data.Data[i].Selected
+			t.rows[i].IsCPViewed = data.Data[i].IsCPViewed
 		}
-	}
-	border := widget.Border{
-		Color: g.Colours[colors.GREY],
-		Width: unit.Px(1),
 	}
 
 	return material.List(th, &t.columnList).Layout(gtx, 1, func(gtx C, _ int) D {
 		return material.List(th, &t.rowList).Layout(gtx, len(data.Data), func(gtx C, i int) D {
-			return material.Clickable(gtx, &t.rows[i].click, func(gtx C) D {
-				var content D
-				rowColor := g.Colours[colors.ANTIQUE_WHITE]
-
-				if t.rows[i].selected {
-					rowColor = g.Colours[colors.AERO_BLUE]
-				}
-
-				if t.rows[i].active {
-					if t.rows[i].click.Clicked() {
-						if t.rows[i].selected {
-							data.Data[i].Selected = false
-						} else {
-							data.Data[i].Selected = true
-						}
+			if t.rows[i].Active {
+				if t.rows[i].Click.Clicked() {
+					fmt.Println(t.rows[i].Name)
+					if t.rows[i].Selected {
+						data.Data[i].Selected = false
+					} else {
+						data.Data[i].Selected = true
 					}
-
-					if t.rows[i].click.Hovered() {
-						if !t.rows[i].selected {
-							rowColor = g.Colours[colors.NYANZA]
-						} else {
-							rowColor = g.Colours[colors.LIGHT_SALMON]
-						}
-					}
-
-					content = layout.Flex{}.Layout(gtx,
-						layout.Rigid(func(gtx C) D {
-							return border.Layout(gtx, func(gtx C) D {
-								return layout.Inset{
-									Top:    unit.Dp(2),
-									Bottom: unit.Dp(2),
-									Left:   unit.Dp(2),
-								}.Layout(gtx, func(gtx C) D {
-									return layout.Stack{Alignment: layout.Center}.Layout(gtx,
-
-										layout.Expanded(func(gtx C) D {
-											return g.ColoredArea(gtx, image.Pt(450, gtx.Constraints.Min.Y), rowColor)
-										}),
-
-										layout.Stacked(func(gtx C) D {
-											return material.Body1(th, t.rows[i].name).Layout(gtx)
-										}))
-								})
-							})
-						}),
-						layout.Rigid(func(gtx C) D {
-							return border.Layout(gtx, func(gtx C) D {
-								return layout.Inset{
-									Top:    unit.Dp(2),
-									Bottom: unit.Dp(2),
-									Left:   unit.Dp(2),
-								}.Layout(gtx, func(gtx C) D {
-									return layout.Stack{Alignment: layout.Center}.Layout(gtx,
-
-										layout.Expanded(func(gtx C) D {
-											return g.ColoredArea(gtx, image.Pt(550, gtx.Constraints.Min.Y), rowColor)
-										}),
-
-										layout.Stacked(func(gtx C) D {
-											return material.Body1(th, t.rows[i].officialName).Layout(gtx)
-										}))
-								})
-							})
-						}),
-						layout.Rigid(func(gtx C) D {
-							return border.Layout(gtx, func(gtx C) D {
-								return layout.Inset{
-									Top:    unit.Dp(2),
-									Bottom: unit.Dp(2),
-									Left:   unit.Dp(2),
-								}.Layout(gtx, func(gtx C) D {
-									return layout.Stack{Alignment: layout.Center}.Layout(gtx,
-
-										layout.Expanded(func(gtx C) D {
-											return g.ColoredArea(gtx, image.Pt(200, gtx.Constraints.Min.Y), rowColor)
-										}),
-
-										layout.Stacked(func(gtx C) D {
-											capital := "N/A"
-											if len(t.rows[i].capital) > 0 {
-												capital = t.rows[i].capital[0]
-											}
-											return material.Body1(th, capital).Layout(gtx)
-										}))
-								})
-							})
-						}),
-						layout.Rigid(func(gtx C) D {
-							return border.Layout(gtx, func(gtx C) D {
-								return layout.Inset{
-									Top:    unit.Dp(2),
-									Bottom: unit.Dp(2),
-									Left:   unit.Dp(2),
-								}.Layout(gtx, func(gtx C) D {
-									return layout.Stack{Alignment: layout.Center}.Layout(gtx,
-
-										layout.Expanded(func(gtx C) D {
-											return g.ColoredArea(gtx, image.Pt(50, gtx.Constraints.Min.Y), rowColor)
-										}),
-
-										layout.Stacked(func(gtx C) D {
-											independent := "No"
-											if t.rows[i].independent {
-												independent = "Yes"
-											}
-											return material.Body1(th, independent).Layout(gtx)
-										}))
-								})
-							})
-						}),
-						layout.Rigid(func(gtx C) D {
-							return border.Layout(gtx, func(gtx C) D {
-								return layout.Inset{
-									Top:    unit.Dp(2),
-									Bottom: unit.Dp(2),
-									Left:   unit.Dp(2),
-								}.Layout(gtx, func(gtx C) D {
-									return layout.Stack{Alignment: layout.Center}.Layout(gtx,
-
-										layout.Expanded(func(gtx C) D {
-											return g.ColoredArea(gtx, image.Pt(175, gtx.Constraints.Min.Y), rowColor)
-										}),
-
-										layout.Stacked(func(gtx C) D {
-											return material.Body1(th, t.rows[i].status).Layout(gtx)
-										}))
-								})
-							})
-						}),
-						layout.Rigid(func(gtx C) D {
-							return border.Layout(gtx, func(gtx C) D {
-								return layout.Inset{
-									Top:    unit.Dp(2),
-									Bottom: unit.Dp(2),
-									Left:   unit.Dp(2),
-								}.Layout(gtx, func(gtx C) D {
-									return layout.Stack{Alignment: layout.Center}.Layout(gtx,
-
-										layout.Expanded(func(gtx C) D {
-											return g.ColoredArea(gtx, image.Pt(50, gtx.Constraints.Min.Y), rowColor)
-										}),
-
-										layout.Stacked(func(gtx C) D {
-											unMember := "No"
-											if t.rows[i].unMember {
-												unMember = "Yes"
-											}
-											return material.Body1(th, unMember).Layout(gtx)
-										}))
-								})
-							})
-						}),
-						layout.Rigid(func(gtx C) D {
-							return border.Layout(gtx, func(gtx C) D {
-								return layout.Inset{
-									Top:    unit.Dp(2),
-									Bottom: unit.Dp(2),
-									Left:   unit.Dp(2),
-								}.Layout(gtx, func(gtx C) D {
-									return layout.Stack{Alignment: layout.Center}.Layout(gtx,
-
-										layout.Expanded(func(gtx C) D {
-											return g.ColoredArea(gtx, image.Pt(50, gtx.Constraints.Min.Y), rowColor)
-										}),
-
-										layout.Stacked(material.Body1(th, t.rows[i].cca2).Layout))
-								})
-							})
-						}),
-						layout.Rigid(func(gtx C) D {
-							return border.Layout(gtx, func(gtx C) D {
-								return layout.Inset{
-									Top:    unit.Dp(2),
-									Bottom: unit.Dp(2),
-									Left:   unit.Dp(2),
-								}.Layout(gtx, func(gtx C) D {
-									return layout.Stack{Alignment: layout.Center}.Layout(gtx,
-
-										layout.Expanded(func(gtx C) D {
-											return g.ColoredArea(gtx, image.Pt(50, gtx.Constraints.Min.Y), rowColor)
-										}),
-
-										layout.Stacked(material.Body1(th, t.rows[i].cca3).Layout))
-								})
-							})
-						}),
-						layout.Rigid(func(gtx C) D {
-							return border.Layout(gtx, func(gtx C) D {
-								return layout.Inset{
-									Top:    unit.Dp(2),
-									Bottom: unit.Dp(2),
-									Left:   unit.Dp(2),
-								}.Layout(gtx, func(gtx C) D {
-									return layout.Stack{Alignment: layout.Center}.Layout(gtx,
-
-										layout.Expanded(func(gtx C) D {
-											return g.ColoredArea(gtx, image.Pt(50, gtx.Constraints.Min.Y), rowColor)
-										}),
-
-										layout.Stacked(material.Body1(th, t.rows[i].ccn3).Layout))
-								})
-							})
-						}),
-						layout.Rigid(func(gtx C) D {
-							return border.Layout(gtx, func(gtx C) D {
-								return layout.Inset{
-									Top:    unit.Dp(2),
-									Bottom: unit.Dp(2),
-									Left:   unit.Dp(2),
-								}.Layout(gtx, func(gtx C) D {
-									return layout.Stack{Alignment: layout.Center}.Layout(gtx,
-
-										layout.Expanded(func(gtx C) D {
-											return g.ColoredArea(gtx, image.Pt(100, gtx.Constraints.Min.Y), rowColor)
-										}),
-
-										layout.Stacked(material.Body1(th, fmt.Sprintf("%.0f", t.rows[i].area)).Layout))
-								})
-							})
-						}),
-						layout.Rigid(func(gtx C) D {
-							return border.Layout(gtx, func(gtx C) D {
-								return layout.Inset{
-									Top:    unit.Dp(2),
-									Bottom: unit.Dp(2),
-									Left:   unit.Dp(2),
-								}.Layout(gtx, func(gtx C) D {
-									return layout.Stack{Alignment: layout.Center}.Layout(gtx,
-
-										layout.Expanded(func(gtx C) D {
-											return g.ColoredArea(gtx, image.Pt(100, gtx.Constraints.Min.Y), rowColor)
-										}),
-
-										layout.Stacked(material.Body1(th, fmt.Sprintf("%d", int(t.rows[i].population))).Layout))
-								})
-							})
-						}),
-					)
 				}
-				return content
-			})
+			}
+			return t.rows[i].LayRow(gtx, th)
 		})
 	})
 }
