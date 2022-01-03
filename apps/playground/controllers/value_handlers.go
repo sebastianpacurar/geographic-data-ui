@@ -2,10 +2,10 @@ package controllers
 
 import (
 	"fmt"
-	"gioui-experiment/apps/playground/data/counter"
-	g "gioui-experiment/globals"
+	"gioui-experiment/apps/playground/data"
 	"gioui.org/layout"
 	"gioui.org/text"
+	"gioui.org/unit"
 	"gioui.org/widget"
 	"gioui.org/widget/material"
 	"gioui.org/x/component"
@@ -38,7 +38,7 @@ type (
 
 // Layout TODO: this gets way too overly complicated. To Be Simplified!
 func (vh *ValueHandler) Layout(gtx C, th *material.Theme) D {
-	pgv := counter.PgVals
+	pgv := data.PgVals
 	// start field
 	startFromField := layout.Flexed(1, func(gtx C) D {
 		return vh.InputBox(gtx, th, &vh.startFrom.textField, pgv, "start")
@@ -52,7 +52,7 @@ func (vh *ValueHandler) Layout(gtx C, th *material.Theme) D {
 		for range vh.startFrom.btn.Clicks() {
 			vh.handleStartBtn(pgv)
 		}
-		return g.Inset.Layout(gtx, func(C) D {
+		return layout.UniformInset(unit.Dp(10)).Layout(gtx, func(C) D {
 			return material.Button(th, &vh.startFrom.btn, "set start").Layout(gtx)
 		})
 	})
@@ -69,7 +69,7 @@ func (vh *ValueHandler) Layout(gtx C, th *material.Theme) D {
 		for range vh.skipBy.btn.Clicks() {
 			vh.handleSkipBtn(pgv)
 		}
-		return g.Inset.Layout(gtx, func(C) D {
+		return layout.UniformInset(unit.Dp(10)).Layout(gtx, func(C) D {
 			return material.Button(th, &vh.skipBy.btn, "set step").Layout(gtx)
 		})
 	})
@@ -91,7 +91,7 @@ func (vh *ValueHandler) Layout(gtx C, th *material.Theme) D {
 		for range vh.stopAt.btn.Clicks() {
 			vh.handleStopBtn(pgv)
 		}
-		return g.Inset.Layout(gtx, func(C) D {
+		return layout.UniformInset(unit.Dp(10)).Layout(gtx, func(C) D {
 			return material.Button(th, &vh.stopAt.btn, "on hold").Layout(gtx)
 		})
 	})
@@ -113,11 +113,11 @@ func (vh *ValueHandler) Layout(gtx C, th *material.Theme) D {
 	)
 }
 
-func (vh *ValueHandler) InputBox(gtx C, th *material.Theme, e *component.TextField, pgv *counter.Generator, context string) D {
+func (vh *ValueHandler) InputBox(gtx C, th *material.Theme, e *component.TextField, pgv *data.Generator, context string) D {
 	seq := pgv.GetActiveSequence()
 	var placeholder string
 	switch seq {
-	case counter.PRIMES, counter.FIBS:
+	case data.PRIMES, data.FIBS:
 		switch context {
 		case "start":
 			placeholder = fmt.Sprintf("n-th %s", seq[:len(seq)-1])
@@ -126,7 +126,7 @@ func (vh *ValueHandler) InputBox(gtx C, th *material.Theme, e *component.TextFie
 			placeholder = "set step by n"
 			e.CharLimit = 5
 		}
-	case counter.NATURALS, counter.INTEGERS:
+	case data.NATURALS, data.INTEGERS:
 		switch context {
 		case "start":
 			placeholder = "start from n"
@@ -157,46 +157,46 @@ func isNumeric(val string) bool {
 	}
 }
 
-func (vh *ValueHandler) handleStartBtn(pgv *counter.Generator) {
+func (vh *ValueHandler) handleStartBtn(pgv *data.Generator) {
 	val := strings.TrimSpace(vh.startFrom.textField.Text())
 	numVal, _ := strconv.ParseUint(val, 10, 64)
 	seq := pgv.GetActiveSequence()
 	switch seq {
-	case counter.PRIMES:
+	case data.PRIMES:
 		pgv.Primes.Index = int(numVal) - 1
-	case counter.FIBS:
+	case data.FIBS:
 		pgv.Fibonacci.Index = int(numVal) - 1
-	case counter.NATURALS:
+	case data.NATURALS:
 		pgv.Naturals.Displayed = numVal
-	case counter.INTEGERS:
+	case data.INTEGERS:
 		pgv.Integers.Displayed = numVal
 	}
 }
 
-func (vh *ValueHandler) handleSkipBtn(pgv *counter.Generator) {
+func (vh *ValueHandler) handleSkipBtn(pgv *data.Generator) {
 	val := strings.TrimSpace(vh.skipBy.textField.Text())
 	numVal, _ := strconv.ParseUint(val, 10, 64)
 	seq := pgv.GetActiveSequence()
 	switch seq {
-	case counter.PRIMES:
+	case data.PRIMES:
 		pgv.Primes.Step = numVal
-	case counter.FIBS:
+	case data.FIBS:
 		pgv.Fibonacci.Step = numVal
-	case counter.NATURALS:
+	case data.NATURALS:
 		pgv.Naturals.Step = numVal
-	case counter.INTEGERS:
+	case data.INTEGERS:
 		pgv.Integers.Step = numVal
 	}
 }
 
-func (vh *ValueHandler) handleStopBtn(pgv *counter.Generator) {
+func (vh *ValueHandler) handleStopBtn(pgv *data.Generator) {
 	val := strings.TrimSpace(vh.stopAt.textField.Text())
 	numVal, _ := strconv.ParseUint(val, 10, 64)
 	seq := pgv.GetActiveSequence()
 	switch seq {
-	case counter.PRIMES:
+	case data.PRIMES:
 		pgv.Primes.Stop = numVal
-	case counter.FIBS:
+	case data.FIBS:
 		pgv.Fibonacci.Stop = numVal
 	}
 }

@@ -6,6 +6,7 @@ import (
 	g "gioui-experiment/globals"
 	"gioui.org/io/clipboard"
 	"gioui.org/layout"
+	"gioui.org/unit"
 	"gioui.org/widget"
 	"gioui.org/widget/material"
 	"gioui.org/x/outlay"
@@ -70,7 +71,7 @@ func (gr *Grid) Layout(gtx C, th *material.Theme) D {
 			}
 
 			if gr.cards[i].Active {
-				content = g.Inset.Layout(gtx, func(gtx C) D {
+				content = layout.UniformInset(unit.Dp(10)).Layout(gtx, func(gtx C) D {
 					return gr.cards[i].LayCard(gtx, th)
 				})
 			}

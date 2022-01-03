@@ -7,9 +7,8 @@ import (
 )
 
 var (
-	ClipBoardVal  string
-	DefaultMargin = unit.Dp(10)
-	Colours       = map[string]color.NRGBA{
+	ClipBoardVal string
+	Colours      = map[string]color.NRGBA{
 		"red":             {R: 255, A: 255},
 		"dark-red":        {R: 139, A: 255},
 		"flame-red":       {R: 220, G: 85, B: 44, A: 255},
@@ -30,10 +29,9 @@ var (
 
 		"text_selection": {R: 191, G: 255, B: 209, A: 255},
 	}
-	Inset   = layout.UniformInset(DefaultMargin)
 	SpacerX = layout.Rigid(
 		layout.Spacer{
-			Width: DefaultMargin,
+			Width: unit.Dp(10),
 		}.Layout,
 	)
 )

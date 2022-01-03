@@ -1,9 +1,10 @@
 package controllers
 
 import (
-	"gioui-experiment/apps/playground/data/counter"
+	"gioui-experiment/apps/playground/data"
 	g "gioui-experiment/globals"
 	"gioui.org/layout"
+	"gioui.org/unit"
 	"gioui.org/widget"
 	"gioui.org/widget/material"
 	"math"
@@ -22,7 +23,7 @@ type (
 )
 
 func (inc *Incrementor) Layout(gtx C, th *material.Theme) D {
-	pgv := counter.PgVals
+	pgv := data.PgVals
 
 	minusBtn := layout.Rigid(func(gtx C) D {
 		if inc.isMinusBtnDisabled(pgv) {
@@ -31,7 +32,7 @@ func (inc *Incrementor) Layout(gtx C, th *material.Theme) D {
 		for range inc.minusBtn.Clicks() {
 			inc.handleMinusBtn(pgv)
 		}
-		return g.Inset.Layout(gtx,
+		return layout.UniformInset(unit.Dp(10)).Layout(gtx,
 			material.IconButton(th, &inc.minusBtn, g.MinusIcon, "desc").Layout)
 	})
 
@@ -42,7 +43,7 @@ func (inc *Incrementor) Layout(gtx C, th *material.Theme) D {
 		for range inc.resetBtn.Clicks() {
 			inc.handleResetBtn(pgv)
 		}
-		return g.Inset.Layout(gtx,
+		return layout.UniformInset(unit.Dp(10)).Layout(gtx,
 			material.IconButton(th, &inc.resetBtn, g.RefreshIcon, "desc").Layout)
 	})
 
@@ -53,7 +54,7 @@ func (inc *Incrementor) Layout(gtx C, th *material.Theme) D {
 		for range inc.plusBtn.Clicks() {
 			inc.handlePlusBtn(pgv)
 		}
-		return g.Inset.Layout(gtx,
+		return layout.UniformInset(unit.Dp(10)).Layout(gtx,
 			material.IconButton(th, &inc.plusBtn, g.PlusIcon, "desc").Layout)
 	})
 
@@ -64,107 +65,107 @@ func (inc *Incrementor) Layout(gtx C, th *material.Theme) D {
 	)
 }
 
-func (inc *Incrementor) isResetBtnDisabled(pgv *counter.Generator) bool {
+func (inc *Incrementor) isResetBtnDisabled(pgv *data.Generator) bool {
 	seq := pgv.GetActiveSequence()
 	res := false
 	switch seq {
-	case counter.PRIMES:
+	case data.PRIMES:
 		res = pgv.Cache[seq][pgv.Primes.Index] == pgv.Cache[seq][int(pgv.Primes.Start)-1]
-	case counter.FIBS:
+	case data.FIBS:
 		res = pgv.Cache[seq][pgv.Fibonacci.Index] == pgv.Cache[seq][int(pgv.Fibonacci.Start)-1]
-	case counter.NATURALS:
+	case data.NATURALS:
 		res = pgv.Naturals.Displayed == pgv.Naturals.Start
-	case counter.INTEGERS:
+	case data.INTEGERS:
 		res = pgv.Integers.Displayed == pgv.Integers.Start
 	}
 	return res
 }
 
-func (inc *Incrementor) isMinusBtnDisabled(pgv *counter.Generator) bool {
+func (inc *Incrementor) isMinusBtnDisabled(pgv *data.Generator) bool {
 	seq := pgv.GetActiveSequence()
 	res := false
 	switch seq {
-	case counter.PRIMES:
+	case data.PRIMES:
 		res = pgv.Primes.Index <= 0
-	case counter.FIBS:
+	case data.FIBS:
 		res = pgv.Fibonacci.Index <= 0
-	case counter.NATURALS:
+	case data.NATURALS:
 		res = pgv.Naturals.Displayed <= 0
-	case counter.INTEGERS:
+	case data.INTEGERS:
 		res = pgv.Integers.Displayed <= 0
 	}
 	return res
 }
 
-func (inc *Incrementor) isPlusBtnDisabled(pgv *counter.Generator) bool {
+func (inc *Incrementor) isPlusBtnDisabled(pgv *data.Generator) bool {
 	seq := pgv.GetActiveSequence()
 	res := false
 	switch seq {
-	case counter.PRIMES:
+	case data.PRIMES:
 		res = pgv.Primes.Index == len(pgv.Cache[seq])-1
-	case counter.FIBS:
+	case data.FIBS:
 		res = pgv.Fibonacci.Index == len(pgv.Cache[seq])-1
-	case counter.NATURALS:
+	case data.NATURALS:
 		res = pgv.Naturals.Displayed == math.MaxUint64
-	case counter.INTEGERS:
+	case data.INTEGERS:
 		res = pgv.Integers.Displayed == math.MaxUint64
 	}
 	return res
 }
 
-func (inc *Incrementor) handleResetBtn(pgv *counter.Generator) {
+func (inc *Incrementor) handleResetBtn(pgv *data.Generator) {
 	seq := pgv.GetActiveSequence()
 	switch seq {
-	case counter.PRIMES:
+	case data.PRIMES:
 		pgv.Primes.Index = int(pgv.Primes.Start) - 1
-	case counter.FIBS:
+	case data.FIBS:
 		pgv.Fibonacci.Index = int(pgv.Fibonacci.Start) - 1
-	case counter.NATURALS:
+	case data.NATURALS:
 		pgv.Naturals.Displayed = pgv.Naturals.Start
-	case counter.INTEGERS:
+	case data.INTEGERS:
 		pgv.Integers.Displayed = pgv.Integers.Start
 	}
 }
 
-func (inc *Incrementor) handlePlusBtn(pgv *counter.Generator) {
+func (inc *Incrementor) handlePlusBtn(pgv *data.Generator) {
 	seq := pgv.GetActiveSequence()
 	switch seq {
-	case counter.PRIMES:
+	case data.PRIMES:
 		pgv.Primes.Index += int(pgv.Primes.Step)
-	case counter.FIBS:
+	case data.FIBS:
 		pgv.Fibonacci.Index += int(pgv.Fibonacci.Step)
-	case counter.NATURALS:
+	case data.NATURALS:
 		pgv.Naturals.Displayed += pgv.Naturals.Step
-	case counter.INTEGERS:
+	case data.INTEGERS:
 		pgv.Integers.Displayed += pgv.Integers.Step
 	}
 }
 
-func (inc *Incrementor) handleMinusBtn(pgv *counter.Generator) {
+func (inc *Incrementor) handleMinusBtn(pgv *data.Generator) {
 	seq := pgv.GetActiveSequence()
 	switch seq {
-	case counter.PRIMES:
+	case data.PRIMES:
 		pgv.Primes.Index -= int(pgv.Primes.Step)
-	case counter.FIBS:
+	case data.FIBS:
 		pgv.Fibonacci.Index -= int(pgv.Fibonacci.Step)
-	case counter.NATURALS:
+	case data.NATURALS:
 		pgv.Naturals.Displayed -= pgv.Naturals.Step
-	case counter.INTEGERS:
+	case data.INTEGERS:
 		pgv.Integers.Displayed -= pgv.Integers.Step
 	}
 }
 
-func (inc *Incrementor) parseResetLabel(pgv *counter.Generator) string {
+func (inc *Incrementor) parseResetLabel(pgv *data.Generator) string {
 	var lbl string
 	seq := pgv.GetActiveSequence()
 	switch seq {
-	case counter.PRIMES:
+	case data.PRIMES:
 		lbl = strconv.FormatUint(pgv.Cache[seq][pgv.Primes.Start-1], 10)
-	case counter.FIBS:
+	case data.FIBS:
 		lbl = strconv.FormatUint(pgv.Cache[seq][pgv.Fibonacci.Start-1], 10)
-	case counter.NATURALS:
+	case data.NATURALS:
 		lbl = strconv.FormatUint(pgv.Naturals.Start, 10)
-	case counter.INTEGERS:
+	case data.INTEGERS:
 		lbl = strconv.FormatUint(pgv.Integers.Start, 10)
 	}
 	return lbl

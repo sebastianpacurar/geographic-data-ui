@@ -1,7 +1,7 @@
 package controllers
 
 import (
-	"gioui-experiment/apps/playground/data/counter"
+	"gioui-experiment/apps/playground/data"
 	"gioui.org/layout"
 	"gioui.org/unit"
 	"gioui.org/widget/material"
@@ -10,7 +10,7 @@ import (
 )
 
 type Status struct {
-	counter.Generator
+	data.Generator
 	primesState   component.DiscloserState
 	fibsState     component.DiscloserState
 	naturalsState component.DiscloserState
@@ -20,14 +20,14 @@ type Status struct {
 // Layout - TODO: hardcoded due to UTTER LAZINESS
 // More "dynamics" to be added
 func (s *Status) Layout(gtx C, th *material.Theme) D {
-	pgv := counter.PgVals
+	pgv := data.PgVals
 
 	// TODO: rethink location of Cache population
-	if len(pgv.Cache[counter.PRIMES]) != counter.PLIMIT {
-		s.GenPrimes(counter.PLIMIT)
+	if len(pgv.Cache[data.PRIMES]) != data.PLIMIT {
+		s.GenPrimes(data.PLIMIT)
 	}
-	if len(pgv.Cache[counter.FIBS]) != counter.FLIMIT {
-		s.GenFibs(counter.FLIMIT)
+	if len(pgv.Cache[data.FIBS]) != data.FLIMIT {
+		s.GenFibs(data.FLIMIT)
 	}
 
 	return layout.Flex{Axis: layout.Vertical}.Layout(gtx,

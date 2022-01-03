@@ -130,7 +130,13 @@ func (r *Router) Layout(gtx C, th *material.Theme) D {
 								gtx.Constraints = layout.Exact(gtx.Constraints.Constrain(containerSize))
 								return layout.Flex{Axis: layout.Vertical}.Layout(gtx,
 									layout.Rigid(func(gtx C) D {
-										return r.pages[r.current].LayoutView(gtx, th)
+										return layout.Inset{
+											Right:  unit.Dp(10),
+											Bottom: unit.Dp(5),
+											Left:   unit.Dp(10),
+										}.Layout(gtx, func(gtx C) D {
+											return r.pages[r.current].LayoutView(gtx, th)
+										})
 									}))
 							}))
 					},

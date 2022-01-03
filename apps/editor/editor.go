@@ -89,7 +89,7 @@ func (app *Application) LayoutView(gtx C, th *material.Theme) D {
 		border.Width = unit.Px(2)
 	}
 
-	return g.Inset.Layout(gtx, func(gtx C) D {
+	return layout.UniformInset(unit.Dp(10)).Layout(gtx, func(gtx C) D {
 		return layout.Stack{}.Layout(gtx,
 			layout.Stacked(func(gtx C) D {
 				gtx.Constraints = layout.Exact(gtx.Constraints.Constrain(gtx.Constraints.Max))

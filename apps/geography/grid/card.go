@@ -86,7 +86,7 @@ func (c *Card) LayCard(gtx C, th *material.Theme) D {
 			})
 		}),
 		layout.Stacked(func(gtx C) D {
-			return g.Inset.Layout(gtx, func(gtx C) D {
+			return layout.UniformInset(unit.Dp(10)).Layout(gtx, func(gtx C) D {
 				gtx.Constraints = layout.Exact(gtx.Constraints.Constrain(size))
 				return layout.Flex{Axis: layout.Vertical, Spacing: layout.SpaceAround}.Layout(gtx,
 
