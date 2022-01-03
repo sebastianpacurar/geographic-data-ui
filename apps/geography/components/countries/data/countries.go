@@ -7,19 +7,32 @@ import (
 	"io/ioutil"
 	"log"
 	"net/http"
+	"os"
 )
 
 var (
 	allCountries = &Countries{}
-	Data         = allCountries.List
+	Data         = allCountries.CountriesList
+	AllFlags     = allCountries.FlagsList
 )
 
 type (
 	Countries struct {
-		List     []Country
-		IsCached bool
+		CountriesList []Country
+		FlagsList     []CountryFlag
+		IsCached      bool
 	}
 
+	// CountryFlag - Used with v2
+	CountryFlag struct {
+		Name string `json:"name"`
+		Flag Flag   `json:"flags"`
+	}
+	Flag struct {
+		Png string `json:"png"`
+	}
+
+	// Country - Used with v3.1
 	Country struct {
 		Name           Name                       `json:"name"`
 		TopLevelDomain []string                   `json:"tld"`
@@ -42,7 +55,6 @@ type (
 		Demonyms       map[string]Demonym         `json:"demonyms"`
 		Population     int32                      `json:"population"`
 		StartOfWeek    string                     `json:"startOfWeek"`
-		FlagSrc        Flag                       `json:"flags"`
 
 		// Active - used for search rows/cards
 		Active bool
@@ -73,11 +85,6 @@ type (
 		Male   string `json:"m"`
 	}
 
-	Flag struct {
-		Png string `json:"png"`
-		Svg string `json:"svg"`
-	}
-
 	Currency struct {
 		Name   string `json:"name"`
 		Symbol string `json:"symbol"`
@@ -106,37 +113,107 @@ func (c *Countries) GetSelectedCount() int {
 
 func (c *Countries) InitCountries() error {
 	if !c.IsCached {
-		data, err := c.fetchCountries("all")
+		countries, err := c.fetchCountries("all")
 		if err != nil {
-			log.Fatalln("error fetching data from RESTCountries API ", err.Error())
+			log.Fatalln("error fetching data from RESTCountries API ", err)
 			return err
 		}
-		err = json.Unmarshal(data, &Data)
+		err = json.Unmarshal(countries, &Data)
 		if err != nil {
-			log.Fatalln("json Unmarshal RESTCountries for mutable: ", err.Error())
+			log.Fatalln("json Unmarshal RESTCountries for mutable: ", err)
 			return err
 		}
+
+		flags, err := c.fetchFlags()
+		if err != nil {
+			log.Fatalln("error fetching data from RESTCountries API ", err)
+			return err
+		}
+		err = json.Unmarshal(flags, &AllFlags)
+		if err != nil {
+			log.Fatalln("json Unmarshal RESTCountries for mutable: ", err)
+			return err
+		}
+
+		for i := range AllFlags {
+			err := c.SaveFlagsToFile(AllFlags[i].Flag.Png, AllFlags[i].Name)
+			if err != nil {
+				return err
+			}
+		}
+
 		c.IsCached = true
 	}
 	return nil
+}
+
+func (c *Countries) SaveFlagsToFile(url, name string) error {
+	response, e := http.Get(url)
+	if e != nil {
+		log.Fatalln(e)
+	}
+	defer func(Body io.ReadCloser) {
+		err := Body.Close()
+		if err != nil {
+			log.Fatalln(err)
+		}
+	}(response.Body)
+
+	file, err := os.Create(fmt.Sprintf("./apps/geography/output/flags/%s.png", name))
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer func(file *os.File) {
+		err := file.Close()
+		if err != nil {
+			log.Fatalln(err)
+		}
+	}(file)
+
+	_, err = io.Copy(file, response.Body)
+	if err != nil {
+		log.Fatal(err)
+	}
+	return nil
+}
+
+func (c *Countries) fetchFlags() ([]byte, error) {
+	URL := fmt.Sprintf("https://restcountries.com/v2/all")
+	res, err := http.Get(URL)
+	if err != nil {
+		log.Fatalln(err)
+		return []byte{}, err
+	}
+	defer func(Body io.ReadCloser) {
+		err = Body.Close()
+		if err != nil {
+			log.Fatalln(err)
+		}
+	}(res.Body)
+	body, err := ioutil.ReadAll(res.Body)
+	if err != nil {
+		log.Fatalln(err)
+		return []byte{}, err
+	}
+	return body, nil
 }
 
 func (c *Countries) fetchCountries(location string) ([]byte, error) {
 	URL := fmt.Sprintf("https://restcountries.com/v3.1/%s", location)
 	res, err := http.Get(URL)
 	if err != nil {
-		log.Fatalln(fmt.Sprintf("http.Get(\"%s\") failed: ", URL), err.Error())
+		log.Fatalln(fmt.Sprintf("http.Get(\"%s\") failed: ", URL))
 		return []byte{}, err
 	}
 	defer func(Body io.ReadCloser) {
 		err = Body.Close()
 		if err != nil {
-			log.Fatalln("error at deferred func, at the end: ", err.Error())
+			log.Fatalln("error at deferred func, at the end: ", err)
 		}
 	}(res.Body)
 	body, err := ioutil.ReadAll(res.Body)
 	if err != nil {
-		log.Fatalln("error at res.Body reading: ", err.Error())
+		log.Fatalln("error at res.Body reading: ", err)
 		return []byte{}, err
 	}
 	return body, nil
