@@ -27,7 +27,6 @@ type Row struct {
 	Active       bool
 	Selected     bool
 	IsCPViewed   bool
-	IsViewed     bool
 }
 
 func (r *Row) LayRow(gtx C, th *material.Theme) D {

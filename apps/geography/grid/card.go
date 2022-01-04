@@ -16,7 +16,6 @@ type (
 		Name     string
 		Cca2     string
 		Active   bool
-		Hovered  bool
 		Selected bool
 		Click    widget.Clickable
 		flag     image.Image
@@ -79,7 +78,6 @@ func (c *Card) LayCard(gtx C, th *material.Theme) D {
 					} else if c.Click.Hovered() && c.Selected {
 						cardColor = g.Colours[colors.LIGHT_SALMON]
 					}
-
 					return g.RColoredArea(gtx, size, 10, cardColor)
 				})
 				return area

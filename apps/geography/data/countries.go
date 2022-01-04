@@ -62,7 +62,6 @@ type (
 		Selected bool
 		// for CP details and contextual view
 		IsCPViewed bool
-		IsViewed   bool
 	}
 
 	Name struct {

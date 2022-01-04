@@ -40,9 +40,6 @@ func (t *Table) Layout(gtx C, th *material.Theme) D {
 				Area:         data.Data[i].Area,
 				Population:   data.Data[i].Population,
 				Active:       data.Data[i].Active,
-				Selected:     data.Data[i].Selected,
-				IsCPViewed:   data.Data[i].IsCPViewed,
-				IsViewed:     data.Data[i].IsViewed,
 			})
 		}
 		t.loaded = true

@@ -17,10 +17,11 @@ type (
 	D = layout.Dimensions
 
 	Grid struct {
-		cards  []Card
-		list   widget.List
-		wrap   outlay.GridWrap
-		loaded bool
+		cards      []Card
+		list       widget.List
+		wrap       outlay.GridWrap
+		Contextual interface{}
+		loaded     bool
 	}
 )
 
@@ -61,7 +62,7 @@ func (gr *Grid) Layout(gtx C, th *material.Theme) D {
 			}
 
 			if gr.cards[i].Click.Clicked() {
-				//apps.Router{}
+				gr.Contextual = data.Data[i]
 			}
 
 			if gr.cards[i].selectBtn.Clicked() {

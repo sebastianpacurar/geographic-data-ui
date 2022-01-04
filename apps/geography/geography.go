@@ -26,7 +26,6 @@ type (
 		th *material.Theme
 		ControlPanel
 		Display
-
 		*apps.Router
 	}
 
@@ -53,6 +52,9 @@ type (
 
 		// slider
 		Slider Slider
+
+		// lock the context on the country
+		ContextualSet bool
 	}
 )
 
@@ -79,6 +81,15 @@ func (app *Application) NavItem() component.NavItem {
 func (app *Application) LayoutView(gtx C, th *material.Theme) D {
 	err := app.Display.Api.InitCountries()
 	app.Display.FilterData()
+
+	for _, e := range app.AppBar.Events(gtx) {
+		switch e.(type) {
+		case component.AppBarContextMenuDismissed:
+			app.Display.ContextualSet = false
+			app.Display.Grid.Contextual = nil
+		}
+	}
+
 	if app.Display.Selected == nil {
 		app.Display.Selected = app.Display.Table
 	}
@@ -97,7 +108,7 @@ func (app *Application) LayoutView(gtx C, th *material.Theme) D {
 		app.Display.Loaded = true
 	}
 
-	return layout.Flex{Axis: layout.Vertical}.Layout(gtx,
+	dims := layout.Flex{Axis: layout.Vertical}.Layout(gtx,
 		layout.Rigid(func(gtx C) D {
 
 			// search field
@@ -242,6 +253,21 @@ func (app *Application) LayoutView(gtx C, th *material.Theme) D {
 				return D{}
 			})
 		}))
+
+	//TODO: fix this
+	if !app.ContextualSet {
+		switch app.Display.Grid.Contextual.(type) {
+		case data.Country:
+			app.Router.AppBar.SetContextualActions([]component.AppBarAction{}, []component.OverflowAction{})
+			app.Router.AppBar.ToggleContextual(gtx.Now, "Toggled")
+			app.ContextualSet = true
+			dims = layout.Flex{Axis: layout.Vertical}.Layout(gtx,
+				layout.Rigid(material.Body2(th, "test 1").Layout),
+				layout.Rigid(material.Body2(th, "test 2").Layout),
+			)
+		}
+	}
+	return dims
 }
 
 func (app *Application) LayoutController(gtx C, th *material.Theme) D {
