@@ -31,7 +31,15 @@ func (s *Slider) PushRight() {
 	s.push = -1
 }
 
-func (s *Slider) Layout(gtx layout.Context, w layout.Widget) layout.Dimensions {
+func (s *Slider) PushUp() {
+	s.push = 1
+}
+
+func (s *Slider) PushDown() {
+	s.push = -1
+}
+
+func (s *Slider) Layout(gtx layout.Context, direction layout.Axis, w layout.Widget) layout.Dimensions {
 	if s.push != 0 {
 		s.next = nil
 		s.lastCall = s.nextCall
@@ -86,6 +94,32 @@ func (s *Slider) Layout(gtx layout.Context, w layout.Widget) layout.Dimensions {
 		return dims
 	}
 
+	switch direction {
+	case layout.Horizontal:
+		s.pushHorizontally(gtx, dims)
+	case layout.Vertical:
+		s.pushVertically(gtx, dims)
+	}
+	return dims
+}
+
+// smooth - ease-in-out
+func smooth(t float32) float32 {
+	if t < 0 {
+		return -easeInOutCubic(-t)
+	}
+	return easeInOutCubic(t)
+}
+
+// easeInOutCubic - Maps a linear value to an ease-in-out-cubic easing function.
+func easeInOutCubic(t float32) float32 {
+	if t < 0.5 {
+		return 4 * t * t * t
+	}
+	return (t-1)*(2*t-2)*(2*t-2) + 1
+}
+
+func (s *Slider) pushHorizontally(gtx C, dims D) {
 	offset := smooth(s.offset)
 
 	if s.offset > 0 {
@@ -109,21 +143,30 @@ func (s *Slider) Layout(gtx layout.Context, w layout.Widget) layout.Dimensions {
 		}).Push(gtx.Ops).Pop()
 		s.nextCall.Add(gtx.Ops)
 	}
-	return dims
 }
 
-// smooth - ease-in-out
-func smooth(t float32) float32 {
-	if t < 0 {
-		return -easeInOutCubic(-t)
-	}
-	return easeInOutCubic(t)
-}
+func (s *Slider) pushVertically(gtx C, dims D) {
+	offset := smooth(s.offset)
 
-// easeInOutCubic - Maps a linear value to an ease-in-out-cubic easing function.
-func easeInOutCubic(t float32) float32 {
-	if t < 0.5 {
-		return 4 * t * t * t
+	if s.offset > 0 {
+		defer op.Offset(f32.Point{
+			Y: float32(dims.Size.Y) * (offset - 1),
+		}).Push(gtx.Ops).Pop()
+		s.lastCall.Add(gtx.Ops)
+
+		defer op.Offset(f32.Point{
+			Y: float32(dims.Size.Y),
+		}).Push(gtx.Ops).Pop()
+		s.nextCall.Add(gtx.Ops)
+	} else {
+		defer op.Offset(f32.Point{
+			Y: float32(dims.Size.Y) * (offset + 1),
+		}).Push(gtx.Ops).Pop()
+		s.lastCall.Add(gtx.Ops)
+
+		defer op.Offset(f32.Point{
+			Y: float32(-dims.Size.Y),
+		}).Push(gtx.Ops).Pop()
+		s.nextCall.Add(gtx.Ops)
 	}
-	return (t-1)*(2*t-2)*(2*t-2) + 1
 }

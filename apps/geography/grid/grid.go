@@ -32,29 +32,29 @@ func (gr *Grid) Layout(gtx C, th *material.Theme) D {
 	gr.list.Alignment = layout.Middle
 
 	if !gr.loaded {
-		for i := range data.Data {
+		for i := range data.Cached {
 			gr.cards = append(gr.cards, Card{
-				Name:     data.Data[i].Name.Common,
-				Cca2:     data.Data[i].Cca2,
-				Active:   data.Data[i].Active,
-				Selected: data.Data[i].Selected,
+				Name:     data.Cached[i].Name.Common,
+				Cca2:     data.Cached[i].Cca2,
+				Active:   data.Cached[i].Active,
+				Selected: data.Cached[i].Selected,
 			})
 		}
 		gr.loaded = true
 	} else {
-		for i := range data.Data {
-			gr.cards[i].Active = data.Data[i].Active
-			gr.cards[i].Selected = data.Data[i].Selected
+		for i := range data.Cached {
+			gr.cards[i].Active = data.Cached[i].Active
+			gr.cards[i].Selected = data.Cached[i].Selected
 		}
 	}
 
 	return material.List(th, &gr.list).Layout(gtx, 1, func(gtx C, _ int) D {
-		return gr.wrap.Layout(gtx, len(data.Data), func(gtx C, i int) D {
+		return gr.wrap.Layout(gtx, len(data.Cached), func(gtx C, i int) D {
 			var content D
 
 			// copy only this specific card
 			if gr.cards[i].copyToClipBtn.Clicked() {
-				res, _ := json.MarshalIndent(data.Data[i], "", "\t")
+				res, _ := json.MarshalIndent(data.Cached[i], "", "\t")
 				clipboard.WriteOp{
 					Text: string(res),
 				}.Add(gtx.Ops)
@@ -62,13 +62,13 @@ func (gr *Grid) Layout(gtx C, th *material.Theme) D {
 			}
 
 			if gr.cards[i].Click.Clicked() {
-				gr.Contextual = data.Data[i]
+				gr.Contextual = data.Cached[i]
 			}
 
 			if gr.cards[i].selectBtn.Clicked() {
-				data.Data[i].Selected = true
+				data.Cached[i].Selected = true
 			} else if gr.cards[i].deselectBtn.Clicked() {
-				data.Data[i].Selected = false
+				data.Cached[i].Selected = false
 			}
 
 			if gr.cards[i].Active {

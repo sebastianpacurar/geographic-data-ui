@@ -12,7 +12,7 @@ import (
 
 var (
 	allCountries = &Countries{}
-	Data         = allCountries.CountriesList
+	Cached       = allCountries.CountriesList
 	AllFlags     = allCountries.FlagsList
 )
 
@@ -92,9 +92,9 @@ type (
 
 func (c *Countries) GetSelected() []Country {
 	res := make([]Country, 0)
-	for i := range Data {
-		if Data[i].Selected {
-			res = append(res, Data[i])
+	for i := range Cached {
+		if Cached[i].Selected {
+			res = append(res, Cached[i])
 		}
 	}
 	return res
@@ -102,8 +102,8 @@ func (c *Countries) GetSelected() []Country {
 
 func (c *Countries) GetSelectedCount() int {
 	count := 0
-	for i := range Data {
-		if Data[i].Selected {
+	for i := range Cached {
+		if Cached[i].Selected {
 			count++
 		}
 	}
@@ -117,7 +117,7 @@ func (c *Countries) InitCountries() error {
 			log.Fatalln("error fetching data from RESTCountries API ", err)
 			return err
 		}
-		err = json.Unmarshal(countries, &Data)
+		err = json.Unmarshal(countries, &Cached)
 		if err != nil {
 			log.Fatalln("json Unmarshal RESTCountries for mutable: ", err)
 			return err

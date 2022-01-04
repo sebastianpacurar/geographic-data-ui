@@ -79,15 +79,18 @@ func (app *Application) NavItem() component.NavItem {
 }
 
 func (app *Application) LayoutView(gtx C, th *material.Theme) D {
-	var dims D
 	err := app.Display.Api.InitCountries()
 	app.Display.FilterData()
 
 	for _, e := range app.AppBar.Events(gtx) {
 		switch e.(type) {
 		case component.AppBarContextMenuDismissed:
+			app.Router.AppBar.StopContextual(gtx.Now)
 			app.Display.ContextualSet = false
 			app.Display.Grid.Contextual = nil
+		case component.AppBarNavigationClicked:
+			app.ModalNavDrawer.Appear(gtx.Now)
+			app.NavAnim.Disappear(gtx.Now)
 		}
 	}
 
@@ -103,11 +106,13 @@ func (app *Application) LayoutView(gtx C, th *material.Theme) D {
 
 	// run only once during lifetime
 	if !app.Display.Loaded {
-		for i := range data.Data {
-			data.Data[i].Active = true
+		for i := range data.Cached {
+			data.Cached[i].Active = true
 		}
 		app.Display.Loaded = true
 	}
+
+	var dims D
 
 	switch app.Display.Grid.Contextual.(type) {
 	case data.Country:
@@ -116,7 +121,6 @@ func (app *Application) LayoutView(gtx C, th *material.Theme) D {
 			app.Router.AppBar.StartContextual(gtx.Now, "Toggled")
 			app.ContextualSet = true
 		}
-		app.ContextualSet = true
 		dims = layout.Flex{Axis: layout.Vertical}.Layout(gtx,
 			layout.Rigid(material.Body2(th, "test 1").Layout),
 			layout.Rigid(material.Body2(th, "test 2").Layout),
@@ -169,66 +173,7 @@ func (app *Application) LayoutView(gtx C, th *material.Theme) D {
 				//Export to excel button
 				exportBtn := layout.Rigid(func(gtx C) D {
 					if app.Display.SaveAsXlsx.Clicked() {
-						columns := []string{"A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L"}
 
-						xlsx := excelize.NewFile()
-						xlsx.SetSheetName("Sheet1", "Countries")
-						xlsx.SetActiveSheet(1)
-
-						for i := range columns {
-							excelRow := 1
-							for j := range data.Data {
-								// write only displayed rows/cards related countries
-								if data.Data[j].Active {
-									res := ""
-									switch columns[i] {
-									case "A":
-										res = data.Data[j].Name.Common
-									case "B":
-										res = data.Data[j].Name.Official
-									case "C":
-										res = data.Data[j].Cca2
-									case "D":
-										res = data.Data[j].Cca3
-									case "E":
-										res = data.Data[j].Ccn3
-									case "F":
-										res = data.Data[j].Cioc
-									case "G":
-										if data.Data[j].Independent {
-											res = "Yes"
-										} else {
-											res = "No"
-										}
-									case "H":
-										res = data.Data[j].Status
-									case "I":
-										if data.Data[j].UNMember {
-											res = "Yes"
-										} else {
-											res = "No"
-										}
-									case "J":
-										if len(data.Data[j].Capital) > 0 {
-											res = data.Data[j].Capital[0]
-										} else {
-											res = "N/A"
-										}
-									case "K":
-										res = fmt.Sprintf("%f", data.Data[j].Area)
-									case "L":
-										res = string(data.Data[j].Population)
-									}
-									if err := xlsx.SetCellValue("Countries", columns[i]+strconv.Itoa(excelRow), res); err != nil {
-										log.Fatalln(err)
-									}
-								}
-								excelRow += 1
-							}
-						}
-						if err := xlsx.SaveAs("./apps/geography/output/Countries.xlsx"); err != nil {
-							log.Fatalln("error at excel save: ", err.Error())
-						}
 					}
 					return layout.Inset{
 						Top:    unit.Dp(10),
@@ -257,14 +202,15 @@ func (app *Application) LayoutView(gtx C, th *material.Theme) D {
 
 			// Selected display
 			layout.Rigid(func(gtx C) D {
-				return app.Display.Slider.Layout(gtx, func(gtx C) D {
+				return app.Display.Slider.Layout(gtx, layout.Horizontal, func(gtx C) D {
+					var dims D
 					switch app.Display.Selected.(type) {
 					case grid.Grid:
-						return app.Display.Grid.Layout(gtx, th)
+						dims = app.Display.Grid.Layout(gtx, th)
 					case table.Table:
-						return app.Display.Table.Layout(gtx, th)
+						dims = app.Display.Table.Layout(gtx, th)
 					}
-					return D{}
+					return dims
 				})
 			}))
 	}
@@ -275,23 +221,86 @@ func (app *Application) LayoutController(gtx C, th *material.Theme) D {
 	return app.ControlPanel.Layout(gtx, th)
 }
 
-// FilterData - filter countries based on data.Data and data.Cached manipulation
+// FilterData - filter countries based on data.Cached and data.Cached manipulation
 func (d *Display) FilterData() {
 	if d.CurrentStr != d.SearchField.Text() {
 		if d.SearchField.Len() > 0 {
-			for i := range data.Data {
-				if strings.HasPrefix(strings.ToLower(data.Data[i].Name.Common), strings.ToLower(d.SearchField.Text())) {
-					data.Data[i].Active = true
+			for i := range data.Cached {
+				if strings.HasPrefix(strings.ToLower(data.Cached[i].Name.Common), strings.ToLower(d.SearchField.Text())) {
+					data.Cached[i].Active = true
 				} else {
-					data.Data[i].Active = false
+					data.Cached[i].Active = false
 				}
 			}
 			d.CurrentStr = d.SearchField.Text()
 		} else if d.SearchField.Len() == 0 {
-			for i := range data.Data {
-				data.Data[i].Active = true
+			for i := range data.Cached {
+				data.Cached[i].Active = true
 			}
 			d.CurrentStr = d.SearchField.Text()
 		}
+	}
+}
+
+func (d *Display) saveDataToExcel() {
+	columns := []string{"A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L"}
+
+	xlsx := excelize.NewFile()
+	xlsx.SetSheetName("Sheet1", "Countries")
+	xlsx.SetActiveSheet(1)
+
+	for i := range columns {
+		excelRow := 1
+		for j := range data.Cached {
+			// write only displayed rows/cards related countries
+			if data.Cached[j].Active {
+				res := ""
+				switch columns[i] {
+				case "A":
+					res = data.Cached[j].Name.Common
+				case "B":
+					res = data.Cached[j].Name.Official
+				case "C":
+					res = data.Cached[j].Cca2
+				case "D":
+					res = data.Cached[j].Cca3
+				case "E":
+					res = data.Cached[j].Ccn3
+				case "F":
+					res = data.Cached[j].Cioc
+				case "G":
+					if data.Cached[j].Independent {
+						res = "Yes"
+					} else {
+						res = "No"
+					}
+				case "H":
+					res = data.Cached[j].Status
+				case "I":
+					if data.Cached[j].UNMember {
+						res = "Yes"
+					} else {
+						res = "No"
+					}
+				case "J":
+					if len(data.Cached[j].Capital) > 0 {
+						res = data.Cached[j].Capital[0]
+					} else {
+						res = "N/A"
+					}
+				case "K":
+					res = fmt.Sprintf("%f", data.Cached[j].Area)
+				case "L":
+					res = string(data.Cached[j].Population)
+				}
+				if err := xlsx.SetCellValue("Countries", columns[i]+strconv.Itoa(excelRow), res); err != nil {
+					log.Fatalln(err)
+				}
+			}
+			excelRow += 1
+		}
+	}
+	if err := xlsx.SaveAs("./apps/geography/output/Countries.xlsx"); err != nil {
+		log.Fatalln("error at excel save: ", err.Error())
 	}
 }

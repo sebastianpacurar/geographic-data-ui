@@ -23,9 +23,9 @@ type (
 func (cd *CountryDetails) Layout(gtx C, th *material.Theme) D {
 	var content D
 
-	for i := range data.Data {
-		if data.Data[i].IsCPViewed {
-			cd.viewed = data.Data[i]
+	for i := range data.Cached {
+		if data.Cached[i].IsCPViewed {
+			cd.viewed = data.Cached[i]
 		}
 	}
 	if cd.viewed.Name.Common != "" {
