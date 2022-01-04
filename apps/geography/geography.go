@@ -79,6 +79,7 @@ func (app *Application) NavItem() component.NavItem {
 }
 
 func (app *Application) LayoutView(gtx C, th *material.Theme) D {
+	var dims D
 	err := app.Display.Api.InitCountries()
 	app.Display.FilterData()
 
@@ -108,164 +109,164 @@ func (app *Application) LayoutView(gtx C, th *material.Theme) D {
 		app.Display.Loaded = true
 	}
 
-	dims := layout.Flex{Axis: layout.Vertical}.Layout(gtx,
-		layout.Rigid(func(gtx C) D {
+	switch app.Display.Grid.Contextual.(type) {
+	case data.Country:
+		if !app.ContextualSet {
+			app.Router.AppBar.SetContextualActions([]component.AppBarAction{}, []component.OverflowAction{})
+			app.Router.AppBar.StartContextual(gtx.Now, "Toggled")
+			app.ContextualSet = true
+		}
+		app.ContextualSet = true
+		dims = layout.Flex{Axis: layout.Vertical}.Layout(gtx,
+			layout.Rigid(material.Body2(th, "test 1").Layout),
+			layout.Rigid(material.Body2(th, "test 2").Layout),
+		)
+	case nil:
+		dims = layout.Flex{Axis: layout.Vertical}.Layout(gtx,
+			layout.Rigid(func(gtx C) D {
 
-			// search field
-			search := layout.Flexed(1, func(gtx C) D {
-				return app.Display.SearchField.Layout(gtx, th, "Search country")
-			})
+				// search field
+				search := layout.Flexed(1, func(gtx C) D {
+					return app.Display.SearchField.Layout(gtx, th, "Search country")
+				})
 
-			// Table button
-			tblBtn := layout.Rigid(func(gtx C) D {
-				if app.Display.TableBtn.Clicked() {
-					app.Display.Selected = app.Display.Table
-					app.Display.Slider.PushRight()
-				}
-				switch app.Display.Selected.(type) {
-				case table.Table:
-					gtx = gtx.Disabled()
-				}
-				return layout.Inset{
-					Top:    unit.Dp(10),
-					Right:  unit.Dp(8),
-					Bottom: unit.Dp(8),
-					Left:   unit.Dp(8),
-				}.Layout(gtx, material.Button(th, &app.Display.TableBtn, "Table").Layout)
-			})
+				// Table button
+				tblBtn := layout.Rigid(func(gtx C) D {
+					if app.Display.TableBtn.Clicked() {
+						app.Display.Selected = app.Display.Table
+						app.Display.Slider.PushRight()
+					}
+					switch app.Display.Selected.(type) {
+					case table.Table:
+						gtx = gtx.Disabled()
+					}
+					return layout.Inset{
+						Top:    unit.Dp(10),
+						Right:  unit.Dp(8),
+						Bottom: unit.Dp(8),
+						Left:   unit.Dp(8),
+					}.Layout(gtx, material.Button(th, &app.Display.TableBtn, "Table").Layout)
+				})
 
-			// grid button
-			grdBtn := layout.Rigid(func(gtx C) D {
-				if app.Display.GridBtn.Clicked() {
-					app.Display.Selected = app.Display.Grid
-					app.Display.Slider.PushLeft()
-				}
-				switch app.Display.Selected.(type) {
-				case grid.Grid:
-					gtx = gtx.Disabled()
-				}
-				return layout.Inset{
-					Top:    unit.Dp(10),
-					Right:  unit.Dp(8),
-					Bottom: unit.Dp(8),
-					Left:   unit.Dp(8),
-				}.Layout(gtx, material.Button(th, &app.Display.GridBtn, "Grid").Layout)
-			})
+				// grid button
+				grdBtn := layout.Rigid(func(gtx C) D {
+					if app.Display.GridBtn.Clicked() {
+						app.Display.Selected = app.Display.Grid
+						app.Display.Slider.PushLeft()
+					}
+					switch app.Display.Selected.(type) {
+					case grid.Grid:
+						gtx = gtx.Disabled()
+					}
+					return layout.Inset{
+						Top:    unit.Dp(10),
+						Right:  unit.Dp(8),
+						Bottom: unit.Dp(8),
+						Left:   unit.Dp(8),
+					}.Layout(gtx, material.Button(th, &app.Display.GridBtn, "Grid").Layout)
+				})
 
-			//Export to excel button
-			exportBtn := layout.Rigid(func(gtx C) D {
-				if app.Display.SaveAsXlsx.Clicked() {
-					columns := []string{"A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L"}
+				//Export to excel button
+				exportBtn := layout.Rigid(func(gtx C) D {
+					if app.Display.SaveAsXlsx.Clicked() {
+						columns := []string{"A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L"}
 
-					xlsx := excelize.NewFile()
-					xlsx.SetSheetName("Sheet1", "Countries")
-					xlsx.SetActiveSheet(1)
+						xlsx := excelize.NewFile()
+						xlsx.SetSheetName("Sheet1", "Countries")
+						xlsx.SetActiveSheet(1)
 
-					for i := range columns {
-						excelRow := 1
-						for j := range data.Data {
-							// write only displayed rows/cards related countries
-							if data.Data[j].Active {
-								res := ""
-								switch columns[i] {
-								case "A":
-									res = data.Data[j].Name.Common
-								case "B":
-									res = data.Data[j].Name.Official
-								case "C":
-									res = data.Data[j].Cca2
-								case "D":
-									res = data.Data[j].Cca3
-								case "E":
-									res = data.Data[j].Ccn3
-								case "F":
-									res = data.Data[j].Cioc
-								case "G":
-									if data.Data[j].Independent {
-										res = "Yes"
-									} else {
-										res = "No"
+						for i := range columns {
+							excelRow := 1
+							for j := range data.Data {
+								// write only displayed rows/cards related countries
+								if data.Data[j].Active {
+									res := ""
+									switch columns[i] {
+									case "A":
+										res = data.Data[j].Name.Common
+									case "B":
+										res = data.Data[j].Name.Official
+									case "C":
+										res = data.Data[j].Cca2
+									case "D":
+										res = data.Data[j].Cca3
+									case "E":
+										res = data.Data[j].Ccn3
+									case "F":
+										res = data.Data[j].Cioc
+									case "G":
+										if data.Data[j].Independent {
+											res = "Yes"
+										} else {
+											res = "No"
+										}
+									case "H":
+										res = data.Data[j].Status
+									case "I":
+										if data.Data[j].UNMember {
+											res = "Yes"
+										} else {
+											res = "No"
+										}
+									case "J":
+										if len(data.Data[j].Capital) > 0 {
+											res = data.Data[j].Capital[0]
+										} else {
+											res = "N/A"
+										}
+									case "K":
+										res = fmt.Sprintf("%f", data.Data[j].Area)
+									case "L":
+										res = string(data.Data[j].Population)
 									}
-								case "H":
-									res = data.Data[j].Status
-								case "I":
-									if data.Data[j].UNMember {
-										res = "Yes"
-									} else {
-										res = "No"
+									if err := xlsx.SetCellValue("Countries", columns[i]+strconv.Itoa(excelRow), res); err != nil {
+										log.Fatalln(err)
 									}
-								case "J":
-									if len(data.Data[j].Capital) > 0 {
-										res = data.Data[j].Capital[0]
-									} else {
-										res = "N/A"
-									}
-								case "K":
-									res = fmt.Sprintf("%f", data.Data[j].Area)
-								case "L":
-									res = string(data.Data[j].Population)
 								}
-								if err := xlsx.SetCellValue("Countries", columns[i]+strconv.Itoa(excelRow), res); err != nil {
-									log.Fatalln(err)
-								}
+								excelRow += 1
 							}
-							excelRow += 1
+						}
+						if err := xlsx.SaveAs("./apps/geography/output/Countries.xlsx"); err != nil {
+							log.Fatalln("error at excel save: ", err.Error())
 						}
 					}
-					if err := xlsx.SaveAs("./apps/geography/output/Countries.xlsx"); err != nil {
-						log.Fatalln("error at excel save: ", err.Error())
-					}
-				}
-				return layout.Inset{
-					Top:    unit.Dp(10),
-					Right:  unit.Dp(10),
-					Bottom: unit.Dp(8),
-					Left:   unit.Dp(8),
-				}.Layout(gtx, func(gtx C) D {
-					var btn material.IconButtonStyle
-					btn = material.IconButton(th, &app.Display.SaveAsXlsx, g.ExcelExportIcon, "Export to Excel")
-					btn.Size = unit.Dp(20)
-					btn.Inset = layout.UniformInset(unit.Dp(8))
-					return btn.Layout(gtx)
+					return layout.Inset{
+						Top:    unit.Dp(10),
+						Right:  unit.Dp(10),
+						Bottom: unit.Dp(8),
+						Left:   unit.Dp(8),
+					}.Layout(gtx, func(gtx C) D {
+						var btn material.IconButtonStyle
+						btn = material.IconButton(th, &app.Display.SaveAsXlsx, g.ExcelExportIcon, "Export to Excel")
+						btn.Size = unit.Dp(20)
+						btn.Inset = layout.UniformInset(unit.Dp(8))
+						return btn.Layout(gtx)
+					})
 				})
-			})
 
-			return layout.Flex{}.Layout(gtx,
-				search,
-				layout.Rigid(func(gtx C) D {
-					return layout.Flex{Alignment: layout.End}.Layout(gtx,
-						tblBtn,
-						grdBtn,
-						exportBtn,
-					)
-				}))
-		}),
+				return layout.Flex{}.Layout(gtx,
+					search,
+					layout.Rigid(func(gtx C) D {
+						return layout.Flex{Alignment: layout.End}.Layout(gtx,
+							tblBtn,
+							grdBtn,
+							exportBtn,
+						)
+					}))
+			}),
 
-		// Selected display
-		layout.Rigid(func(gtx C) D {
-			return app.Display.Slider.Layout(gtx, func(gtx C) D {
-				switch app.Display.Selected.(type) {
-				case grid.Grid:
-					return app.Display.Grid.Layout(gtx, th)
-				case table.Table:
-					return app.Display.Table.Layout(gtx, th)
-				}
-				return D{}
-			})
-		}))
-
-	//TODO: fix this
-	if !app.ContextualSet {
-		switch app.Display.Grid.Contextual.(type) {
-		case data.Country:
-			app.Router.AppBar.SetContextualActions([]component.AppBarAction{}, []component.OverflowAction{})
-			app.Router.AppBar.ToggleContextual(gtx.Now, "Toggled")
-			app.ContextualSet = true
-			dims = layout.Flex{Axis: layout.Vertical}.Layout(gtx,
-				layout.Rigid(material.Body2(th, "test 1").Layout),
-				layout.Rigid(material.Body2(th, "test 2").Layout),
-			)
-		}
+			// Selected display
+			layout.Rigid(func(gtx C) D {
+				return app.Display.Slider.Layout(gtx, func(gtx C) D {
+					switch app.Display.Selected.(type) {
+					case grid.Grid:
+						return app.Display.Grid.Layout(gtx, th)
+					case table.Table:
+						return app.Display.Table.Layout(gtx, th)
+					}
+					return D{}
+				})
+			}))
 	}
 	return dims
 }
