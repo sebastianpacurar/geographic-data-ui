@@ -62,7 +62,8 @@ func (gr *Grid) Layout(gtx C, th *material.Theme) D {
 			}
 
 			if gr.cards[i].Click.Clicked() {
-				gr.Contextual = data.Cached[i]
+				gr.Contextual = data.Cached[i] // interface to assert type when enabling ContextualAppBar
+				data.Cached[i].IsCtxtActive = true
 			}
 
 			if gr.cards[i].selectBtn.Clicked() {

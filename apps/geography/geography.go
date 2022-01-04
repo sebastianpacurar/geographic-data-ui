@@ -26,6 +26,7 @@ type (
 		th *material.Theme
 		ControlPanel
 		Display
+		pinBtn widget.Clickable
 		*apps.Router
 	}
 
@@ -55,6 +56,9 @@ type (
 
 		// lock the context on the country
 		ContextualSet bool
+
+		// Contextual Viewed Country
+		ContextualCountry data.Country
 	}
 )
 
@@ -85,9 +89,14 @@ func (app *Application) LayoutView(gtx C, th *material.Theme) D {
 	for _, e := range app.AppBar.Events(gtx) {
 		switch e.(type) {
 		case component.AppBarContextMenuDismissed:
-			app.Router.AppBar.StopContextual(gtx.Now)
 			app.Display.ContextualSet = false
 			app.Display.Grid.Contextual = nil
+			for i := range data.Cached {
+				if data.Cached[i].IsCtxtActive {
+					data.Cached[i].IsCtxtActive = false
+				}
+			}
+
 		case component.AppBarNavigationClicked:
 			app.ModalNavDrawer.Appear(gtx.Now)
 			app.NavAnim.Disappear(gtx.Now)
@@ -117,13 +126,31 @@ func (app *Application) LayoutView(gtx C, th *material.Theme) D {
 	switch app.Display.Grid.Contextual.(type) {
 	case data.Country:
 		if !app.ContextualSet {
-			app.Router.AppBar.SetContextualActions([]component.AppBarAction{}, []component.OverflowAction{})
-			app.Router.AppBar.StartContextual(gtx.Now, "Toggled")
+			app.Router.AppBar.SetContextualActions(
+				[]component.AppBarAction{
+					component.SimpleIconAction(&app.pinBtn, g.PinIcon,
+						component.OverflowAction{
+							Name: "Pin Country",
+							Tag:  &app.pinBtn,
+						},
+					),
+				},
+				[]component.OverflowAction{},
+			)
+			app.Router.AppBar.ToggleContextual(gtx.Now, "Toggled")
+
+			for i := range data.Cached {
+				if data.Cached[i].IsCtxtActive {
+					app.Display.ContextualCountry = data.Cached[i]
+				}
+			}
+
 			app.ContextualSet = true
 		}
+
 		dims = layout.Flex{Axis: layout.Vertical}.Layout(gtx,
-			layout.Rigid(material.Body2(th, "test 1").Layout),
-			layout.Rigid(material.Body2(th, "test 2").Layout),
+			layout.Rigid(material.Body2(th, app.Display.ContextualCountry.Name.Common).Layout),
+			layout.Rigid(material.Body2(th, app.Display.ContextualCountry.Name.Official).Layout),
 		)
 	case nil:
 		dims = layout.Flex{Axis: layout.Vertical}.Layout(gtx,

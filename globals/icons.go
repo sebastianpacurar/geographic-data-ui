@@ -40,7 +40,7 @@ var ExcelExportIcon = func() *widget.Icon {
 	return icon
 }()
 
-var CloseIcon = func() *widget.Icon {
-	icon, _ := widget.NewIcon(icons.NavigationClose)
+var PinIcon = func() *widget.Icon {
+	icon, _ := widget.NewIcon(icons.MapsPinDrop)
 	return icon
 }()
