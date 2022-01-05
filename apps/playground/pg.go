@@ -20,12 +20,12 @@ type (
 	D = layout.Dimensions
 
 	Application struct {
-		//dockBtn widget.Clickable
-		//btn     material.IconButtonStyle
-		//icon    *widget.Icon
 		th *material.Theme
 		ControlPanel
 		*apps.Router
+
+		DisableCPBtn widget.Clickable
+		isCPDisabled bool
 
 		Tabs
 	}
@@ -50,33 +50,7 @@ func New(router *apps.Router) *Application {
 }
 
 func (app *Application) Actions() []component.AppBarAction {
-	return []component.AppBarAction{
-		// TODO: think what to do with this only on PG
-		//{
-		//	OverflowAction: component.OverflowAction{
-		//		Tag: &app.dockBtn,
-		//	},
-		//	Layout: func(gtx C, bg, fg color.NRGBA) D {
-		//		for range app.dockBtn.Clicks() {
-		//			app.NonModalDrawer = !app.NonModalDrawer
-		//		}
-		//		if app.NonModalDrawer {
-		//			app.icon = g.LockCLosedIcon
-		//			app.btn = component.SimpleIconButton(bg, fg, &app.dockBtn, app.icon)
-		//			app.btn.Background = bg
-		//			app.btn.Color = g.Colours[colours.DARK_RED]
-		//			app.btn.Size = unit.Dp(24)
-		//		} else {
-		//			app.icon = g.LockOpenedIcon
-		//			app.btn = component.SimpleIconButton(bg, fg, &app.dockBtn, app.icon)
-		//			app.btn.Background = bg
-		//			app.btn.Color = g.Colours[colours.SEA_GREEN]
-		//			app.btn.Size = unit.Dp(24)
-		//		}
-		//		return app.btn.Layout(gtx)
-		//	},
-		//},
-	}
+	return []component.AppBarAction{}
 }
 
 func (app *Application) Overflow() []component.OverflowAction {
@@ -91,56 +65,77 @@ func (app *Application) NavItem() component.NavItem {
 	}
 }
 
+func (app *Application) IsCPDisabled() bool {
+	return app.isCPDisabled
+}
+
 func (app *Application) LayoutView(gtx C, th *material.Theme) D {
 	app.initApps()
+
 	return layout.Flex{Axis: layout.Vertical}.Layout(gtx,
 		layout.Rigid(func(gtx C) D {
-			return material.List(th, &app.Tabs.list).Layout(gtx, len(app.TabsList), func(gtx C, i int) D {
-				var (
-					dims D
-					btn  material.ButtonStyle
-				)
-				btn = material.Button(th, &app.TabsList[i].Btn, app.TabsList[i].Name)
-				btn.CornerRadius = unit.Dp(1)
-				btn.Inset = layout.UniformInset(unit.Dp(10))
-				btn.Background = g.Colours[colours.WHITE]
-				btn.Color = g.Colours[colours.BLACK]
-				dims = btn.Layout(gtx)
+			return layout.Flex{Spacing: layout.SpaceBetween}.Layout(gtx,
+				layout.Rigid(func(gtx C) D {
+					return material.List(th, &app.Tabs.list).Layout(gtx, len(app.TabsList), func(gtx C, i int) D {
+						var (
+							dims D
+							btn  material.ButtonStyle
+						)
+						btn = material.Button(th, &app.TabsList[i].Btn, app.TabsList[i].Name)
+						btn.CornerRadius = unit.Dp(1)
+						btn.Inset = layout.UniformInset(unit.Dp(10))
+						btn.Background = g.Colours[colours.WHITE]
+						btn.Color = g.Colours[colours.BLACK]
+						dims = btn.Layout(gtx)
 
-				if app.TabsList[i].Btn.Clicked() {
-					name := app.TabsList[i].Name
-					app.TabsList[i].IsSelected = true
-					for i := range app.TabsList {
-						if name != app.TabsList[i].Name {
-							app.TabsList[i].IsSelected = false
+						if app.TabsList[i].Btn.Clicked() {
+							name := app.TabsList[i].Name
+							app.TabsList[i].IsSelected = true
+							for i := range app.TabsList {
+								if name != app.TabsList[i].Name {
+									app.TabsList[i].IsSelected = false
+								}
+							}
+							op.InvalidateOp{}.Add(gtx.Ops)
 						}
-					}
-					op.InvalidateOp{}.Add(gtx.Ops)
-				}
 
-				if app.TabsList[i].IsSelected {
-					dims = widget.Border{
-						Width:        unit.Px(1),
-						CornerRadius: unit.Dp(1),
-					}.Layout(gtx, func(gtx C) D {
-						size := image.Pt(dims.Size.X, dims.Size.Y)
-						return layout.Stack{}.Layout(gtx,
-							layout.Expanded(func(gtx C) D {
-								return g.ColoredArea(gtx, size, g.Colours[colours.AERO_BLUE])
-							}),
-							layout.Stacked(func(gtx C) D {
-								return layout.UniformInset(unit.Dp(10)).Layout(gtx, func(gtx C) D {
-									var lbl material.LabelStyle
-									lbl = material.Body1(th, app.TabsList[i].Name)
-									lbl.TextSize = btn.TextSize
-									return lbl.Layout(gtx)
-								})
-							}))
+						if app.TabsList[i].IsSelected {
+							dims = widget.Border{
+								Width:        unit.Px(1),
+								CornerRadius: btn.CornerRadius,
+							}.Layout(gtx, func(gtx C) D {
+								size := image.Pt(dims.Size.X, dims.Size.Y)
+								gtx.Constraints = layout.Exact(gtx.Constraints.Constrain(size))
 
+								return layout.Stack{Alignment: layout.S}.Layout(gtx,
+									layout.Expanded(func(gtx C) D {
+										return g.ColoredArea(gtx, size, g.Colours[colours.AERO_BLUE])
+									}),
+									layout.Stacked(func(gtx C) D {
+										return layout.Flex{Axis: layout.Vertical}.Layout(gtx,
+											layout.Flexed(1, func(gtx C) D {
+												var lbl material.LabelStyle
+												lbl = material.Body1(th, app.TabsList[i].Name)
+												lbl.TextSize = btn.TextSize
+
+												return layout.Flex{}.Layout(gtx,
+													layout.Flexed(1, func(gtx C) D {
+														return layout.Center.Layout(gtx, lbl.Layout)
+													}))
+											}),
+											layout.Rigid(func(gtx C) D {
+												return layout.Stack{}.Layout(gtx,
+													layout.Expanded(func(gtx C) D {
+														return g.ColoredArea(gtx, image.Pt(gtx.Constraints.Max.X, 3), g.Colours[colours.SEA_GREEN])
+													}))
+											}))
+									}))
+							})
+						}
+						return dims
 					})
-				}
-				return dims
-			})
+				}),
+				app.layDisableButton(th))
 		}),
 		layout.Flexed(1, func(gtx C) D {
 			var dims D
@@ -151,6 +146,26 @@ func (app *Application) LayoutView(gtx C, th *material.Theme) D {
 			}
 			return dims
 		}))
+}
+
+func (app *Application) layDisableButton(th *material.Theme) layout.FlexChild {
+	return layout.Rigid(func(gtx C) D {
+		if app.DisableCPBtn.Clicked() {
+			app.isCPDisabled = !app.isCPDisabled
+		}
+
+		var btn material.ButtonStyle
+		if !app.isCPDisabled {
+			btn = material.Button(th, &app.DisableCPBtn, "Disable CP")
+			btn.Background = g.Colours[colours.FLAME_RED]
+			btn.Color = g.Colours[colours.WHITE]
+		} else {
+			btn = material.Button(th, &app.DisableCPBtn, "Enable CP")
+			btn.Background = g.Colours[colours.SEA_GREEN]
+			btn.Color = g.Colours[colours.WHITE]
+		}
+		return btn.Layout(gtx)
+	})
 }
 
 func (app *Application) LayoutController(gtx C, th *material.Theme) D {
@@ -205,7 +220,14 @@ func (app *Application) initApps() {
 				Name:       "Draw",
 				IsSelected: false,
 				Layout: func(gtx C, th *material.Theme) D {
-					return D{}
+					return layout.Stack{}.Layout(gtx,
+						layout.Expanded(func(gtx C) D {
+							size := image.Pt(gtx.Constraints.Max.X, gtx.Constraints.Max.Y)
+							return g.RColoredArea(gtx, size, 10, g.Colours[colours.WHITE])
+						}),
+						layout.Stacked(func(gtx C) D {
+							return D{}
+						}))
 				},
 			},
 		}

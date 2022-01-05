@@ -25,6 +25,7 @@ type (
 		Actions() []component.AppBarAction
 		Overflow() []component.OverflowAction
 		NavItem() component.NavItem
+		IsCPDisabled() bool
 	}
 
 	Router struct {
@@ -91,10 +92,6 @@ func (r *Router) Layout(gtx C, th *material.Theme) D {
 	for _, e := range r.AppBar.Events(gtx) {
 		switch e.(type) {
 		case component.AppBarNavigationClicked:
-			// TODO: not needed for now
-			//if r.NonModalDrawer {
-			//	r.NavAnim.ToggleVisibility(gtx.Now)
-			//} else {
 			r.ModalNavDrawer.Appear(gtx.Now)
 			r.NavAnim.Disappear(gtx.Now)
 		}
@@ -112,9 +109,9 @@ func (r *Router) Layout(gtx C, th *material.Theme) D {
 				return r.NavDrawer.Layout(gtx, th, &r.NavAnim)
 			}),
 			layout.Flexed(1, func(gtx C) D {
+				var dims D
 
-				// lay out the view and controller with a resizer in between (65% of the screen belongs to the view)
-				return r.Resize.Layout(gtx,
+				dims = r.Resize.Layout(gtx,
 					func(gtx C) D {
 						return layout.Stack{}.Layout(gtx,
 							layout.Expanded(func(gtx C) D {
@@ -140,7 +137,6 @@ func (r *Router) Layout(gtx C, th *material.Theme) D {
 									}))
 							}))
 					},
-
 					func(gtx C) D {
 						return layout.Stack{Alignment: layout.NW}.Layout(gtx,
 							layout.Expanded(func(gtx C) D {
@@ -167,7 +163,6 @@ func (r *Router) Layout(gtx C, th *material.Theme) D {
 								})
 							}))
 					},
-
 					func(gtx C) D {
 						rect := image.Rectangle{
 							Max: image.Point{
@@ -178,6 +173,33 @@ func (r *Router) Layout(gtx C, th *material.Theme) D {
 						paint.FillShape(gtx.Ops, color.NRGBA{A: 200}, clip.Rect(rect).Op())
 						return D{Size: rect.Max}
 					})
+
+				if r.current == "pg" && r.pages[r.current].IsCPDisabled() {
+					dims = layout.Stack{}.Layout(gtx,
+						layout.Expanded(func(gtx C) D {
+							container := g.ColoredArea(
+								gtx,
+								gtx.Constraints.Max,
+								g.Colours[colours.ANTIQUE_WHITE],
+							)
+							return container
+						}),
+						layout.Stacked(func(gtx C) D {
+							containerSize := image.Pt(gtx.Constraints.Max.X, gtx.Constraints.Max.Y)
+							gtx.Constraints = layout.Exact(gtx.Constraints.Constrain(containerSize))
+							return layout.Flex{Axis: layout.Vertical}.Layout(gtx,
+								layout.Rigid(func(gtx C) D {
+									return layout.Inset{
+										Right:  unit.Dp(10),
+										Bottom: unit.Dp(5),
+										Left:   unit.Dp(10),
+									}.Layout(gtx, func(gtx C) D {
+										return r.pages[r.current].LayoutView(gtx, th)
+									})
+								}))
+						}))
+				}
+				return dims
 			}))
 	})
 

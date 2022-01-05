@@ -25,16 +25,6 @@ var MenuIcon = func() *widget.Icon {
 	return icon
 }()
 
-//var LockCLosedIcon = func() *widget.Icon {
-//	icon, _ := widget.NewIcon(icons.ActionLock)
-//	return icon
-//}()
-//
-//var LockOpenedIcon = func() *widget.Icon {
-//	icon, _ := widget.NewIcon(icons.ActionLockOpen)
-//	return icon
-//}()
-
 var ExcelExportIcon = func() *widget.Icon {
 	icon, _ := widget.NewIcon(icons.FileFileDownload)
 	return icon

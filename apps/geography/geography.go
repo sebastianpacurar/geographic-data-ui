@@ -29,6 +29,8 @@ type (
 		Display
 		pinBtn widget.Clickable
 		*apps.Router
+
+		isCPDisabled bool
 	}
 
 	Display struct {
@@ -42,24 +44,19 @@ type (
 		SaveAsXlsx widget.Clickable
 
 		// grid and Table displays
-		Grid  grid.Grid
-		Table table.Table
-
-		// grid or Table Selected display
+		Grid     grid.Grid
+		Table    table.Table
 		Selected interface{}
 		Loaded   bool
 
 		// api data
 		Api data.Countries
 
-		// slider
-		Slider Slider
-
-		// lock the context on the country
-		ContextualSet bool
-
 		// Contextual Viewed Country
+		ContextualSet     bool
 		ContextualCountry data.Country
+
+		Slider Slider
 	}
 )
 
@@ -81,6 +78,10 @@ func (app *Application) NavItem() component.NavItem {
 	return component.NavItem{
 		Name: "Geography - countries, states, statistics",
 	}
+}
+
+func (app *Application) IsCPDisabled() bool {
+	return app.isCPDisabled
 }
 
 func (app *Application) LayoutView(gtx C, th *material.Theme) D {

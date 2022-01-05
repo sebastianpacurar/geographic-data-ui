@@ -22,6 +22,8 @@ type (
 		TextArea
 		ControlPanel
 		*apps.Router
+
+		isCPDisabled bool
 	}
 
 	TextArea struct {
@@ -35,6 +37,8 @@ type (
 		// menu options
 		PasteBtn widget.Clickable
 	}
+
+	isCPDisabled bool
 )
 
 func New(router *apps.Router) *Application {
@@ -55,6 +59,10 @@ func (app *Application) NavItem() component.NavItem {
 	return component.NavItem{
 		Name: "Editor - multifunctional text editor",
 	}
+}
+
+func (app *Application) IsCPDisabled() bool {
+	return app.isCPDisabled
 }
 
 func (app *Application) LayoutView(gtx C, th *material.Theme) D {
