@@ -8,6 +8,7 @@ import (
 	"gioui-experiment/apps/geography/table"
 	g "gioui-experiment/globals"
 	"gioui.org/layout"
+	"gioui.org/op"
 	"gioui.org/unit"
 	"gioui.org/widget"
 	"gioui.org/widget/material"
@@ -96,6 +97,7 @@ func (app *Application) LayoutView(gtx C, th *material.Theme) D {
 					data.Cached[i].IsCtxtActive = false
 				}
 			}
+			op.InvalidateOp{}.Add(gtx.Ops)
 
 		case component.AppBarNavigationClicked:
 			app.ModalNavDrawer.Appear(gtx.Now)
@@ -137,20 +139,22 @@ func (app *Application) LayoutView(gtx C, th *material.Theme) D {
 				},
 				[]component.OverflowAction{},
 			)
-			app.Router.AppBar.ToggleContextual(gtx.Now, "Toggled")
 
 			for i := range data.Cached {
 				if data.Cached[i].IsCtxtActive {
 					app.Display.ContextualCountry = data.Cached[i]
 				}
 			}
-
+			app.Router.AppBar.ToggleContextual(gtx.Now, app.Display.ContextualCountry.Name.Common)
 			app.ContextualSet = true
+			op.InvalidateOp{}.Add(gtx.Ops)
 		}
 
 		dims = layout.Flex{Axis: layout.Vertical}.Layout(gtx,
-			layout.Rigid(material.Body2(th, app.Display.ContextualCountry.Name.Common).Layout),
-			layout.Rigid(material.Body2(th, app.Display.ContextualCountry.Name.Official).Layout),
+			layout.Rigid(material.Body2(th, app.Display.ContextualCountry.Cca2).Layout),
+			layout.Rigid(material.Body2(th, app.Display.ContextualCountry.Cca3).Layout),
+			layout.Rigid(material.Body2(th, app.Display.ContextualCountry.Ccn3).Layout),
+			layout.Rigid(material.Body2(th, fmt.Sprintf("%f", app.Display.ContextualCountry.Area)).Layout),
 		)
 	case nil:
 		dims = layout.Flex{Axis: layout.Vertical}.Layout(gtx,
