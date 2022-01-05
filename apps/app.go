@@ -2,7 +2,7 @@ package apps
 
 import (
 	g "gioui-experiment/globals"
-	"gioui-experiment/themes/colors"
+	"gioui-experiment/themes/colours"
 	"gioui.org/layout"
 	"gioui.org/op/clip"
 	"gioui.org/op/paint"
@@ -121,7 +121,7 @@ func (r *Router) Layout(gtx C, th *material.Theme) D {
 								container := g.ColoredArea(
 									gtx,
 									gtx.Constraints.Max,
-									g.Colours[colors.ANTIQUE_WHITE],
+									g.Colours[colours.ANTIQUE_WHITE],
 								)
 								return container
 							}),
@@ -147,14 +147,14 @@ func (r *Router) Layout(gtx C, th *material.Theme) D {
 								return g.ColoredArea(
 									gtx,
 									gtx.Constraints.Max,
-									g.Colours[colors.AERO_BLUE],
+									g.Colours[colours.AERO_BLUE],
 								)
 							}),
 							layout.Stacked(func(gtx C) D {
 								containerSize := image.Pt(gtx.Constraints.Max.X, gtx.Constraints.Max.Y)
 								gtx.Constraints = layout.Exact(gtx.Constraints.Constrain(containerSize))
 								border := widget.Border{
-									Color: g.Colours[colors.SEA_GREEN],
+									Color: g.Colours[colours.SEA_GREEN],
 									Width: unit.Px(1),
 								}
 								return border.Layout(gtx, func(gtx C) D {

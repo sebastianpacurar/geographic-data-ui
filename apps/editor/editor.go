@@ -3,7 +3,7 @@ package editor
 import (
 	"gioui-experiment/apps"
 	g "gioui-experiment/globals"
-	"gioui-experiment/themes/colors"
+	"gioui-experiment/themes/colours"
 	"gioui.org/layout"
 	"gioui.org/text"
 	"gioui.org/unit"
@@ -79,7 +79,7 @@ func (app *Application) LayoutView(gtx C, th *material.Theme) D {
 	}
 
 	border := widget.Border{
-		Color:        g.Colours[colors.GREY],
+		Color:        g.Colours[colours.GREY],
 		CornerRadius: unit.Dp(5),
 		Width:        unit.Px(2),
 	}
@@ -97,7 +97,7 @@ func (app *Application) LayoutView(gtx C, th *material.Theme) D {
 					return material.List(th, &app.TextArea.List).Layout(gtx, 1, func(gtx C, _ int) D {
 						return layout.UniformInset(unit.Dp(8)).Layout(gtx, func(gtx C) D {
 							ed := material.Editor(th, &app.TextArea.Field, "Type your Thoughts...")
-							ed.SelectionColor = g.Colours[colors.TEXT_SELECTION]
+							ed.SelectionColor = g.Colours[colours.TEXT_SELECTION]
 
 							if app.TextArea.PasteBtn.Clicked() {
 								ed.Editor.SetText(g.ClipBoardVal)

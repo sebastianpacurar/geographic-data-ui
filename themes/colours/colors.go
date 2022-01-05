@@ -1,10 +1,8 @@
-package colors
+package colours
 
 const (
-	DARK_RED      = "dark-red"
 	FLAME_RED     = "flame-red"
 	SEA_GREEN     = "sea-green"
-	DEEP_SKY_BLUE = "deep-sky-blue"
 	GREY          = "grey"
 	WHITE         = "white"
 	BLACK         = "black"

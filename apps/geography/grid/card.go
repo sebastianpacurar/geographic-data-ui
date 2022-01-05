@@ -2,7 +2,7 @@ package grid
 
 import (
 	g "gioui-experiment/globals"
-	"gioui-experiment/themes/colors"
+	"gioui-experiment/themes/colours"
 	"gioui.org/layout"
 	"gioui.org/unit"
 	"gioui.org/widget"
@@ -61,22 +61,22 @@ func (c *Card) LayCard(gtx C, th *material.Theme) D {
 	return layout.Stack{}.Layout(gtx,
 		layout.Stacked(func(gtx C) D {
 			return widget.Border{
-				Color:        g.Colours[colors.GREY],
+				Color:        g.Colours[colours.GREY],
 				CornerRadius: unit.Dp(2),
 				Width:        unit.Px(2),
 			}.Layout(gtx, func(gtx C) D {
 
 				area := material.Clickable(gtx, &c.Click, func(gtx C) D {
-					cardColor := g.Colours[colors.WHITE]
+					cardColor := g.Colours[colours.WHITE]
 
 					if c.Selected {
-						cardColor = g.Colours[colors.AERO_BLUE]
+						cardColor = g.Colours[colours.AERO_BLUE]
 					}
 
 					if c.Click.Hovered() && !c.Selected {
-						cardColor = g.Colours[colors.NYANZA]
+						cardColor = g.Colours[colours.NYANZA]
 					} else if c.Click.Hovered() && c.Selected {
-						cardColor = g.Colours[colors.LIGHT_SALMON]
+						cardColor = g.Colours[colours.LIGHT_SALMON]
 					}
 					return g.RColoredArea(gtx, size, 10, cardColor)
 				})

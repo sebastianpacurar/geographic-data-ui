@@ -3,7 +3,7 @@ package table
 import (
 	"fmt"
 	g "gioui-experiment/globals"
-	"gioui-experiment/themes/colors"
+	"gioui-experiment/themes/colours"
 	"gioui.org/layout"
 	"gioui.org/unit"
 	"gioui.org/widget"
@@ -31,23 +31,23 @@ type Row struct {
 
 func (r *Row) LayRow(gtx C, th *material.Theme) D {
 	border := widget.Border{
-		Color: g.Colours[colors.GREY],
+		Color: g.Colours[colours.GREY],
 		Width: unit.Px(1),
 	}
 
 	return material.Clickable(gtx, &r.Click, func(gtx C) D {
 
-		rowColor := g.Colours[colors.ANTIQUE_WHITE]
+		rowColor := g.Colours[colours.ANTIQUE_WHITE]
 
 		if r.Selected {
-			rowColor = g.Colours[colors.AERO_BLUE]
+			rowColor = g.Colours[colours.AERO_BLUE]
 		}
 
 		if r.Click.Hovered() {
 			if r.Selected {
-				rowColor = g.Colours[colors.LIGHT_SALMON]
+				rowColor = g.Colours[colours.LIGHT_SALMON]
 			} else {
-				rowColor = g.Colours[colors.NYANZA]
+				rowColor = g.Colours[colours.NYANZA]
 			}
 		}
 

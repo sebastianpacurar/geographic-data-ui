@@ -4,7 +4,7 @@ import (
 	"gioui-experiment/apps"
 	"gioui-experiment/apps/playground/data"
 	g "gioui-experiment/globals"
-	"gioui-experiment/themes/colors"
+	"gioui-experiment/themes/colours"
 	"gioui.org/layout"
 	"gioui.org/op"
 	"gioui.org/unit"
@@ -64,13 +64,13 @@ func (app *Application) Actions() []component.AppBarAction {
 		//			app.icon = g.LockCLosedIcon
 		//			app.btn = component.SimpleIconButton(bg, fg, &app.dockBtn, app.icon)
 		//			app.btn.Background = bg
-		//			app.btn.Color = g.Colours[colors.DARK_RED]
+		//			app.btn.Color = g.Colours[colours.DARK_RED]
 		//			app.btn.Size = unit.Dp(24)
 		//		} else {
 		//			app.icon = g.LockOpenedIcon
 		//			app.btn = component.SimpleIconButton(bg, fg, &app.dockBtn, app.icon)
 		//			app.btn.Background = bg
-		//			app.btn.Color = g.Colours[colors.SEA_GREEN]
+		//			app.btn.Color = g.Colours[colours.SEA_GREEN]
 		//			app.btn.Size = unit.Dp(24)
 		//		}
 		//		return app.btn.Layout(gtx)
@@ -103,8 +103,8 @@ func (app *Application) LayoutView(gtx C, th *material.Theme) D {
 				btn = material.Button(th, &app.TabsList[i].Btn, app.TabsList[i].Name)
 				btn.CornerRadius = unit.Dp(1)
 				btn.Inset = layout.UniformInset(unit.Dp(10))
-				btn.Background = g.Colours[colors.WHITE]
-				btn.Color = g.Colours[colors.BLACK]
+				btn.Background = g.Colours[colours.WHITE]
+				btn.Color = g.Colours[colours.BLACK]
 				dims = btn.Layout(gtx)
 
 				if app.TabsList[i].Btn.Clicked() {
@@ -126,7 +126,7 @@ func (app *Application) LayoutView(gtx C, th *material.Theme) D {
 						size := image.Pt(dims.Size.X, dims.Size.Y)
 						return layout.Stack{}.Layout(gtx,
 							layout.Expanded(func(gtx C) D {
-								return g.ColoredArea(gtx, size, g.Colours[colors.AERO_BLUE])
+								return g.ColoredArea(gtx, size, g.Colours[colours.AERO_BLUE])
 							}),
 							layout.Stacked(func(gtx C) D {
 								return layout.UniformInset(unit.Dp(10)).Layout(gtx, func(gtx C) D {
