@@ -1,7 +1,7 @@
 package playground
 
 import (
-	controllers2 "gioui-experiment/apps/playground/controllers"
+	"gioui-experiment/apps/playground/controllers/counter"
 	"gioui.org/layout"
 	"gioui.org/unit"
 	"gioui.org/widget"
@@ -14,11 +14,11 @@ type (
 		controllers []Controller
 		list        widget.List
 
-		vh       controllers2.ValueHandler
-		inc      controllers2.Incrementor
-		sequence controllers2.Sequence
-		filters  controllers2.Filters
-		status   controllers2.Status
+		vh       counter.ValueHandler
+		inc      counter.Incrementor
+		sequence counter.Sequence
+		filters  counter.Filters
+		status   counter.Status
 
 		// hardcoded in order to keep track of the specific current state
 		incState     component.DiscloserState

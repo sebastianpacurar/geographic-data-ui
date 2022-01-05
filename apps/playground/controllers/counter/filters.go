@@ -1,4 +1,4 @@
-package controllers
+package counter
 
 import (
 	"gioui.org/layout"

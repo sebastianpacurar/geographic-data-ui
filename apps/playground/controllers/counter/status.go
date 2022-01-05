@@ -1,4 +1,4 @@
-package controllers
+package counter
 
 import (
 	"gioui-experiment/apps/playground/data"
