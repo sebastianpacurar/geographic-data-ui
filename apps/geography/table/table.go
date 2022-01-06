@@ -39,6 +39,9 @@ func (t *Table) Layout(gtx C, th *material.Theme) D {
 				Ccn3:         data.Cached[i].Ccn3,
 				Area:         data.Cached[i].Area,
 				Population:   data.Cached[i].Population,
+				Region:       data.Cached[i].Region,
+				Subregion:    data.Cached[i].Subregion,
+				IddRoot:      data.Cached[i].Idd.Root,
 				Active:       data.Cached[i].Active,
 			})
 		}

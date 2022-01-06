@@ -35,7 +35,6 @@ func (gr *Grid) Layout(gtx C, th *material.Theme) D {
 		for i := range data.Cached {
 			gr.cards = append(gr.cards, Card{
 				Name:     data.Cached[i].Name.Common,
-				Cca2:     data.Cached[i].Cca2,
 				Active:   data.Cached[i].Active,
 				Selected: data.Cached[i].Selected,
 				Flag:     data.Cached[i].FlagImg,

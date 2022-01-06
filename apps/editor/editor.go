@@ -89,12 +89,12 @@ func (app *Application) LayoutView(gtx C, th *material.Theme) D {
 	border := widget.Border{
 		Color:        g.Colours[colours.GREY],
 		CornerRadius: unit.Dp(5),
-		Width:        unit.Px(2),
+		Width:        unit.Dp(2),
 	}
 	switch {
 	case app.TextArea.Field.Focused():
 		border.Color = th.Palette.ContrastBg
-		border.Width = unit.Px(2)
+		border.Width = unit.Dp(2)
 	}
 
 	return layout.UniformInset(unit.Dp(10)).Layout(gtx, func(gtx C) D {

@@ -76,7 +76,7 @@ func (sc *SelectedCountries) Layout(gtx C, th *material.Theme) D {
 					border := widget.Border{
 						Color:        g.Colours[colours.GREY],
 						CornerRadius: unit.Dp(1),
-						Width:        unit.Px(1),
+						Width:        unit.Dp(1),
 					}
 					return border.Layout(gtx, func(gtx C) D {
 						return layout.Flex{Spacing: layout.SpaceBetween}.Layout(gtx,

@@ -24,6 +24,9 @@ type Row struct {
 	Ccn3         string
 	Area         float64
 	Population   int32
+	Region       string
+	Subregion    string
+	IddRoot      string
 	Active       bool
 	Selected     bool
 	IsCPViewed   bool
@@ -32,7 +35,7 @@ type Row struct {
 func (r *Row) LayRow(gtx C, th *material.Theme) D {
 	border := widget.Border{
 		Color: g.Colours[colours.GREY],
-		Width: unit.Px(1),
+		Width: unit.Dp(1),
 	}
 
 	return material.Clickable(gtx, &r.Click, func(gtx C) D {
@@ -109,6 +112,63 @@ func (r *Row) LayRow(gtx C, th *material.Theme) D {
 									Capital = r.Capital[0]
 								}
 								return material.Body1(th, Capital).Layout(gtx)
+							}))
+					})
+				})
+			}),
+			layout.Rigid(func(gtx C) D {
+				return border.Layout(gtx, func(gtx C) D {
+					return layout.Inset{
+						Top:    unit.Dp(2),
+						Bottom: unit.Dp(2),
+						Left:   unit.Dp(2),
+					}.Layout(gtx, func(gtx C) D {
+						return layout.Stack{Alignment: layout.Center}.Layout(gtx,
+
+							layout.Expanded(func(gtx C) D {
+								return g.ColoredArea(gtx, image.Pt(175, gtx.Constraints.Min.Y), rowColor)
+							}),
+
+							layout.Stacked(func(gtx C) D {
+								return material.Body1(th, r.Region).Layout(gtx)
+							}))
+					})
+				})
+			}),
+			layout.Rigid(func(gtx C) D {
+				return border.Layout(gtx, func(gtx C) D {
+					return layout.Inset{
+						Top:    unit.Dp(2),
+						Bottom: unit.Dp(2),
+						Left:   unit.Dp(2),
+					}.Layout(gtx, func(gtx C) D {
+						return layout.Stack{Alignment: layout.Center}.Layout(gtx,
+
+							layout.Expanded(func(gtx C) D {
+								return g.ColoredArea(gtx, image.Pt(220, gtx.Constraints.Min.Y), rowColor)
+							}),
+
+							layout.Stacked(func(gtx C) D {
+								return material.Body1(th, r.Subregion).Layout(gtx)
+							}))
+					})
+				})
+			}),
+			layout.Rigid(func(gtx C) D {
+				return border.Layout(gtx, func(gtx C) D {
+					return layout.Inset{
+						Top:    unit.Dp(2),
+						Bottom: unit.Dp(2),
+						Left:   unit.Dp(2),
+					}.Layout(gtx, func(gtx C) D {
+						return layout.Stack{Alignment: layout.Center}.Layout(gtx,
+
+							layout.Expanded(func(gtx C) D {
+								return g.ColoredArea(gtx, image.Pt(80, gtx.Constraints.Min.Y), rowColor)
+							}),
+
+							layout.Stacked(func(gtx C) D {
+								return material.Body1(th, r.IddRoot).Layout(gtx)
 							}))
 					})
 				})

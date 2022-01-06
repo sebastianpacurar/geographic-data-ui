@@ -151,7 +151,7 @@ func (r *Router) Layout(gtx C, th *material.Theme) D {
 								gtx.Constraints = layout.Exact(gtx.Constraints.Constrain(containerSize))
 								border := widget.Border{
 									Color: g.Colours[colours.SEA_GREEN],
-									Width: unit.Px(1),
+									Width: unit.Dp(1),
 								}
 								return border.Layout(gtx, func(gtx C) D {
 									return layout.Inset{

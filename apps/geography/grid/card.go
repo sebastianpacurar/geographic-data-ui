@@ -15,7 +15,6 @@ import (
 type (
 	Card struct {
 		Name string
-		Cca2 string
 		Flag image.Image
 
 		Active   bool
@@ -34,7 +33,7 @@ type (
 )
 
 func (c *Card) LayCard(gtx C, th *material.Theme) D {
-	size := image.Pt(200, 275)
+	size := image.Pt(150, 150)
 	gtx.Constraints = layout.Exact(gtx.Constraints.Constrain(size))
 
 	if !c.isMenuTriggered {
@@ -65,7 +64,7 @@ func (c *Card) LayCard(gtx C, th *material.Theme) D {
 			return widget.Border{
 				Color:        g.Colours[colours.GREY],
 				CornerRadius: unit.Dp(2),
-				Width:        unit.Px(2),
+				Width:        unit.Dp(1),
 			}.Layout(gtx, func(gtx C) D {
 
 				area := material.Clickable(gtx, &c.Click, func(gtx C) D {
@@ -109,16 +108,6 @@ func (c *Card) LayCard(gtx C, th *material.Theme) D {
 									Src: paint.NewImageOp(c.Flag),
 									Fit: widget.Contain,
 								}.Layout(gtx)
-							}))
-					}),
-
-					// country cca2 code
-					layout.Rigid(func(gtx C) D {
-						return layout.Flex{}.Layout(gtx,
-							layout.Flexed(1, func(gtx C) D {
-								return layout.Center.Layout(gtx, func(gtx C) D {
-									return material.Body2(th, c.Cca2).Layout(gtx)
-								})
 							}))
 					}))
 			})

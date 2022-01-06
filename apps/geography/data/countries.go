@@ -46,7 +46,7 @@ type (
 		Independent    bool                       `json:"independent"`
 		Status         string                     `json:"status"`
 		UNMember       bool                       `json:"unMember"`
-		Currencies     Currency                   `json:"currencies"`
+		Currencies     map[string]Currency        `json:"currencies"`
 		Idd            InternationalDirectDialing `json:"idd"`
 		Capital        []string                   `json:"capital"`
 		AltSpellings   []string                   `json:"altSpellings"`
@@ -58,6 +58,9 @@ type (
 		Demonyms       map[string]Demonym         `json:"demonyms"`
 		Population     int32                      `json:"population"`
 		StartOfWeek    string                     `json:"startOfWeek"`
+		Region         string                     `json:"region"`
+		Subregion      string                     `json:"subregion"`
+		Continents     []string                   `json:"continents"`
 
 		// Active - used for search rows/cards
 		Active bool

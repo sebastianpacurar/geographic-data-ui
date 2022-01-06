@@ -101,7 +101,7 @@ func (app *Application) LayoutView(gtx C, th *material.Theme) D {
 
 						if app.TabsList[i].IsSelected {
 							dims = widget.Border{
-								Width:        unit.Px(1),
+								Width:        unit.Dp(1),
 								CornerRadius: btn.CornerRadius,
 							}.Layout(gtx, func(gtx C) D {
 								size := image.Pt(dims.Size.X, dims.Size.Y)
