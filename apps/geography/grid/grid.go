@@ -38,6 +38,7 @@ func (gr *Grid) Layout(gtx C, th *material.Theme) D {
 				Cca2:     data.Cached[i].Cca2,
 				Active:   data.Cached[i].Active,
 				Selected: data.Cached[i].Selected,
+				Flag:     data.Cached[i].FlagImg,
 			})
 		}
 		gr.loaded = true

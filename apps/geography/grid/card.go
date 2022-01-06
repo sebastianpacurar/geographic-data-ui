@@ -4,6 +4,7 @@ import (
 	g "gioui-experiment/globals"
 	"gioui-experiment/themes/colours"
 	"gioui.org/layout"
+	"gioui.org/op/paint"
 	"gioui.org/unit"
 	"gioui.org/widget"
 	"gioui.org/widget/material"
@@ -13,12 +14,13 @@ import (
 
 type (
 	Card struct {
-		Name     string
-		Cca2     string
+		Name string
+		Cca2 string
+		Flag image.Image
+
 		Active   bool
 		Selected bool
 		Click    widget.Clickable
-		flag     image.Image
 
 		menu            component.MenuState
 		ctxArea         component.ContextArea
@@ -99,6 +101,18 @@ func (c *Card) LayCard(gtx C, th *material.Theme) D {
 						)
 					}),
 
+					// country flag image
+					layout.Rigid(func(gtx C) D {
+						return layout.Flex{}.Layout(gtx,
+							layout.Flexed(1, func(gtx C) D {
+								return widget.Image{
+									Src: paint.NewImageOp(c.Flag),
+									Fit: widget.Contain,
+								}.Layout(gtx)
+							}))
+					}),
+
+					// country cca2 code
 					layout.Rigid(func(gtx C) D {
 						return layout.Flex{}.Layout(gtx,
 							layout.Flexed(1, func(gtx C) D {
