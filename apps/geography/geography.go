@@ -93,7 +93,10 @@ func (app *Application) LayoutView(gtx C, th *material.Theme) D {
 
 	if !app.FlagsOn {
 		for i := range data.Cached {
-			_ = data.Cached[i].ProcessFlagFromUrl(data.Cached[i].FlagField.Png)
+			//TODO: this one is really sloooow
+			//_ = data.Cached[i].ProcessFlagFromUrl(data.Cached[i].FlagField.Png)
+
+			_ = data.Cached[i].ReadFlagFromFile()
 		}
 		app.FlagsOn = true
 	}

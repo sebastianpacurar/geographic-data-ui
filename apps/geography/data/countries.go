@@ -14,27 +14,28 @@ import (
 var (
 	allCountries = &Countries{}
 	Cached       = allCountries.CountriesList
-	AllFlags     = allCountries.FlagsList
+
+	// AllFlags - used only to get all flags correctly from stable v2 api version
+	AllFlags = allCountries.FlagsList
 )
 
 type (
 	Countries struct {
 		CountriesList []Country
-		FlagsList     []CountryFlag
+		FlagsList     []CountryFlag // used only to get all flags correctly from stable v2 api version
 		IsCached      bool
 	}
 
-	// CountryFlag - Used with v2
+	// CountryFlag - Used with v2 API - Caution: country naming discrepancies!
 	CountryFlag struct {
-		Name      string `json:"name"`
-		FlagField Flag   `json:"flags"`
+		FlagField Flag `json:"flags"`
 		FlagImg   image.Image
 	}
 	Flag struct {
 		Png string `json:"png"`
 	}
 
-	// Country - Used with v3.1
+	// Country - Used with v3.1 API
 	Country struct {
 		Name           Name                       `json:"name"`
 		TopLevelDomain []string                   `json:"tld"`
@@ -66,7 +67,7 @@ type (
 		IsCPViewed   bool
 		IsCtxtActive bool
 
-		// FlagImage - the processed flag
+		// FlagImage - the processed flag as image.Image
 		CountryFlag
 	}
 
@@ -162,18 +163,8 @@ func (c *Countries) InitCountries() error {
 	return nil
 }
 
-//func (c *Countries) SaveAllFlags() error {
-//	for i := range AllFlags {
-//		err := c.writeFlagToFile(AllFlags[i].Flag.Png, AllFlags[i].Name)
-//		if err != nil {
-//			return err
-//		}
-//	}
-//	return nil
-//}
-
-func (c *Country) WriteFlagToFile(url string) error {
-	resp, e := http.Get(url)
+func (c *Country) WriteFlagToFile() error {
+	resp, e := http.Get(c.FlagField.Png)
 	if e != nil {
 		log.Fatalln(e)
 	}
@@ -202,6 +193,24 @@ func (c *Country) WriteFlagToFile(url string) error {
 	return nil
 }
 
+// ReadFlagFromFile - Currently faster than ProcessFlagFromUrl, although it demands the png files present in output/flags
+func (c *Country) ReadFlagFromFile() error {
+	path := fmt.Sprintf("./apps/geography/output/flags/%s.png", c.Name.Common)
+	if _, err := os.Stat(path); os.IsNotExist(err) {
+		path = "./apps/geography/output/flags/no-flag.png"
+	}
+
+	file, err := os.Open(path)
+	if err != nil {
+		log.Fatalln(err)
+	}
+
+	img, _, _ := image.Decode(file)
+	c.FlagImg = img
+	return nil
+}
+
+// fetchFlags - Fetches only the flags and saves them in CountryFlag
 func (c *Countries) fetchFlags() ([]byte, error) {
 	URL := fmt.Sprintf("https://restcountries.com/v2/all")
 	res, err := http.Get(URL)
@@ -223,6 +232,7 @@ func (c *Countries) fetchFlags() ([]byte, error) {
 	return body, nil
 }
 
+// fetchCountries - Fetches All Country Data except the flag
 func (c *Countries) fetchCountries(location string) ([]byte, error) {
 	URL := fmt.Sprintf("https://restcountries.com/v3.1/%s", location)
 	res, err := http.Get(URL)
