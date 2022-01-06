@@ -153,8 +153,8 @@ func (app *Application) layDisableButton(th *material.Theme) layout.FlexChild {
 		if app.DisableCPBtn.Clicked() {
 			app.isCPDisabled = !app.isCPDisabled
 		}
-
 		var btn material.ButtonStyle
+
 		if !app.isCPDisabled {
 			btn = material.Button(th, &app.DisableCPBtn, "Disable CP")
 			btn.Background = g.Colours[colours.FLAME_RED]
@@ -193,12 +193,7 @@ func (app *Application) initApps() {
 					seq := pgv.GetActiveSequence()
 
 					/// DISPLAYED NUMBER
-					return layout.Inset{
-						Top:    unit.Dp(10),
-						Right:  unit.Dp(50),
-						Bottom: unit.Dp(20),
-						Left:   unit.Dp(50),
-					}.Layout(gtx, func(gtx C) D {
+					return layout.UniformInset(unit.Dp(20)).Layout(gtx, func(gtx C) D {
 						var val string
 						switch seq {
 						case data.PRIMES:

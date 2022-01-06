@@ -3,6 +3,7 @@ package data
 import (
 	"encoding/json"
 	"fmt"
+	"image"
 	"io"
 	"io/ioutil"
 	"log"
@@ -25,8 +26,9 @@ type (
 
 	// CountryFlag - Used with v2
 	CountryFlag struct {
-		Name string `json:"name"`
-		Flag Flag   `json:"flags"`
+		Name      string `json:"name"`
+		FlagField Flag   `json:"flags"`
+		FlagImg   image.Image
 	}
 	Flag struct {
 		Png string `json:"png"`
@@ -63,6 +65,9 @@ type (
 		// for CP details and contextual view
 		IsCPViewed   bool
 		IsCtxtActive bool
+
+		// FlagImage - the processed flag
+		CountryFlag
 	}
 
 	Name struct {
@@ -111,6 +116,24 @@ func (c *Countries) GetSelectedCount() int {
 	return count
 }
 
+// ProcessFlagFromUrl - decode image directly from url  (very slow)
+func (c *Country) ProcessFlagFromUrl(url string) error {
+	resp, e := http.Get(url)
+	if e != nil {
+		log.Fatalln(e)
+	}
+	defer func(Body io.ReadCloser) {
+		err := Body.Close()
+		if err != nil {
+			log.Fatalln(err)
+		}
+	}(resp.Body)
+
+	img, _, _ := image.Decode(resp.Body)
+	c.FlagImg = img
+	return nil
+}
+
 func (c *Countries) InitCountries() error {
 	if !c.IsCached {
 		countries, err := c.fetchCountries("all")
@@ -139,18 +162,18 @@ func (c *Countries) InitCountries() error {
 	return nil
 }
 
-func (c *Countries) SaveAllFlags() error {
-	for i := range AllFlags {
-		err := c.CopyFlagToFile(AllFlags[i].Flag.Png, AllFlags[i].Name)
-		if err != nil {
-			return err
-		}
-	}
-	return nil
-}
+//func (c *Countries) SaveAllFlags() error {
+//	for i := range AllFlags {
+//		err := c.writeFlagToFile(AllFlags[i].Flag.Png, AllFlags[i].Name)
+//		if err != nil {
+//			return err
+//		}
+//	}
+//	return nil
+//}
 
-func (c *Countries) CopyFlagToFile(url, name string) error {
-	response, e := http.Get(url)
+func (c *Country) WriteFlagToFile(url string) error {
+	resp, e := http.Get(url)
 	if e != nil {
 		log.Fatalln(e)
 	}
@@ -159,9 +182,9 @@ func (c *Countries) CopyFlagToFile(url, name string) error {
 		if err != nil {
 			log.Fatalln(err)
 		}
-	}(response.Body)
+	}(resp.Body)
 
-	file, err := os.Create(fmt.Sprintf("./apps/geography/output/flags/%s.png", name))
+	file, err := os.Create(fmt.Sprintf("./apps/geography/output/flags/%s.png", c.Name.Common))
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -172,7 +195,7 @@ func (c *Countries) CopyFlagToFile(url, name string) error {
 		}
 	}(file)
 
-	_, err = io.Copy(file, response.Body)
+	_, err = io.Copy(file, resp.Body)
 	if err != nil {
 		log.Fatal(err)
 	}

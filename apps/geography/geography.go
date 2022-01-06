@@ -9,6 +9,7 @@ import (
 	g "gioui-experiment/globals"
 	"gioui.org/layout"
 	"gioui.org/op"
+	"gioui.org/op/paint"
 	"gioui.org/unit"
 	"gioui.org/widget"
 	"gioui.org/widget/material"
@@ -56,6 +57,8 @@ type (
 		ContextualSet     bool
 		ContextualCountry data.Country
 
+		FlagsOn bool
+
 		Slider Slider
 	}
 )
@@ -87,6 +90,13 @@ func (app *Application) IsCPDisabled() bool {
 func (app *Application) LayoutView(gtx C, th *material.Theme) D {
 	err := app.Display.Api.InitCountries()
 	app.Display.FilterData()
+
+	if !app.FlagsOn {
+		for i := range data.Cached {
+			_ = data.Cached[i].ProcessFlagFromUrl(data.Cached[i].FlagField.Png)
+		}
+		app.FlagsOn = true
+	}
 
 	for _, e := range app.AppBar.Events(gtx) {
 		switch e.(type) {
@@ -156,7 +166,12 @@ func (app *Application) LayoutView(gtx C, th *material.Theme) D {
 			layout.Rigid(material.Body2(th, app.Display.ContextualCountry.Cca3).Layout),
 			layout.Rigid(material.Body2(th, app.Display.ContextualCountry.Ccn3).Layout),
 			layout.Rigid(material.Body2(th, fmt.Sprintf("%f", app.Display.ContextualCountry.Area)).Layout),
-		)
+			layout.Flexed(1, func(gtx C) D {
+				return widget.Image{
+					Src: paint.NewImageOp(app.Display.ContextualCountry.FlagImg),
+					Fit: widget.Contain,
+				}.Layout(gtx)
+			}))
 	case nil:
 		dims = layout.Flex{Axis: layout.Vertical}.Layout(gtx,
 			layout.Rigid(func(gtx C) D {
