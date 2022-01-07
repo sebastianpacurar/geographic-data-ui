@@ -12,4 +12,5 @@ const (
 	NYANZA        = "nyanza"
 
 	TEXT_SELECTION = "text_selection"
+	CARD_COLOR     = "card_color"
 )

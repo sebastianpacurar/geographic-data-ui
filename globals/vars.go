@@ -28,6 +28,7 @@ var (
 		"nyanza":          {R: 233, G: 255, B: 219, A: 255},
 
 		"text_selection": {R: 191, G: 255, B: 209, A: 255},
+		"card_color":     {R: 237, G: 237, B: 237, A: 255},
 	}
 	SpacerX = layout.Rigid(
 		layout.Spacer{

@@ -3,6 +3,7 @@ package grid
 import (
 	g "gioui-experiment/globals"
 	"gioui-experiment/themes/colours"
+	"gioui.org/font/gofont"
 	"gioui.org/layout"
 	"gioui.org/op/paint"
 	"gioui.org/unit"
@@ -19,7 +20,6 @@ type (
 
 		Active   bool
 		Selected bool
-		Click    widget.Clickable
 
 		menu            component.MenuState
 		ctxArea         component.ContextArea
@@ -29,12 +29,18 @@ type (
 		selectBtn     widget.Clickable
 		deselectBtn   widget.Clickable
 		copyToClipBtn widget.Clickable
+		viewBtn       widget.Clickable
 	}
 )
 
 func (c *Card) LayCard(gtx C, th *material.Theme) D {
-	size := image.Pt(150, 150)
-	gtx.Constraints = layout.Exact(gtx.Constraints.Constrain(size))
+	size := image.Pt(200, 250)
+	var container component.SurfaceStyle
+
+	container.Theme = material.NewTheme(gofont.Collection())
+	container.Theme.Bg = g.Colours[colours.CARD_COLOR]
+	container.Elevation = unit.Dp(5)
+	container.ShadowStyle = component.Shadow(unit.Dp(5), unit.Dp(8))
 
 	if !c.isMenuTriggered {
 		lbl := "Select"
@@ -56,65 +62,43 @@ func (c *Card) LayCard(gtx C, th *material.Theme) D {
 			Options: []func(gtx C) D{
 				item.Layout,
 				component.MenuItem(th, &c.copyToClipBtn, "Copy as JSON").Layout,
+				component.MenuItem(th, &c.viewBtn, "View").Layout,
 			},
 		}
 	}
 	return layout.Stack{}.Layout(gtx,
 		layout.Stacked(func(gtx C) D {
-			return widget.Border{
-				Color:        g.Colours[colours.GREY],
-				CornerRadius: unit.Dp(1),
-				Width:        unit.Dp(2),
-			}.Layout(gtx, func(gtx C) D {
-
-				area := material.Clickable(gtx, &c.Click, func(gtx C) D {
-					cardColor := g.Colours[colours.ANTIQUE_WHITE]
-
-					if c.Selected {
-						cardColor = g.Colours[colours.AERO_BLUE]
-					}
-
-					if c.Click.Hovered() && !c.Selected {
-						cardColor = g.Colours[colours.NYANZA]
-					} else if c.Click.Hovered() && c.Selected {
-						cardColor = g.Colours[colours.LIGHT_SALMON]
-					}
-					return g.RColoredArea(gtx, size, 10, cardColor)
-				})
-				return area
-			})
-		}),
-		layout.Stacked(func(gtx C) D {
-			return layout.UniformInset(unit.Dp(10)).Layout(gtx, func(gtx C) D {
+			return container.Layout(gtx, func(gtx C) D {
 				gtx.Constraints = layout.Exact(gtx.Constraints.Constrain(size))
-				return layout.Flex{Axis: layout.Vertical, Spacing: layout.SpaceAround}.Layout(gtx,
+				return layout.UniformInset(unit.Dp(10)).Layout(gtx, func(gtx C) D {
+					//gtx.Constraints = layout.Exact(gtx.Constraints.Constrain(size))
+					return layout.Flex{Axis: layout.Vertical, Spacing: layout.SpaceAround}.Layout(gtx,
+						// country name
+						layout.Rigid(func(gtx C) D {
+							return layout.Flex{}.Layout(gtx,
+								layout.Flexed(1, func(gtx C) D {
+									return layout.Center.Layout(gtx, func(gtx C) D {
+										return material.Body2(th, c.Name).Layout(gtx)
+									})
+								}),
+							)
+						}),
 
-					// country name
-					layout.Rigid(func(gtx C) D {
-						return layout.Flex{}.Layout(gtx,
-							layout.Flexed(1, func(gtx C) D {
-								return layout.Center.Layout(gtx, func(gtx C) D {
-									return material.Body2(th, c.Name).Layout(gtx)
-								})
-							}),
-						)
-					}),
-
-					// country flag image
-					layout.Rigid(func(gtx C) D {
-						return layout.Flex{}.Layout(gtx,
-							layout.Flexed(1, func(gtx C) D {
-								return layout.Center.Layout(gtx, func(gtx C) D {
-									return widget.Image{
-										Src: paint.NewImageOp(c.Flag),
-										Fit: widget.Contain,
-									}.Layout(gtx)
-								})
-							}))
-					}))
+						// country flag image
+						layout.Rigid(func(gtx C) D {
+							return layout.Flex{}.Layout(gtx,
+								layout.Flexed(1, func(gtx C) D {
+									return layout.Center.Layout(gtx, func(gtx C) D {
+										return widget.Image{
+											Src: paint.NewImageOp(c.Flag),
+											Fit: widget.Contain,
+										}.Layout(gtx)
+									})
+								}))
+						}))
+				})
 			})
 		}),
-
 		layout.Expanded(func(gtx C) D {
 			return c.ctxArea.Layout(gtx, func(gtx C) D {
 				gtx.Constraints.Min = image.Point{}

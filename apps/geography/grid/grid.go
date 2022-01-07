@@ -61,7 +61,7 @@ func (gr *Grid) Layout(gtx C, th *material.Theme) D {
 				g.ClipBoardVal = string(res)
 			}
 
-			if gr.cards[i].Click.Clicked() {
+			if gr.cards[i].viewBtn.Clicked() {
 				gr.Contextual = data.Cached[i] // interface to assert type when enabling ContextualAppBar
 				data.Cached[i].IsCtxtActive = true
 			}
@@ -73,7 +73,7 @@ func (gr *Grid) Layout(gtx C, th *material.Theme) D {
 			}
 
 			if gr.cards[i].Active {
-				content = layout.UniformInset(unit.Dp(10)).Layout(gtx, func(gtx C) D {
+				content = layout.UniformInset(unit.Dp(15)).Layout(gtx, func(gtx C) D {
 					return gr.cards[i].LayCard(gtx, th)
 				})
 			}
