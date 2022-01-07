@@ -29,7 +29,8 @@ type (
 	// CountryFlag - Used with v2 API - Caution: country naming discrepancies!
 	CountryFlag struct {
 		FlagField Flag `json:"flags"`
-		FlagImg   image.Image
+		// FlagImg - obtained after decoding the FlagField png
+		FlagImg image.Image
 	}
 	Flag struct {
 		Png string `json:"png"`
@@ -70,7 +71,6 @@ type (
 		IsCPViewed   bool
 		IsCtxtActive bool
 
-		// FlagImage - the processed flag as image.Image
 		CountryFlag
 	}
 
@@ -167,45 +167,58 @@ func (c *Countries) InitCountries() error {
 }
 
 func (c *Country) WriteFlagToFile() error {
-	resp, e := http.Get(c.FlagField.Png)
-	if e != nil {
-		log.Fatalln(e)
-	}
-	defer func(Body io.ReadCloser) {
-		err := Body.Close()
-		if err != nil {
-			log.Fatalln(err)
-		}
-	}(resp.Body)
-
-	file, err := os.Create(fmt.Sprintf("./apps/geography/output/flags/%s.png", c.Name.Common))
+	count, err := fileCount("output/geography/flags")
 	if err != nil {
-		log.Fatal(err)
+		log.Fatalln(fmt.Sprintf("Error at counting files in output/geography/flags: %s", err))
 	}
-	defer func(file *os.File) {
-		err := file.Close()
-		if err != nil {
-			log.Fatalln(err)
-		}
-	}(file)
 
-	_, err = io.Copy(file, resp.Body)
-	if err != nil {
-		log.Fatal(err)
+	if count < 250 {
+		resp, e := http.Get(c.FlagField.Png)
+		if e != nil {
+			log.Fatalln(e)
+		}
+		defer func(Body io.ReadCloser) {
+			err := Body.Close()
+			if err != nil {
+				log.Fatalln(err)
+			}
+		}(resp.Body)
+
+		file, err := os.Create(fmt.Sprintf("output/geography/flags/%s.png", c.Name.Common))
+		if err != nil {
+			log.Fatal(err)
+		}
+		defer func(file *os.File) {
+			err := file.Close()
+			if err != nil {
+				log.Fatalln(err)
+			}
+		}(file)
+
+		_, err = io.Copy(file, resp.Body)
+		if err != nil {
+			log.Fatal(err)
+		}
 	}
 	return nil
 }
 
 // ReadFlagFromFile - Currently faster than ProcessFlagFromUrl, although it demands the png files present in output/flags
 func (c *Country) ReadFlagFromFile() error {
-	path := fmt.Sprintf("./apps/geography/output/flags/%s.png", c.Name.Common)
-	if _, err := os.Stat(path); os.IsNotExist(err) {
-		path = "./apps/geography/output/flags/no-flag.png"
-	}
+	path := fmt.Sprintf("output/geography/flags/%s.png", c.Name.Common)
 
 	file, err := os.Open(path)
 	if err != nil {
-		log.Fatalln(err)
+		_ = c.WriteFlagToFile()
+	}
+
+	if _, err := os.Stat(path); os.IsNotExist(err) {
+		path = "output/geography/flags/placeholder/no-flag.png"
+	}
+
+	file, err = os.Open(path)
+	if err != nil {
+		log.Fatalln(fmt.Sprintf("Error opening path: %s", path))
 	}
 
 	img, _, _ := image.Decode(file)
@@ -255,4 +268,18 @@ func (c *Countries) fetchCountries(location string) ([]byte, error) {
 		return []byte{}, err
 	}
 	return body, nil
+}
+
+func fileCount(path string) (int, error) {
+	i := 0
+	entry, err := ioutil.ReadDir(path)
+	if err != nil {
+		log.Fatalln(fmt.Sprintf("Error when reading directory %s", err))
+	}
+	for _, f := range entry {
+		if !f.IsDir() {
+			i++
+		}
+	}
+	return i, nil
 }

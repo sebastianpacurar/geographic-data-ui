@@ -44,7 +44,7 @@ type (
 		GridBtn    widget.Clickable
 		SaveAsXlsx widget.Clickable
 
-		// grid and Table displays
+		// Grid and Table displays
 		Grid     grid.Grid
 		Table    table.Table
 		Selected interface{}
@@ -350,7 +350,7 @@ func (d *Display) saveDataToExcel() {
 			excelRow += 1
 		}
 	}
-	if err := xlsx.SaveAs("./apps/geography/output/Countries.xlsx"); err != nil {
+	if err := xlsx.SaveAs("output/geography/excel/Countries.xlsx"); err != nil {
 		log.Fatalln("error at excel save: ", err.Error())
 	}
 }

@@ -66,6 +66,14 @@ func (app *Application) IsCPDisabled() bool {
 }
 
 func (app *Application) LayoutView(gtx C, th *material.Theme) D {
+	var ed material.EditorStyle
+	ed = material.Editor(th, &app.TextArea.Field, "Type your Thoughts...")
+	ed.SelectionColor = g.Colours[colours.TEXT_SELECTION]
+
+	if app.TextArea.PasteBtn.Clicked() {
+		ed.Editor.SetText(g.ClipBoardVal)
+	}
+
 	app.TextArea.List.Axis = layout.Vertical
 	app.TextArea.Field.SingleLine = false
 	app.TextArea.Field.Alignment = text.Start
@@ -96,32 +104,28 @@ func (app *Application) LayoutView(gtx C, th *material.Theme) D {
 		border.Color = th.Palette.ContrastBg
 		border.Width = unit.Dp(2)
 	}
-
-	return layout.UniformInset(unit.Dp(10)).Layout(gtx, func(gtx C) D {
-		return layout.Stack{}.Layout(gtx,
-			layout.Stacked(func(gtx C) D {
-				gtx.Constraints = layout.Exact(gtx.Constraints.Constrain(gtx.Constraints.Max))
+	return layout.Stack{}.Layout(gtx,
+		layout.Stacked(func(gtx C) D {
+			gtx.Constraints = layout.Exact(gtx.Constraints.Constrain(gtx.Constraints.Max))
+			return layout.UniformInset(unit.Dp(10)).Layout(gtx, func(gtx C) D {
 				return border.Layout(gtx, func(gtx C) D {
-					return material.List(th, &app.TextArea.List).Layout(gtx, 1, func(gtx C, _ int) D {
-						return layout.UniformInset(unit.Dp(8)).Layout(gtx, func(gtx C) D {
-							ed := material.Editor(th, &app.TextArea.Field, "Type your Thoughts...")
-							ed.SelectionColor = g.Colours[colours.TEXT_SELECTION]
-
-							if app.TextArea.PasteBtn.Clicked() {
-								ed.Editor.SetText(g.ClipBoardVal)
-							}
-							return ed.Layout(gtx)
-						})
-					})
+					return layout.Flex{Axis: layout.Vertical}.Layout(gtx,
+						layout.Flexed(1, func(gtx C) D {
+							return material.List(th, &app.TextArea.List).Layout(gtx, 1, func(gtx C, _ int) D {
+								return layout.UniformInset(unit.Dp(8)).Layout(gtx, func(gtx C) D {
+									return ed.Layout(gtx)
+								})
+							})
+						}))
 				})
-			}),
-			layout.Expanded(func(gtx C) D {
-				return app.TextArea.CtxArea.Layout(gtx, func(gtx C) D {
-					gtx.Constraints.Min = image.Point{}
-					return component.Menu(th, &app.TextArea.Menu).Layout(gtx)
-				})
-			}))
-	})
+			})
+		}),
+		layout.Expanded(func(gtx C) D {
+			return app.TextArea.CtxArea.Layout(gtx, func(gtx C) D {
+				gtx.Constraints.Min = image.Point{}
+				return component.Menu(th, &app.TextArea.Menu).Layout(gtx)
+			})
+		}))
 }
 
 func (app *Application) LayoutController(gtx C, th *material.Theme) D {

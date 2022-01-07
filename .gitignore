@@ -1,5 +1,5 @@
 /.idea
 
-# gio output
-/apps/geography/output/excel/*
-/apps/geography/output/flags/*.png
+# app file output
+/output/geography/flags/*.png
+output/geography/excel/*.xlsx

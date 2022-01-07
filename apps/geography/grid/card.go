@@ -104,10 +104,12 @@ func (c *Card) LayCard(gtx C, th *material.Theme) D {
 					layout.Rigid(func(gtx C) D {
 						return layout.Flex{}.Layout(gtx,
 							layout.Flexed(1, func(gtx C) D {
-								return widget.Image{
-									Src: paint.NewImageOp(c.Flag),
-									Fit: widget.Contain,
-								}.Layout(gtx)
+								return layout.Center.Layout(gtx, func(gtx C) D {
+									return widget.Image{
+										Src: paint.NewImageOp(c.Flag),
+										Fit: widget.Contain,
+									}.Layout(gtx)
+								})
 							}))
 					}))
 			})
