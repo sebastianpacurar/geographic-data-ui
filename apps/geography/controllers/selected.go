@@ -14,7 +14,6 @@ import (
 type (
 	SelectedCountries struct {
 		pills []pill
-		list  widget.List
 		api   data.Countries
 		wrap  outlay.GridWrap
 		count int

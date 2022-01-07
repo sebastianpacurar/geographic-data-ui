@@ -164,7 +164,7 @@ func (r *Row) LayRow(gtx C, th *material.Theme) D {
 						return layout.Stack{Alignment: layout.Center}.Layout(gtx,
 
 							layout.Expanded(func(gtx C) D {
-								return g.ColoredArea(gtx, image.Pt(80, gtx.Constraints.Min.Y), rowColor)
+								return g.ColoredArea(gtx, image.Pt(280, gtx.Constraints.Min.Y), rowColor)
 							}),
 
 							layout.Stacked(func(gtx C) D {
@@ -183,7 +183,7 @@ func (r *Row) LayRow(gtx C, th *material.Theme) D {
 						return layout.Stack{Alignment: layout.Center}.Layout(gtx,
 
 							layout.Expanded(func(gtx C) D {
-								return g.ColoredArea(gtx, image.Pt(50, gtx.Constraints.Min.Y), rowColor)
+								return g.ColoredArea(gtx, image.Pt(180, gtx.Constraints.Min.Y), rowColor)
 							}),
 
 							layout.Stacked(func(gtx C) D {
@@ -225,7 +225,7 @@ func (r *Row) LayRow(gtx C, th *material.Theme) D {
 						return layout.Stack{Alignment: layout.Center}.Layout(gtx,
 
 							layout.Expanded(func(gtx C) D {
-								return g.ColoredArea(gtx, image.Pt(50, gtx.Constraints.Min.Y), rowColor)
+								return g.ColoredArea(gtx, image.Pt(200, gtx.Constraints.Min.Y), rowColor)
 							}),
 
 							layout.Stacked(func(gtx C) D {
@@ -248,7 +248,7 @@ func (r *Row) LayRow(gtx C, th *material.Theme) D {
 						return layout.Stack{Alignment: layout.Center}.Layout(gtx,
 
 							layout.Expanded(func(gtx C) D {
-								return g.ColoredArea(gtx, image.Pt(50, gtx.Constraints.Min.Y), rowColor)
+								return g.ColoredArea(gtx, image.Pt(85, gtx.Constraints.Min.Y), rowColor)
 							}),
 
 							layout.Stacked(material.Body1(th, r.Cca2).Layout))
@@ -265,7 +265,7 @@ func (r *Row) LayRow(gtx C, th *material.Theme) D {
 						return layout.Stack{Alignment: layout.Center}.Layout(gtx,
 
 							layout.Expanded(func(gtx C) D {
-								return g.ColoredArea(gtx, image.Pt(50, gtx.Constraints.Min.Y), rowColor)
+								return g.ColoredArea(gtx, image.Pt(85, gtx.Constraints.Min.Y), rowColor)
 							}),
 
 							layout.Stacked(material.Body1(th, r.Cca3).Layout))
@@ -282,7 +282,7 @@ func (r *Row) LayRow(gtx C, th *material.Theme) D {
 						return layout.Stack{Alignment: layout.Center}.Layout(gtx,
 
 							layout.Expanded(func(gtx C) D {
-								return g.ColoredArea(gtx, image.Pt(50, gtx.Constraints.Min.Y), rowColor)
+								return g.ColoredArea(gtx, image.Pt(85, gtx.Constraints.Min.Y), rowColor)
 							}),
 
 							layout.Stacked(material.Body1(th, r.Ccn3).Layout))
@@ -322,8 +322,7 @@ func (r *Row) LayRow(gtx C, th *material.Theme) D {
 							layout.Stacked(material.Body1(th, fmt.Sprintf("%d", int(r.Population))).Layout))
 					})
 				})
-			}),
-		)
+			}))
 		return row
 	})
 }

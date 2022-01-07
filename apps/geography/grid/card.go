@@ -63,12 +63,12 @@ func (c *Card) LayCard(gtx C, th *material.Theme) D {
 		layout.Stacked(func(gtx C) D {
 			return widget.Border{
 				Color:        g.Colours[colours.GREY],
-				CornerRadius: unit.Dp(2),
-				Width:        unit.Dp(1),
+				CornerRadius: unit.Dp(1),
+				Width:        unit.Dp(2),
 			}.Layout(gtx, func(gtx C) D {
 
 				area := material.Clickable(gtx, &c.Click, func(gtx C) D {
-					cardColor := g.Colours[colours.WHITE]
+					cardColor := g.Colours[colours.ANTIQUE_WHITE]
 
 					if c.Selected {
 						cardColor = g.Colours[colours.AERO_BLUE]
