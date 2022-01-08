@@ -15,7 +15,6 @@ type (
 		rows       []Row
 		rowList    widget.List
 		columnList widget.List
-		headerList widget.List
 		loaded     bool
 	}
 )
@@ -56,7 +55,7 @@ func (t *Table) Layout(gtx C, th *material.Theme) D {
 	}
 
 	return material.List(th, &t.columnList).Layout(gtx, 1, func(gtx C, _ int) D {
-		return material.List(th, &t.rowList).Layout(gtx, 2, func(gtx C, i int) D {
+		return material.List(th, &t.rowList).Layout(gtx, len(data.Cached), func(gtx C, i int) D {
 			var dims D
 			if t.rows[i].Active {
 				if t.rows[i].Click.Clicked() {
