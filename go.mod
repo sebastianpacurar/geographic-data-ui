@@ -3,8 +3,8 @@ module gioui-experiment
 go 1.17
 
 require (
-	gioui.org v0.0.0-20211230092323-cce0a121e1b8
-	github.com/xuri/excelize/v2 v2.4.1
+	gioui.org v0.0.0-20220107171640-11f39582b847
+	github.com/xuri/excelize/v2 v2.5.0
 )
 
 require (
@@ -16,12 +16,12 @@ require (
 	github.com/xuri/efp v0.0.0-20210322160811-ab561f5b45e3 // indirect
 	golang.org/x/crypto v0.0.0-20211215153901-e495a2d5b3d3 // indirect
 	golang.org/x/image v0.0.0-20211028202545-6944b10bf410 // indirect
-	golang.org/x/net v0.0.0-20211216030914-fe4d6282115f // indirect
+	golang.org/x/net v0.0.0-20220107192237-5cfca573fb4d // indirect
 )
 
 require (
-	gioui.org/x v0.0.0-20211230193557-0484e0de5e4d
-	golang.org/x/exp v0.0.0-20211221223016-e29036178569
+	gioui.org/x v0.0.0-20220105211426-ffad81642756
+	golang.org/x/exp v0.0.0-20220104160115-025e73f80486
 	golang.org/x/sys v0.0.0-20211216021012-1d35b9e2eb4e // indirect
 	golang.org/x/text v0.3.7 // indirect
 )

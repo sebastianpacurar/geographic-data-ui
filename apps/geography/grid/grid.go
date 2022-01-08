@@ -6,6 +6,7 @@ import (
 	g "gioui-experiment/globals"
 	"gioui.org/io/clipboard"
 	"gioui.org/layout"
+	"gioui.org/op"
 	"gioui.org/unit"
 	"gioui.org/widget"
 	"gioui.org/widget/material"
@@ -64,6 +65,7 @@ func (gr *Grid) Layout(gtx C, th *material.Theme) D {
 			if gr.cards[i].viewBtn.Clicked() {
 				gr.Contextual = data.Cached[i] // interface to assert type when enabling ContextualAppBar
 				data.Cached[i].IsCtxtActive = true
+				op.InvalidateOp{}.Add(gtx.Ops)
 			}
 
 			if gr.cards[i].selectBtn.Clicked() {
