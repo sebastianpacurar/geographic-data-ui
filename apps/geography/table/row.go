@@ -1,7 +1,6 @@
 package table
 
 import (
-	"gioui-experiment/apps/geography/data"
 	g "gioui-experiment/globals"
 	"gioui-experiment/themes/colours"
 	"gioui.org/layout"
@@ -34,8 +33,9 @@ type (
 		Selected     bool
 		IsCPViewed   bool
 
-		loaded bool
-		Column []Cell
+		loaded      bool
+		ColumnNames []string
+		Columns     []Cell
 	}
 
 	Cell struct {
@@ -47,50 +47,10 @@ type (
 )
 
 func (r *Row) LayRow(gtx C, th *material.Theme) D {
-	if !r.loaded {
-		r.generateColumns()
-		r.loaded = true
-	}
-	inset := layout.Inset{
-		Top:    unit.Dp(2),
-		Bottom: unit.Dp(2),
-		Left:   unit.Dp(2),
-	}
-	border := widget.Border{
-		Color: g.Colours[colours.GREY],
-		Width: unit.Dp(1),
-	}
-
-	return material.Clickable(gtx, &r.Click, func(gtx C) D {
-		var dims D
-		rowColor := g.Colours[colours.ANTIQUE_WHITE]
-		if r.Selected {
-			rowColor = g.Colours[colours.AERO_BLUE]
-		}
-		if r.Click.Hovered() {
-			if r.Selected {
-				rowColor = g.Colours[colours.LIGHT_SALMON]
-			} else {
-				rowColor = g.Colours[colours.NYANZA]
-			}
-		}
-
-		dims = material.List(th, &r.List).Layout(gtx, 1, func(gtx C, i int) D {
-			cell := r.Column[i]
-			return inset.Layout(gtx, func(gtx C) D {
-				return border.Layout(gtx, func(gtx C) D {
-					return cell.Layout(gtx, th, &cell, rowColor)
-				})
-			})
-		})
-		return dims
-	})
-}
-
-func (r *Row) generateColumns() {
-	cols := []string{
+	r.ColumnNames = []string{
 		"Name",
-		//"Capital",
+		"Official Name",
+		"Capital",
 		//"Region",
 		//"Subregion",
 		//"International Direct Dial Root",
@@ -101,29 +61,85 @@ func (r *Row) generateColumns() {
 		//"CCA 3",
 		//"CCN3",
 	}
-	for i := range cols {
-		r.Column = append(r.Column,
+
+	var dims D
+
+	r.List.Axis = layout.Horizontal
+	r.List.Alignment = layout.Middle
+	if !r.loaded {
+		r.generateColumns()
+		r.loaded = true
+	}
+	border := widget.Border{
+		Color: g.Colours[colours.GREY],
+		Width: unit.Dp(1),
+	}
+	rowColor := g.Colours[colours.ANTIQUE_WHITE]
+
+	dims = material.List(th, &r.List).Layout(gtx, len(r.ColumnNames), func(gtx C, i int) D {
+		return border.Layout(gtx, func(gtx C) D {
+			return r.Columns[i].Layout(gtx, th, &r.Columns[i], rowColor)
+		})
+	})
+
+	return material.Clickable(gtx, &r.Click, func(gtx C) D {
+		if r.Selected {
+			rowColor = g.Colours[colours.AERO_BLUE]
+		}
+		if r.Click.Hovered() {
+			if r.Selected {
+				rowColor = g.Colours[colours.LIGHT_SALMON]
+			} else {
+				rowColor = g.Colours[colours.NYANZA]
+			}
+		}
+		return dims
+	})
+}
+
+func (r *Row) generateColumns() {
+	for i := range r.ColumnNames {
+		r.Columns = append(r.Columns,
 			Cell{
-				HeadCell: cols[i],
+				HeadCell: r.ColumnNames[i],
 				Size:     450,
 				Layout: func(gtx C, th *material.Theme, c *Cell, color color.NRGBA) D {
 					return layout.Stack{Alignment: layout.Center}.Layout(gtx,
 						layout.Expanded(func(gtx C) D {
 							return g.ColoredArea(gtx, image.Pt(c.Size, 80), color)
 						}),
-						layout.Stacked(material.Body1(th, data.Cached[i].Name.Common).Layout))
+						layout.Stacked(material.Body1(th, r.Name).Layout))
+				},
+			},
+			Cell{
+				HeadCell: r.ColumnNames[i],
+				Size:     550,
+				Layout: func(gtx C, th *material.Theme, c *Cell, color color.NRGBA) D {
+					return layout.Stack{Alignment: layout.Center}.Layout(gtx,
+						layout.Expanded(func(gtx C) D {
+							return g.ColoredArea(gtx, image.Pt(c.Size, 80), color)
+						}),
+						layout.Stacked(material.Body1(th, r.OfficialName).Layout))
+				},
+			},
+			Cell{
+				HeadCell: r.ColumnNames[i],
+				Size:     200,
+				Layout: func(gtx C, th *material.Theme, c *Cell, color color.NRGBA) D {
+					return layout.Stack{Alignment: layout.Center}.Layout(gtx,
+						layout.Expanded(func(gtx C) D {
+							return g.ColoredArea(gtx, image.Pt(c.Size, gtx.Constraints.Min.Y), color)
+						}),
+						layout.Stacked(func(gtx C) D {
+							Capital := "N/A"
+							if len(r.Capital) > 0 {
+								Capital = r.Capital[0]
+							}
+							return material.Body1(th, Capital).Layout(gtx)
+						}))
 				},
 			},
 			//Cell{
-			//	headCell: "Official Name",
-			//	size:     550,
-			//	Layout:   nil,
-			//},
-			//Cell{
-			//	headCell: "Capital",
-			//	size:     200,
-			//	Layout:   nil,
-			//}, Cell{
 			//	headCell: "Region",
 			//	size:     175,
 			//	Layout:   nil,

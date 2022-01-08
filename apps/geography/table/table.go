@@ -55,20 +55,22 @@ func (t *Table) Layout(gtx C, th *material.Theme) D {
 		}
 	}
 
-	return material.List(th, &t.rowList).Layout(gtx, len(data.Cached), func(gtx C, i int) D {
-		var dims D
-		if t.rows[i].Active {
-			if t.rows[i].Click.Clicked() {
-				if t.rows[i].Selected {
-					data.Cached[i].Selected = false
-				} else {
-					data.Cached[i].Selected = true
+	return material.List(th, &t.columnList).Layout(gtx, 1, func(gtx C, _ int) D {
+		return material.List(th, &t.rowList).Layout(gtx, 2, func(gtx C, i int) D {
+			var dims D
+			if t.rows[i].Active {
+				if t.rows[i].Click.Clicked() {
+					if t.rows[i].Selected {
+						data.Cached[i].Selected = false
+					} else {
+						data.Cached[i].Selected = true
+					}
 				}
+				dims = t.rows[i].LayRow(gtx, th)
 			}
-			dims = t.rows[i].LayRow(gtx, th)
-		}
-		return dims
 
+			return dims
+		})
 	})
 	//	return layout.Flex{Axis: layout.Vertical}.Layout(gtx,
 	//
