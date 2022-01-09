@@ -10,12 +10,14 @@ import (
 	"gioui.org/widget/material"
 	"image"
 	"image/color"
+	"sort"
 	"strconv"
 	"strings"
+	"unicode"
 )
 
 var ColNames = []string{
-	"Name", "Official Name", "Capital", "Region", "Subregion", "Continents", "IDD Root", "IDD Suffixes", "Top Level Domains",
+	"Name", "Official Name", "Capital", "Region", "Subregion", "Languages", "Continents", "IDD Root", "IDD Suffixes", "Top Level Domains",
 	"Independent", "Status", "United Nations Member", "Land Locked", "CCA 2", "CCA 3", "CCN 3", "IOC Code", "FIFA Code",
 	"Area", "Population", "Latitude", "Longitude", "Start of Week", "Car Signs", "Car Side",
 }
@@ -222,30 +224,36 @@ func (r *Row) generateColumns() {
 						}))
 				},
 			},
+			Cell{
+				HeadCell: "Languages",
+				Size:     650,
+				Layout: func(gtx C, th *material.Theme, c *Cell, color color.NRGBA, isHeader bool) D {
+					return layout.Stack{Alignment: layout.Center}.Layout(gtx,
+						layout.Expanded(func(gtx C) D {
+							return g.ColoredArea(gtx, image.Pt(c.Size, gtx.Constraints.Min.Y), color)
+						}),
+						layout.Stacked(func(gtx C) D {
+							res := ""
+							langs := make([]string, 0, len(r.Languages))
+							for _, v := range r.Languages {
+								langs = append(langs, v)
+							}
+							sort.Strings(langs)
+							if len(langs) <= 5 {
+								res = strings.Join(langs, ", ")
+							} else {
 
-			// TODO: fix shallow copy issue on rerendering
-			//Cell{
-			//	HeadCell: "Languages",
-			//	Size:     350,
-			//	Layout: func(gtx C, th *material.Theme, c *Cell, color color.NRGBA, isHeader bool) D {
-			//		return layout.Stack{Alignment: layout.Center}.Layout(gtx,
-			//			layout.Expanded(func(gtx C) D {
-			//				return g.ColoredArea(gtx, image.Pt(c.Size, gtx.Constraints.Min.Y), color)
-			//			}),
-			//			layout.Stacked(func(gtx C) D {
-			//				langs := make([]string, 0)
-			//				for _, v := range r.Languages {
-			//					langs = append(langs, v)
-			//				}
-			//				res := strings.Join(langs, ", ")
-			//				if isHeader {
-			//					res = c.HeadCell
-			//				}
-			//				return material.Body1(th, res).Layout(gtx)
-			//			}))
-			//	},
-			//},
-
+								// first 5 + (all - 5) more
+								res = strings.Join(langs[:5], ", ")
+								res += fmt.Sprintf(" + %d more", len(langs[5:]))
+							}
+							if isHeader {
+								res = c.HeadCell
+							}
+							return material.Body1(th, res).Layout(gtx)
+						}))
+				},
+			},
 			Cell{
 				HeadCell: "IDD Root",
 				Size:     165,
@@ -298,7 +306,25 @@ func (r *Row) generateColumns() {
 						layout.Stacked(func(gtx C) D {
 							res := "-"
 							if len(r.TopLevelDomains) > 0 || r.TopLevelDomains != nil {
-								res = strings.Join(r.TopLevelDomains, ", ")
+
+								// exclude non latin characters, for now
+								latinList := make([]string, 0, len(r.TopLevelDomains))
+								for i := range r.TopLevelDomains {
+									isLatin := true
+									for _, v := range r.TopLevelDomains[i][1:] {
+										if !unicode.In(v, unicode.Latin) {
+											isLatin = false
+											break
+										}
+									}
+									if isLatin {
+										latinList = append(latinList, r.TopLevelDomains[i])
+									}
+								}
+
+								if len(latinList) >= 0 {
+									res = strings.Join(latinList, ", ")
+								}
 							}
 							if isHeader {
 								res = c.HeadCell
