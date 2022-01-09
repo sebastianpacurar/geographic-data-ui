@@ -13,6 +13,7 @@ type (
 
 	Table struct {
 		rows       []Row
+		headerList layout.List
 		rowList    widget.List
 		columnList widget.List
 		loaded     bool
@@ -55,64 +56,32 @@ func (t *Table) Layout(gtx C, th *material.Theme) D {
 	}
 
 	return material.List(th, &t.columnList).Layout(gtx, 1, func(gtx C, _ int) D {
-		return material.List(th, &t.rowList).Layout(gtx, len(data.Cached), func(gtx C, i int) D {
-			var dims D
-			if t.rows[i].Active {
-				if t.rows[i].Click.Clicked() {
-					if t.rows[i].Selected {
-						data.Cached[i].Selected = false
-					} else {
-						data.Cached[i].Selected = true
-					}
-				}
-				dims = t.rows[i].LayRow(gtx, th)
-			}
+		return layout.Flex{Axis: layout.Vertical}.Layout(gtx,
 
-			return dims
-		})
+			// Header Area
+			layout.Rigid(func(gtx C) D {
+				return t.headerList.Layout(gtx, 1, func(gtx C, i int) D {
+					return t.rows[i].LayRow(gtx, th, true)
+				})
+			}),
+
+			// Row Area
+			layout.Flexed(1, func(gtx C) D {
+				return material.List(th, &t.rowList).Layout(gtx, len(data.Cached), func(gtx C, i int) D {
+					var dims D
+					if t.rows[i].Active {
+						if t.rows[i].Click.Clicked() {
+							if t.rows[i].Selected {
+								data.Cached[i].Selected = false
+							} else {
+								data.Cached[i].Selected = true
+							}
+						}
+						dims = t.rows[i].LayRow(gtx, th, false)
+					}
+					return dims
+				})
+			}))
 	})
-	//	return layout.Flex{Axis: layout.Vertical}.Layout(gtx,
-	//
-	//		// Header Area
-	//		layout.Rigid(func(gtx C) D {
-	//			return layout.Flex{}.Layout(gtx,
-	//				layout.Rigid(func(gtx C) D {
-	//					return border.Layout(gtx, func(gtx C) D {
-	//						return layout.Inset{
-	//							Top:    unit.Dp(2),
-	//							Bottom: unit.Dp(2),
-	//							Left:   unit.Dp(2),
-	//						}.Layout(gtx, func(gtx C) D {
-	//							return layout.Stack{Alignment: layout.Center}.Layout(gtx,
-	//
-	//								layout.Expanded(func(gtx C) D {
-	//									return g.ColoredArea(gtx, image.Pt(450, gtx.Constraints.Min.Y), g.Colours[colours.ANTIQUE_WHITE])
-	//								}),
-	//
-	//								layout.Stacked(func(gtx C) D {
-	//									return material.Body1(th, "Name").Layout(gtx)
-	//								}))
-	//						})
-	//					})
-	//				}),
-	//		}),
-	//
-	//		// Row Area
-	//		layout.Flexed(1, func(gtx C) D {
-	//			return material.List(th, &t.rowList).Layout(gtx, len(data.Cached), func(gtx C, i int) D {
-	//				var dims D
-	//				if t.rows[i].Active {
-	//					if t.rows[i].Click.Clicked() {
-	//						if t.rows[i].Selected {
-	//							data.Cached[i].Selected = false
-	//						} else {
-	//							data.Cached[i].Selected = true
-	//						}
-	//					}
-	//					dims = t.rows[i].La(gtx, th)
-	//				}
-	//				return dims
-	//			})
-	//		}))
-	//})
+
 }

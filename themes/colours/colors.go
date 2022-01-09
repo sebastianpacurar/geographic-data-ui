@@ -10,6 +10,7 @@ const (
 	AERO_BLUE     = "aero-blue"
 	LIGHT_SALMON  = "light-salmon"
 	NYANZA        = "nyanza"
+	LAVENDERBLUSH = "lavenderblush"
 
 	TEXT_SELECTION = "text_selection"
 	CARD_COLOR     = "card_color"
