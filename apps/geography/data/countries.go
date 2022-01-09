@@ -44,14 +44,17 @@ type (
 		Ccn3           string                     `json:"ccn3"`
 		Cca3           string                     `json:"cca3"`
 		Cioc           string                     `json:"cioc"`
+		Fifa           string                     `json:"fifa"`
 		Independent    bool                       `json:"independent"`
 		Status         string                     `json:"status"`
 		UNMember       bool                       `json:"unMember"`
 		Currencies     map[string]Currency        `json:"currencies"`
 		Idd            InternationalDirectDialing `json:"idd"`
+		Car            Car                        `json:"car"`
 		Capital        []string                   `json:"capital"`
 		AltSpellings   []string                   `json:"altSpellings"`
 		Translations   map[string]TranslationLang `json:"translations"`
+		Languages      map[string]string          `json:"languages"`
 		LatLng         []float64                  `json:"latlng"`
 		Landlocked     bool                       `json:"landlocked"`
 		Borders        []string                   `json:"borders"`
@@ -97,6 +100,11 @@ type (
 	Currency struct {
 		Name   string `json:"name"`
 		Symbol string `json:"symbol"`
+	}
+
+	Car struct {
+		Signs []string `json:"signs"`
+		Side  string   `json:"side"`
 	}
 )
 

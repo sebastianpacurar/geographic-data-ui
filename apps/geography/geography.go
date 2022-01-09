@@ -168,7 +168,7 @@ func (app *Application) LayoutView(gtx C, th *material.Theme) D {
 			layout.Rigid(material.Body2(th, app.Display.ContextualCountry.Cca2).Layout),
 			layout.Rigid(material.Body2(th, app.Display.ContextualCountry.Cca3).Layout),
 			layout.Rigid(material.Body2(th, app.Display.ContextualCountry.Ccn3).Layout),
-			layout.Rigid(material.Body2(th, fmt.Sprintf("%f", app.Display.ContextualCountry.Area)).Layout),
+			layout.Rigid(material.Body2(th, strconv.FormatFloat(app.Display.ContextualCountry.Area, 'f', -1, 32)).Layout),
 			layout.Flexed(1, func(gtx C) D {
 				return widget.Image{
 					Src: paint.NewImageOp(app.Display.ContextualCountry.FlagImg),
@@ -239,15 +239,17 @@ func (app *Application) LayoutView(gtx C, th *material.Theme) D {
 					})
 				})
 
-				return layout.Flex{}.Layout(gtx,
-					search,
-					layout.Rigid(func(gtx C) D {
-						return layout.Flex{Alignment: layout.End}.Layout(gtx,
-							tblBtn,
-							grdBtn,
-							exportBtn,
-						)
-					}))
+				return layout.Inset{Bottom: unit.Dp(15)}.Layout(gtx, func(gtx C) D {
+					return layout.Flex{}.Layout(gtx,
+						search,
+						layout.Rigid(func(gtx C) D {
+							return layout.Flex{Alignment: layout.End}.Layout(gtx,
+								tblBtn,
+								grdBtn,
+								exportBtn,
+							)
+						}))
+				})
 			}),
 
 			// Selected display
@@ -339,7 +341,7 @@ func (d *Display) saveDataToExcel() {
 						res = "N/A"
 					}
 				case "K":
-					res = fmt.Sprintf("%f", data.Cached[j].Area)
+					res = strconv.FormatFloat(data.Cached[j].Area, 'f', -1, 32)
 				case "L":
 					res = string(data.Cached[j].Population)
 				}
