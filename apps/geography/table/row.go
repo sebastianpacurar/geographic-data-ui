@@ -598,7 +598,10 @@ func (r *Row) generateColumns() {
 							return g.ColoredArea(gtx, image.Pt(c.Size, gtx.Constraints.Min.Y), color)
 						}),
 						layout.Stacked(func(gtx C) D {
-							res := strings.Join(r.CarSigns, ", ")
+							res := "-"
+							if len(r.CarSigns) > 0 {
+								res = strings.Join(r.CarSigns, ", ")
+							}
 							if isHeader {
 								res = c.HeadCell
 							}
