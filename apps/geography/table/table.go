@@ -20,7 +20,7 @@ type (
 	}
 )
 
-func (t *Table) Layout(gtx C, th *material.Theme) D {
+func (t *Table) Layout(gtx C, th *material.Theme, searchBy string) D {
 	t.rowList.Axis = layout.Vertical
 	t.rowList.Alignment = layout.Middle
 	t.columnList.Axis = layout.Horizontal
@@ -56,13 +56,15 @@ func (t *Table) Layout(gtx C, th *material.Theme) D {
 				CarSigns:        data.Cached[i].Car.Signs,
 				CarSide:         data.Cached[i].Car.Side,
 
-				Active: data.Cached[i].Active,
+				Active:          data.Cached[i].Active,
+				ActiveContinent: data.Cached[i].ActiveContinent,
 			})
 		}
 		t.loaded = true
 	} else {
 		for i := range data.Cached {
 			t.rows[i].Active = data.Cached[i].Active
+			t.rows[i].ActiveContinent = data.Cached[i].ActiveContinent
 			t.rows[i].Selected = data.Cached[i].Selected
 			t.rows[i].IsCPViewed = data.Cached[i].IsCPViewed
 		}
@@ -82,7 +84,7 @@ func (t *Table) Layout(gtx C, th *material.Theme) D {
 			layout.Flexed(1, func(gtx C) D {
 				return material.List(th, &t.rowList).Layout(gtx, len(data.Cached), func(gtx C, i int) D {
 					var dims D
-					if t.rows[i].Active {
+					if t.rows[i].Active && t.rows[i].ActiveContinent {
 						if t.rows[i].Click.Clicked() {
 							if t.rows[i].Selected {
 								data.Cached[i].Selected = false

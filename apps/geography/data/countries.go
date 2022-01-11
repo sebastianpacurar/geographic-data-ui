@@ -73,6 +73,8 @@ type (
 		// for CP details and contextual view
 		IsCPViewed   bool
 		IsCtxtActive bool
+		// for Continent Tab Selection
+		ActiveContinent bool
 
 		CountryFlag
 	}

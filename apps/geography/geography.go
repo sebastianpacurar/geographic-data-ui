@@ -7,6 +7,7 @@ import (
 	"gioui-experiment/apps/geography/grid"
 	"gioui-experiment/apps/geography/table"
 	g "gioui-experiment/globals"
+	"gioui-experiment/themes/colours"
 	"gioui.org/layout"
 	"gioui.org/op"
 	"gioui.org/op/paint"
@@ -15,6 +16,7 @@ import (
 	"gioui.org/widget/material"
 	"gioui.org/x/component"
 	"github.com/xuri/excelize/v2"
+	"image"
 	"log"
 	"strconv"
 	"strings"
@@ -48,7 +50,14 @@ type (
 		Grid     grid.Grid
 		Table    table.Table
 		Selected interface{}
-		Loaded   bool
+
+		// FilterBy - used to search countries
+		FilterBy string
+
+		// mainly used to avoid overhead on "All Cards"
+		AllContinents  []string
+		Continents     []Continent
+		ContinentsList widget.List
 
 		// api data
 		Api data.Countries
@@ -57,9 +66,16 @@ type (
 		ContextualSet     bool
 		ContextualCountry data.Country
 
-		FlagsOn bool
+		InitialSetup bool
 
 		Slider Slider
+	}
+
+	Continent struct {
+		Name       string
+		Btn        widget.Clickable
+		IsSelected bool
+		SetActive  func(c *Continent)
 	}
 )
 
@@ -89,16 +105,35 @@ func (app *Application) IsCPDisabled() bool {
 
 func (app *Application) LayoutView(gtx C, th *material.Theme) D {
 	err := app.Display.Api.InitCountries()
-	app.Display.FilterData()
+	if err != nil {
+		return material.H2(th, fmt.Sprintf("Error when fetching countries: %s", err)).Layout(gtx)
+	}
+	app.Display.FilterData(table.OFFICIAL_NAME)
 
-	if !app.FlagsOn {
+	// run only once at start
+	if !app.InitialSetup {
 		for i := range data.Cached {
 			//TODO: this one is really sloooow
 			//_ = data.Cached[i].ProcessFlagFromUrl(data.Cached[i].FlagField.Png)
 
 			_ = data.Cached[i].ReadFlagFromFile()
 		}
-		app.FlagsOn = true
+
+		// initialize continents, to All Continents
+		app.initContinents()
+		for i := range app.Continents {
+			if app.Continents[i].Name == "All" {
+				for j := range data.Cached {
+					data.Cached[j].ActiveContinent = true
+				}
+			}
+		}
+
+		// set all countries to displayed
+		for i := range data.Cached {
+			data.Cached[i].Active = true
+		}
+		app.InitialSetup = true
 	}
 
 	for _, e := range app.AppBar.Events(gtx) {
@@ -123,19 +158,7 @@ func (app *Application) LayoutView(gtx C, th *material.Theme) D {
 		app.Display.Selected = app.Display.Table
 	}
 
-	if err != nil {
-		return material.H2(th, fmt.Sprintf("Error when fetching countries: %s", err)).Layout(gtx)
-	}
-
 	app.Display.SearchField.SingleLine = true
-
-	// run only once during lifetime
-	if !app.Display.Loaded {
-		for i := range data.Cached {
-			data.Cached[i].Active = true
-		}
-		app.Display.Loaded = true
-	}
 
 	var dims D
 
@@ -252,6 +275,82 @@ func (app *Application) LayoutView(gtx C, th *material.Theme) D {
 				})
 			}),
 
+			// Select Continent
+			layout.Rigid(func(gtx C) D {
+				return layout.Flex{}.Layout(gtx,
+					layout.Rigid(func(gtx C) D {
+						return material.List(th, &app.ContinentsList).Layout(gtx, len(app.AllContinents), func(gtx C, i int) D {
+							var (
+								dim D
+								btn material.ButtonStyle
+							)
+							btn = material.Button(th, &app.Continents[i].Btn, app.Continents[i].Name)
+							btn.CornerRadius = unit.Dp(1)
+							btn.Inset = layout.UniformInset(unit.Dp(10))
+							btn.Background = g.Colours[colours.WHITE]
+							btn.Color = g.Colours[colours.BLACK]
+							dim = btn.Layout(gtx)
+
+							if app.Continents[i].Btn.Clicked() {
+								name := app.Continents[i].Name
+								app.Continents[i].IsSelected = true
+								for j := range app.Continents {
+									if name != app.Continents[j].Name {
+										app.Continents[j].IsSelected = false
+									}
+								}
+
+								// TODO: fix issue with All Continents
+								for j := range data.Cached {
+									continents := strings.Join(data.Cached[j].Continents, " ")
+									if strings.Contains(continents, name) {
+										data.Cached[j].ActiveContinent = true
+									} else {
+										data.Cached[j].ActiveContinent = false
+									}
+								}
+								op.InvalidateOp{}.Add(gtx.Ops)
+							}
+
+							if app.Continents[i].IsSelected {
+								dim = widget.Border{
+									Width:        unit.Dp(1),
+									CornerRadius: btn.CornerRadius,
+								}.Layout(gtx, func(gtx C) D {
+									size := image.Pt(dim.Size.X, dim.Size.Y)
+									gtx.Constraints = layout.Exact(gtx.Constraints.Constrain(size))
+
+									return layout.Stack{Alignment: layout.S}.Layout(gtx,
+										layout.Expanded(func(gtx C) D {
+											return g.ColoredArea(gtx, size, g.Colours[colours.AERO_BLUE])
+										}),
+										layout.Stacked(func(gtx C) D {
+											return layout.Flex{Axis: layout.Vertical}.Layout(gtx,
+												layout.Flexed(1, func(gtx C) D {
+													var lbl material.LabelStyle
+													lbl = material.Body1(th, app.Continents[i].Name)
+													lbl.TextSize = btn.TextSize
+
+													return layout.Flex{}.Layout(gtx,
+														layout.Flexed(1, func(gtx C) D {
+															return layout.Center.Layout(gtx, lbl.Layout)
+														}))
+												}),
+												layout.Rigid(func(gtx C) D {
+													return layout.Stack{}.Layout(gtx,
+														layout.Expanded(func(gtx C) D {
+															return g.ColoredArea(gtx, image.Pt(gtx.Constraints.Max.X, 3), g.Colours[colours.SEA_GREEN])
+														}))
+												}))
+										}))
+								})
+							}
+							return dim
+						})
+					}),
+				)
+			}),
+
 			// Selected display
 			layout.Rigid(func(gtx C) D {
 				return app.Display.Slider.Layout(gtx, layout.Horizontal, func(gtx C) D {
@@ -260,11 +359,12 @@ func (app *Application) LayoutView(gtx C, th *material.Theme) D {
 					case grid.Grid:
 						dims = app.Display.Grid.Layout(gtx, th)
 					case table.Table:
-						dims = app.Display.Table.Layout(gtx, th)
+						dims = app.Display.Table.Layout(gtx, th, app.FilterBy)
 					}
 					return dims
 				})
-			}))
+			}),
+		)
 	}
 	return dims
 }
@@ -274,11 +374,22 @@ func (app *Application) LayoutController(gtx C, th *material.Theme) D {
 }
 
 // FilterData - filter countries based on data.Cached and data.Cached manipulation
-func (d *Display) FilterData() {
+func (d *Display) FilterData(FilterBy string) {
 	if d.CurrentStr != d.SearchField.Text() {
 		if d.SearchField.Len() > 0 {
 			for i := range data.Cached {
-				if strings.HasPrefix(strings.ToLower(data.Cached[i].Name.Common), strings.ToLower(d.SearchField.Text())) {
+				var res string
+
+				switch FilterBy {
+				case table.NAME:
+					res = data.Cached[i].Name.Common
+				case table.OFFICIAL_NAME:
+					res = data.Cached[i].Name.Official
+				case table.CAPITAL:
+					res = data.Cached[i].Capital[0]
+				}
+
+				if strings.HasPrefix(strings.ToLower(res), strings.ToLower(d.SearchField.Text())) {
 					data.Cached[i].Active = true
 				} else {
 					data.Cached[i].Active = false
@@ -354,5 +465,27 @@ func (d *Display) saveDataToExcel() {
 	}
 	if err := xlsx.SaveAs("output/geography/excel/Countries.xlsx"); err != nil {
 		log.Fatalln("error at excel save: ", err.Error())
+	}
+}
+
+func (d *Display) initContinents() {
+	d.AllContinents = []string{"All", "Asia", "Africa", "Antarctica", "Europe", "Oceania", "North America", "South America"}
+	for i := range d.AllContinents {
+		d.Continents = append(d.Continents,
+			Continent{
+				Name:       d.AllContinents[i],
+				IsSelected: false,
+				SetActive: func(c *Continent) {
+					for j := range data.Cached {
+						for _, v := range data.Cached[j].Continents {
+							if v == c.Name {
+								data.Cached[j].ActiveContinent = true
+							} else {
+								data.Cached[j].ActiveContinent = false
+							}
+						}
+					}
+				},
+			})
 	}
 }

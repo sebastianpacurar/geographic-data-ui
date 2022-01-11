@@ -36,9 +36,6 @@ type (
 		*component.AppBar
 		*component.ModalLayer
 		component.Resize
-
-		// currently using only undocked drawer
-		//NonModalDrawer bool
 	}
 )
 
