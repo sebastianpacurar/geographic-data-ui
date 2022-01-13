@@ -2,7 +2,7 @@ package table
 
 import (
 	"fmt"
-	g "gioui-experiment/globals"
+	"gioui-experiment/globals"
 	"gioui-experiment/themes/colours"
 	"gioui.org/layout"
 	"gioui.org/unit"
@@ -71,7 +71,7 @@ type (
 )
 
 func (r *Row) LayRow(gtx C, th *material.Theme, isHeader bool) D {
-	rowColor := g.Colours[colours.ANTIQUE_WHITE]
+	rowColor := globals.Colours[colours.ANTIQUE_WHITE]
 	r.colList.Alignment = layout.Middle
 
 	if !r.loaded {
@@ -80,25 +80,25 @@ func (r *Row) LayRow(gtx C, th *material.Theme, isHeader bool) D {
 	}
 
 	border := widget.Border{
-		Color: g.Colours[colours.GREY],
+		Color: globals.Colours[colours.GREY],
 		Width: unit.Dp(1),
 	}
 	if isHeader {
 		border.Width = unit.Dp(1.5)
-		border.Color = g.Colours[colours.GREY]
+		border.Color = globals.Colours[colours.GREY]
 	}
 
 	return border.Layout(gtx, func(gtx C) D {
 		if !isHeader {
 			return material.Clickable(gtx, &r.Click, func(gtx C) D {
 				if r.Selected {
-					rowColor = g.Colours[colours.AERO_BLUE]
+					rowColor = globals.Colours[colours.AERO_BLUE]
 				}
 				if r.Click.Hovered() {
 					if r.Selected {
-						rowColor = g.Colours[colours.LIGHT_SALMON]
+						rowColor = globals.Colours[colours.LIGHT_SALMON]
 					} else {
-						rowColor = g.Colours[colours.NYANZA]
+						rowColor = globals.Colours[colours.NYANZA]
 					}
 				}
 				return r.colList.Layout(gtx, len(ColNames), func(gtx C, i int) D {
@@ -106,7 +106,7 @@ func (r *Row) LayRow(gtx C, th *material.Theme, isHeader bool) D {
 				})
 			})
 		} else {
-			rowColor = g.Colours[colours.LAVENDERBLUSH]
+			rowColor = globals.Colours[colours.LAVENDERBLUSH]
 			return r.colList.Layout(gtx, len(ColNames), func(gtx C, i int) D {
 				return r.Columns[i].Layout(gtx, th, &r.Columns[i], rowColor, isHeader)
 			})
@@ -123,7 +123,7 @@ func (r *Row) generateColumns() {
 				Layout: func(gtx C, th *material.Theme, c *Cell, color color.NRGBA, isHeader bool) D {
 					return layout.Stack{Alignment: layout.Center}.Layout(gtx,
 						layout.Expanded(func(gtx C) D {
-							return g.ColoredArea(gtx, image.Pt(gtx.Px(unit.Dp(float32(c.Size))), gtx.Constraints.Min.Y), color)
+							return globals.ColoredArea(gtx, image.Pt(gtx.Px(unit.Dp(float32(c.Size))), gtx.Constraints.Min.Y), color)
 						}),
 						layout.Stacked(func(gtx C) D {
 							res := r.Name
@@ -140,7 +140,7 @@ func (r *Row) generateColumns() {
 				Layout: func(gtx C, th *material.Theme, c *Cell, color color.NRGBA, isHeader bool) D {
 					return layout.Stack{Alignment: layout.Center}.Layout(gtx,
 						layout.Expanded(func(gtx C) D {
-							return g.ColoredArea(gtx, image.Pt(gtx.Px(unit.Dp(float32(c.Size))), gtx.Constraints.Min.Y), color)
+							return globals.ColoredArea(gtx, image.Pt(gtx.Px(unit.Dp(float32(c.Size))), gtx.Constraints.Min.Y), color)
 						}),
 						layout.Stacked(func(gtx C) D {
 							res := r.OfficialName
@@ -157,7 +157,7 @@ func (r *Row) generateColumns() {
 				Layout: func(gtx C, th *material.Theme, c *Cell, color color.NRGBA, isHeader bool) D {
 					return layout.Stack{Alignment: layout.Center}.Layout(gtx,
 						layout.Expanded(func(gtx C) D {
-							return g.ColoredArea(gtx, image.Pt(gtx.Px(unit.Dp(float32(c.Size))), gtx.Constraints.Min.Y), color)
+							return globals.ColoredArea(gtx, image.Pt(gtx.Px(unit.Dp(float32(c.Size))), gtx.Constraints.Min.Y), color)
 						}),
 						layout.Stacked(func(gtx C) D {
 							capital := "-"
@@ -177,7 +177,7 @@ func (r *Row) generateColumns() {
 				Layout: func(gtx C, th *material.Theme, c *Cell, color color.NRGBA, isHeader bool) D {
 					return layout.Stack{Alignment: layout.Center}.Layout(gtx,
 						layout.Expanded(func(gtx C) D {
-							return g.ColoredArea(gtx, image.Pt(gtx.Px(unit.Dp(float32(c.Size))), gtx.Constraints.Min.Y), color)
+							return globals.ColoredArea(gtx, image.Pt(gtx.Px(unit.Dp(float32(c.Size))), gtx.Constraints.Min.Y), color)
 						}),
 						layout.Stacked(func(gtx C) D {
 							res := r.Region
@@ -194,7 +194,7 @@ func (r *Row) generateColumns() {
 				Layout: func(gtx C, th *material.Theme, c *Cell, color color.NRGBA, isHeader bool) D {
 					return layout.Stack{Alignment: layout.Center}.Layout(gtx,
 						layout.Expanded(func(gtx C) D {
-							return g.ColoredArea(gtx, image.Pt(gtx.Px(unit.Dp(float32(c.Size))), gtx.Constraints.Min.Y), color)
+							return globals.ColoredArea(gtx, image.Pt(gtx.Px(unit.Dp(float32(c.Size))), gtx.Constraints.Min.Y), color)
 						}),
 						layout.Stacked(func(gtx C) D {
 							subregion := "-"
@@ -214,7 +214,7 @@ func (r *Row) generateColumns() {
 				Layout: func(gtx C, th *material.Theme, c *Cell, color color.NRGBA, isHeader bool) D {
 					return layout.Stack{Alignment: layout.Center}.Layout(gtx,
 						layout.Expanded(func(gtx C) D {
-							return g.ColoredArea(gtx, image.Pt(gtx.Px(unit.Dp(float32(c.Size))), gtx.Constraints.Min.Y), color)
+							return globals.ColoredArea(gtx, image.Pt(gtx.Px(unit.Dp(float32(c.Size))), gtx.Constraints.Min.Y), color)
 						}),
 						layout.Stacked(func(gtx C) D {
 							res := strings.Join(r.Continents, ", ")
@@ -231,7 +231,7 @@ func (r *Row) generateColumns() {
 				Layout: func(gtx C, th *material.Theme, c *Cell, color color.NRGBA, isHeader bool) D {
 					return layout.Stack{Alignment: layout.Center}.Layout(gtx,
 						layout.Expanded(func(gtx C) D {
-							return g.ColoredArea(gtx, image.Pt(gtx.Px(unit.Dp(float32(c.Size))), gtx.Constraints.Min.Y), color)
+							return globals.ColoredArea(gtx, image.Pt(gtx.Px(unit.Dp(float32(c.Size))), gtx.Constraints.Min.Y), color)
 						}),
 						layout.Stacked(func(gtx C) D {
 							res := ""
@@ -261,7 +261,7 @@ func (r *Row) generateColumns() {
 				Layout: func(gtx C, th *material.Theme, c *Cell, color color.NRGBA, isHeader bool) D {
 					return layout.Stack{Alignment: layout.Center}.Layout(gtx,
 						layout.Expanded(func(gtx C) D {
-							return g.ColoredArea(gtx, image.Pt(gtx.Px(unit.Dp(float32(c.Size))), gtx.Constraints.Min.Y), color)
+							return globals.ColoredArea(gtx, image.Pt(gtx.Px(unit.Dp(float32(c.Size))), gtx.Constraints.Min.Y), color)
 						}),
 						layout.Stacked(func(gtx C) D {
 							res := r.IddRoot
@@ -278,7 +278,7 @@ func (r *Row) generateColumns() {
 				Layout: func(gtx C, th *material.Theme, c *Cell, color color.NRGBA, isHeader bool) D {
 					return layout.Stack{Alignment: layout.Center}.Layout(gtx,
 						layout.Expanded(func(gtx C) D {
-							return g.ColoredArea(gtx, image.Pt(gtx.Px(unit.Dp(float32(c.Size))), gtx.Constraints.Min.Y), color)
+							return globals.ColoredArea(gtx, image.Pt(gtx.Px(unit.Dp(float32(c.Size))), gtx.Constraints.Min.Y), color)
 						}),
 						layout.Stacked(func(gtx C) D {
 							res := ""
@@ -302,7 +302,7 @@ func (r *Row) generateColumns() {
 				Layout: func(gtx C, th *material.Theme, c *Cell, color color.NRGBA, isHeader bool) D {
 					return layout.Stack{Alignment: layout.Center}.Layout(gtx,
 						layout.Expanded(func(gtx C) D {
-							return g.ColoredArea(gtx, image.Pt(gtx.Px(unit.Dp(float32(c.Size))), gtx.Constraints.Min.Y), color)
+							return globals.ColoredArea(gtx, image.Pt(gtx.Px(unit.Dp(float32(c.Size))), gtx.Constraints.Min.Y), color)
 						}),
 						layout.Stacked(func(gtx C) D {
 							res := "-"
@@ -340,7 +340,7 @@ func (r *Row) generateColumns() {
 				Layout: func(gtx C, th *material.Theme, c *Cell, color color.NRGBA, isHeader bool) D {
 					return layout.Stack{Alignment: layout.Center}.Layout(gtx,
 						layout.Expanded(func(gtx C) D {
-							return g.ColoredArea(gtx, image.Pt(gtx.Px(unit.Dp(float32(c.Size))), gtx.Constraints.Min.Y), color)
+							return globals.ColoredArea(gtx, image.Pt(gtx.Px(unit.Dp(float32(c.Size))), gtx.Constraints.Min.Y), color)
 						}),
 						layout.Stacked(func(gtx C) D {
 							independent := "No"
@@ -360,7 +360,7 @@ func (r *Row) generateColumns() {
 				Layout: func(gtx C, th *material.Theme, c *Cell, color color.NRGBA, isHeader bool) D {
 					return layout.Stack{Alignment: layout.Center}.Layout(gtx,
 						layout.Expanded(func(gtx C) D {
-							return g.ColoredArea(gtx, image.Pt(gtx.Px(unit.Dp(float32(c.Size))), gtx.Constraints.Min.Y), color)
+							return globals.ColoredArea(gtx, image.Pt(gtx.Px(unit.Dp(float32(c.Size))), gtx.Constraints.Min.Y), color)
 						}),
 						layout.Stacked(func(gtx C) D {
 							res := r.Status
@@ -377,7 +377,7 @@ func (r *Row) generateColumns() {
 				Layout: func(gtx C, th *material.Theme, c *Cell, color color.NRGBA, isHeader bool) D {
 					return layout.Stack{Alignment: layout.Center}.Layout(gtx,
 						layout.Expanded(func(gtx C) D {
-							return g.ColoredArea(gtx, image.Pt(gtx.Px(unit.Dp(float32(c.Size))), gtx.Constraints.Min.Y), color)
+							return globals.ColoredArea(gtx, image.Pt(gtx.Px(unit.Dp(float32(c.Size))), gtx.Constraints.Min.Y), color)
 						}),
 						layout.Stacked(func(gtx C) D {
 							unMember := "No"
@@ -397,7 +397,7 @@ func (r *Row) generateColumns() {
 				Layout: func(gtx C, th *material.Theme, c *Cell, color color.NRGBA, isHeader bool) D {
 					return layout.Stack{Alignment: layout.Center}.Layout(gtx,
 						layout.Expanded(func(gtx C) D {
-							return g.ColoredArea(gtx, image.Pt(gtx.Px(unit.Dp(float32(c.Size))), gtx.Constraints.Min.Y), color)
+							return globals.ColoredArea(gtx, image.Pt(gtx.Px(unit.Dp(float32(c.Size))), gtx.Constraints.Min.Y), color)
 						}),
 						layout.Stacked(func(gtx C) D {
 							landLocked := "No"
@@ -417,7 +417,7 @@ func (r *Row) generateColumns() {
 				Layout: func(gtx C, th *material.Theme, c *Cell, color color.NRGBA, isHeader bool) D {
 					return layout.Stack{Alignment: layout.Center}.Layout(gtx,
 						layout.Expanded(func(gtx C) D {
-							return g.ColoredArea(gtx, image.Pt(gtx.Px(unit.Dp(float32(c.Size))), gtx.Constraints.Min.Y), color)
+							return globals.ColoredArea(gtx, image.Pt(gtx.Px(unit.Dp(float32(c.Size))), gtx.Constraints.Min.Y), color)
 						}),
 						layout.Stacked(func(gtx C) D {
 							res := r.Cca2
@@ -434,7 +434,7 @@ func (r *Row) generateColumns() {
 				Layout: func(gtx C, th *material.Theme, c *Cell, color color.NRGBA, isHeader bool) D {
 					return layout.Stack{Alignment: layout.Center}.Layout(gtx,
 						layout.Expanded(func(gtx C) D {
-							return g.ColoredArea(gtx, image.Pt(gtx.Px(unit.Dp(float32(c.Size))), gtx.Constraints.Min.Y), color)
+							return globals.ColoredArea(gtx, image.Pt(gtx.Px(unit.Dp(float32(c.Size))), gtx.Constraints.Min.Y), color)
 						}),
 						layout.Stacked(func(gtx C) D {
 							res := r.Cca3
@@ -451,7 +451,7 @@ func (r *Row) generateColumns() {
 				Layout: func(gtx C, th *material.Theme, c *Cell, color color.NRGBA, isHeader bool) D {
 					return layout.Stack{Alignment: layout.Center}.Layout(gtx,
 						layout.Expanded(func(gtx C) D {
-							return g.ColoredArea(gtx, image.Pt(gtx.Px(unit.Dp(float32(c.Size))), gtx.Constraints.Min.Y), color)
+							return globals.ColoredArea(gtx, image.Pt(gtx.Px(unit.Dp(float32(c.Size))), gtx.Constraints.Min.Y), color)
 						}),
 						layout.Stacked(func(gtx C) D {
 							ccn := "-"
@@ -471,7 +471,7 @@ func (r *Row) generateColumns() {
 				Layout: func(gtx C, th *material.Theme, c *Cell, color color.NRGBA, isHeader bool) D {
 					return layout.Stack{Alignment: layout.Center}.Layout(gtx,
 						layout.Expanded(func(gtx C) D {
-							return g.ColoredArea(gtx, image.Pt(gtx.Px(unit.Dp(float32(c.Size))), gtx.Constraints.Min.Y), color)
+							return globals.ColoredArea(gtx, image.Pt(gtx.Px(unit.Dp(float32(c.Size))), gtx.Constraints.Min.Y), color)
 						}),
 						layout.Stacked(func(gtx C) D {
 							ioc := "-"
@@ -491,7 +491,7 @@ func (r *Row) generateColumns() {
 				Layout: func(gtx C, th *material.Theme, c *Cell, color color.NRGBA, isHeader bool) D {
 					return layout.Stack{Alignment: layout.Center}.Layout(gtx,
 						layout.Expanded(func(gtx C) D {
-							return g.ColoredArea(gtx, image.Pt(gtx.Px(unit.Dp(float32(c.Size))), gtx.Constraints.Min.Y), color)
+							return globals.ColoredArea(gtx, image.Pt(gtx.Px(unit.Dp(float32(c.Size))), gtx.Constraints.Min.Y), color)
 						}),
 						layout.Stacked(func(gtx C) D {
 							fifa := "-"
@@ -511,7 +511,7 @@ func (r *Row) generateColumns() {
 				Layout: func(gtx C, th *material.Theme, c *Cell, color color.NRGBA, isHeader bool) D {
 					return layout.Stack{Alignment: layout.Center}.Layout(gtx,
 						layout.Expanded(func(gtx C) D {
-							return g.ColoredArea(gtx, image.Pt(gtx.Px(unit.Dp(float32(c.Size))), gtx.Constraints.Min.Y), color)
+							return globals.ColoredArea(gtx, image.Pt(gtx.Px(unit.Dp(float32(c.Size))), gtx.Constraints.Min.Y), color)
 						}),
 						layout.Stacked(func(gtx C) D {
 							res := strconv.FormatFloat(r.Area, 'f', -1, 32)
@@ -528,7 +528,7 @@ func (r *Row) generateColumns() {
 				Layout: func(gtx C, th *material.Theme, c *Cell, color color.NRGBA, isHeader bool) D {
 					return layout.Stack{Alignment: layout.Center}.Layout(gtx,
 						layout.Expanded(func(gtx C) D {
-							return g.ColoredArea(gtx, image.Pt(gtx.Px(unit.Dp(float32(c.Size))), gtx.Constraints.Min.Y), color)
+							return globals.ColoredArea(gtx, image.Pt(gtx.Px(unit.Dp(float32(c.Size))), gtx.Constraints.Min.Y), color)
 						}),
 						layout.Stacked(func(gtx C) D {
 							res := fmt.Sprintf("%d", int(r.Population))
@@ -545,7 +545,7 @@ func (r *Row) generateColumns() {
 				Layout: func(gtx C, th *material.Theme, c *Cell, color color.NRGBA, isHeader bool) D {
 					return layout.Stack{Alignment: layout.Center}.Layout(gtx,
 						layout.Expanded(func(gtx C) D {
-							return g.ColoredArea(gtx, image.Pt(gtx.Px(unit.Dp(float32(c.Size))), gtx.Constraints.Min.Y), color)
+							return globals.ColoredArea(gtx, image.Pt(gtx.Px(unit.Dp(float32(c.Size))), gtx.Constraints.Min.Y), color)
 						}),
 						layout.Stacked(func(gtx C) D {
 							res := strconv.FormatFloat(r.Latitude, 'f', -1, 64)
@@ -562,7 +562,7 @@ func (r *Row) generateColumns() {
 				Layout: func(gtx C, th *material.Theme, c *Cell, color color.NRGBA, isHeader bool) D {
 					return layout.Stack{Alignment: layout.Center}.Layout(gtx,
 						layout.Expanded(func(gtx C) D {
-							return g.ColoredArea(gtx, image.Pt(gtx.Px(unit.Dp(float32(c.Size))), gtx.Constraints.Min.Y), color)
+							return globals.ColoredArea(gtx, image.Pt(gtx.Px(unit.Dp(float32(c.Size))), gtx.Constraints.Min.Y), color)
 						}),
 						layout.Stacked(func(gtx C) D {
 							res := strconv.FormatFloat(r.Longitude, 'f', -1, 64)
@@ -579,7 +579,7 @@ func (r *Row) generateColumns() {
 				Layout: func(gtx C, th *material.Theme, c *Cell, color color.NRGBA, isHeader bool) D {
 					return layout.Stack{Alignment: layout.Center}.Layout(gtx,
 						layout.Expanded(func(gtx C) D {
-							return g.ColoredArea(gtx, image.Pt(gtx.Px(unit.Dp(float32(c.Size))), gtx.Constraints.Min.Y), color)
+							return globals.ColoredArea(gtx, image.Pt(gtx.Px(unit.Dp(float32(c.Size))), gtx.Constraints.Min.Y), color)
 						}),
 						layout.Stacked(func(gtx C) D {
 							res := r.StartOfWeek
@@ -596,7 +596,7 @@ func (r *Row) generateColumns() {
 				Layout: func(gtx C, th *material.Theme, c *Cell, color color.NRGBA, isHeader bool) D {
 					return layout.Stack{Alignment: layout.Center}.Layout(gtx,
 						layout.Expanded(func(gtx C) D {
-							return g.ColoredArea(gtx, image.Pt(gtx.Px(unit.Dp(float32(c.Size))), gtx.Constraints.Min.Y), color)
+							return globals.ColoredArea(gtx, image.Pt(gtx.Px(unit.Dp(float32(c.Size))), gtx.Constraints.Min.Y), color)
 						}),
 						layout.Stacked(func(gtx C) D {
 							res := "-"
@@ -616,7 +616,7 @@ func (r *Row) generateColumns() {
 				Layout: func(gtx C, th *material.Theme, c *Cell, color color.NRGBA, isHeader bool) D {
 					return layout.Stack{Alignment: layout.Center}.Layout(gtx,
 						layout.Expanded(func(gtx C) D {
-							return g.ColoredArea(gtx, image.Pt(gtx.Px(unit.Dp(float32(c.Size))), gtx.Constraints.Min.Y), color)
+							return globals.ColoredArea(gtx, image.Pt(gtx.Px(unit.Dp(float32(c.Size))), gtx.Constraints.Min.Y), color)
 						}),
 						layout.Stacked(func(gtx C) D {
 							res := r.CarSide

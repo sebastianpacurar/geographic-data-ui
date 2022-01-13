@@ -3,7 +3,7 @@ module gioui-experiment
 go 1.17
 
 require (
-	gioui.org v0.0.0-20220107171640-11f39582b847
+	gioui.org v0.0.0-20220113184748-9209fd91431f
 	github.com/xuri/excelize/v2 v2.5.0
 )
 
@@ -13,15 +13,17 @@ require (
 	github.com/mohae/deepcopy v0.0.0-20170929034955-c48cc78d4826 // indirect
 	github.com/richardlehane/mscfb v1.0.3 // indirect
 	github.com/richardlehane/msoleps v1.0.1 // indirect
+	github.com/shurcooL/go v0.0.0-20200502201357-93f07166e636 // indirect
+	github.com/shurcooL/go-goon v0.0.0-20210110234559-7585751d9a17 // indirect
 	github.com/xuri/efp v0.0.0-20210322160811-ab561f5b45e3 // indirect
-	golang.org/x/crypto v0.0.0-20211215153901-e495a2d5b3d3 // indirect
+	golang.org/x/crypto v0.0.0-20220112180741-5e0467b6c7ce // indirect
 	golang.org/x/image v0.0.0-20211028202545-6944b10bf410 // indirect
-	golang.org/x/net v0.0.0-20220107192237-5cfca573fb4d // indirect
+	golang.org/x/net v0.0.0-20220111093109-d55c255bac03 // indirect
 )
 
 require (
-	gioui.org/x v0.0.0-20220105211426-ffad81642756
+	gioui.org/x v0.0.0-20220111071509-6849543714b7
 	golang.org/x/exp v0.0.0-20220104160115-025e73f80486
-	golang.org/x/sys v0.0.0-20211216021012-1d35b9e2eb4e // indirect
+	golang.org/x/sys v0.0.0-20220111092808-5a964db01320 // indirect
 	golang.org/x/text v0.3.7 // indirect
 )

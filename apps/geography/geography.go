@@ -6,7 +6,6 @@ import (
 	"gioui-experiment/apps/geography/data"
 	"gioui-experiment/apps/geography/grid"
 	"gioui-experiment/apps/geography/table"
-	g "gioui-experiment/globals"
 	"gioui-experiment/themes/colours"
 	"gioui.org/layout"
 	"gioui.org/op"
@@ -75,7 +74,6 @@ type (
 		Name       string
 		Btn        widget.Clickable
 		IsSelected bool
-		SetActive  func(c *Continent)
 	}
 )
 
@@ -104,14 +102,17 @@ func (app *Application) IsCPDisabled() bool {
 }
 
 func (app *Application) LayoutView(gtx C, th *material.Theme) D {
-	err := app.Display.Api.InitCountries()
+	err := app.Api.InitCountries()
 	if err != nil {
 		return material.H2(th, fmt.Sprintf("Error when fetching countries: %s", err)).Layout(gtx)
 	}
-	app.Display.FilterData(table.OFFICIAL_NAME)
+	app.FilterData(table.NAME)
 
 	// run only once at start
 	if !app.InitialSetup {
+		app.SearchField.SingleLine = true
+
+		// initialize all flags
 		for i := range data.Cached {
 			//TODO: this one is really sloooow
 			//_ = data.Cached[i].ProcessFlagFromUrl(data.Cached[i].FlagField.Png)
@@ -119,17 +120,22 @@ func (app *Application) LayoutView(gtx C, th *material.Theme) D {
 			_ = data.Cached[i].ReadFlagFromFile()
 		}
 
-		// initialize continents, to All Continents
+		// initialize Table View at start
+		app.Selected = app.Display.Table
+
+		// initialize continents to "All" as Selected
 		app.initContinents()
 		for i := range app.Continents {
 			if app.Continents[i].Name == "All" {
+				app.Continents[i].IsSelected = true
 				for j := range data.Cached {
 					data.Cached[j].ActiveContinent = true
 				}
+				break
 			}
 		}
 
-		// set all countries to displayed
+		// set all countries to Active
 		for i := range data.Cached {
 			data.Cached[i].Active = true
 		}
@@ -154,20 +160,14 @@ func (app *Application) LayoutView(gtx C, th *material.Theme) D {
 		}
 	}
 
-	if app.Display.Selected == nil {
-		app.Display.Selected = app.Display.Table
-	}
-
-	app.Display.SearchField.SingleLine = true
-
 	var dims D
 
-	switch app.Display.Grid.Contextual.(type) {
+	switch app.Grid.Contextual.(type) {
 	case data.Country:
 		if !app.ContextualSet {
 			app.Router.AppBar.SetContextualActions(
 				[]component.AppBarAction{
-					component.SimpleIconAction(&app.pinBtn, g.PinIcon,
+					component.SimpleIconAction(&app.pinBtn, globals.PinIcon,
 						component.OverflowAction{
 							Name: "Pin Country",
 							Tag:  &app.pinBtn,
@@ -255,7 +255,7 @@ func (app *Application) LayoutView(gtx C, th *material.Theme) D {
 						Left:   unit.Dp(8),
 					}.Layout(gtx, func(gtx C) D {
 						var btn material.IconButtonStyle
-						btn = material.IconButton(th, &app.Display.SaveAsXlsx, g.ExcelExportIcon, "Export to Excel")
+						btn = material.IconButton(th, &app.Display.SaveAsXlsx, globals.ExcelExportIcon, "Export to Excel")
 						btn.Size = unit.Dp(20)
 						btn.Inset = layout.UniformInset(unit.Dp(8))
 						return btn.Layout(gtx)
@@ -287,26 +287,32 @@ func (app *Application) LayoutView(gtx C, th *material.Theme) D {
 							btn = material.Button(th, &app.Continents[i].Btn, app.Continents[i].Name)
 							btn.CornerRadius = unit.Dp(1)
 							btn.Inset = layout.UniformInset(unit.Dp(10))
-							btn.Background = g.Colours[colours.WHITE]
-							btn.Color = g.Colours[colours.BLACK]
+							btn.Background = globals.Colours[colours.WHITE]
+							btn.Color = globals.Colours[colours.BLACK]
 							dim = btn.Layout(gtx)
 
 							if app.Continents[i].Btn.Clicked() {
 								name := app.Continents[i].Name
 								app.Continents[i].IsSelected = true
+
+								// update the tab ui
 								for j := range app.Continents {
 									if name != app.Continents[j].Name {
 										app.Continents[j].IsSelected = false
 									}
 								}
 
-								// TODO: fix issue with All Continents
+								// update ActiveContinent state
 								for j := range data.Cached {
-									continents := strings.Join(data.Cached[j].Continents, " ")
-									if strings.Contains(continents, name) {
+									if name == "All" {
 										data.Cached[j].ActiveContinent = true
 									} else {
-										data.Cached[j].ActiveContinent = false
+										continents := strings.Join(data.Cached[j].Continents, " ")
+										if strings.Contains(continents, app.Continents[i].Name) {
+											data.Cached[j].ActiveContinent = true
+										} else {
+											data.Cached[j].ActiveContinent = false
+										}
 									}
 								}
 								op.InvalidateOp{}.Add(gtx.Ops)
@@ -322,7 +328,7 @@ func (app *Application) LayoutView(gtx C, th *material.Theme) D {
 
 									return layout.Stack{Alignment: layout.S}.Layout(gtx,
 										layout.Expanded(func(gtx C) D {
-											return g.ColoredArea(gtx, size, g.Colours[colours.AERO_BLUE])
+											return globals.ColoredArea(gtx, size, globals.Colours[colours.AERO_BLUE])
 										}),
 										layout.Stacked(func(gtx C) D {
 											return layout.Flex{Axis: layout.Vertical}.Layout(gtx,
@@ -339,7 +345,7 @@ func (app *Application) LayoutView(gtx C, th *material.Theme) D {
 												layout.Rigid(func(gtx C) D {
 													return layout.Stack{}.Layout(gtx,
 														layout.Expanded(func(gtx C) D {
-															return g.ColoredArea(gtx, image.Pt(gtx.Constraints.Max.X, 3), g.Colours[colours.SEA_GREEN])
+															return globals.ColoredArea(gtx, image.Pt(gtx.Constraints.Max.X, 3), globals.Colours[colours.SEA_GREEN])
 														}))
 												}))
 										}))
@@ -468,24 +474,10 @@ func (d *Display) saveDataToExcel() {
 	}
 }
 
+// init all continents with IsSelected set to false
 func (d *Display) initContinents() {
 	d.AllContinents = []string{"All", "Asia", "Africa", "Antarctica", "Europe", "Oceania", "North America", "South America"}
 	for i := range d.AllContinents {
-		d.Continents = append(d.Continents,
-			Continent{
-				Name:       d.AllContinents[i],
-				IsSelected: false,
-				SetActive: func(c *Continent) {
-					for j := range data.Cached {
-						for _, v := range data.Cached[j].Continents {
-							if v == c.Name {
-								data.Cached[j].ActiveContinent = true
-							} else {
-								data.Cached[j].ActiveContinent = false
-							}
-						}
-					}
-				},
-			})
+		d.Continents = append(d.Continents, Continent{Name: d.AllContinents[i]})
 	}
 }

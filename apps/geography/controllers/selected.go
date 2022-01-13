@@ -2,7 +2,7 @@ package controllers
 
 import (
 	"gioui-experiment/apps/geography/data"
-	g "gioui-experiment/globals"
+	"gioui-experiment/globals"
 	"gioui-experiment/themes/colours"
 	"gioui.org/layout"
 	"gioui.org/unit"
@@ -73,7 +73,7 @@ func (sc *SelectedCountries) Layout(gtx C, th *material.Theme) D {
 					Left:   unit.Dp(2),
 				}.Layout(gtx, func(gtx C) D {
 					border := widget.Border{
-						Color:        g.Colours[colours.GREY],
+						Color:        globals.Colours[colours.GREY],
 						CornerRadius: unit.Dp(1),
 						Width:        unit.Dp(1),
 					}
@@ -83,8 +83,8 @@ func (sc *SelectedCountries) Layout(gtx C, th *material.Theme) D {
 								var btn material.ButtonStyle
 								btn = material.Button(th, &sc.pills[i].click, sc.pills[i].content.Name.Common)
 								btn.CornerRadius = unit.Dp(10)
-								btn.Background = g.Colours[colours.AERO_BLUE]
-								btn.Color = g.Colours[colours.BLACK]
+								btn.Background = globals.Colours[colours.AERO_BLUE]
+								btn.Color = globals.Colours[colours.BLACK]
 								btn.TextSize = th.TextSize.Scale(14.0 / 16.0)
 								return btn.Layout(gtx)
 							}),
@@ -92,8 +92,8 @@ func (sc *SelectedCountries) Layout(gtx C, th *material.Theme) D {
 								var btn material.ButtonStyle
 								btn = material.Button(th, &sc.pills[i].deselect, "X")
 								btn.CornerRadius = unit.Dp(0)
-								btn.Background = g.Colours[colours.FLAME_RED]
-								btn.Color = g.Colours[colours.WHITE]
+								btn.Background = globals.Colours[colours.FLAME_RED]
+								btn.Color = globals.Colours[colours.WHITE]
 								btn.TextSize = th.TextSize.Scale(14.0 / 16.0)
 								return btn.Layout(gtx)
 							}))

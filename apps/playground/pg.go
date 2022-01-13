@@ -3,7 +3,6 @@ package playground
 import (
 	"gioui-experiment/apps"
 	"gioui-experiment/apps/playground/data"
-	g "gioui-experiment/globals"
 	"gioui-experiment/themes/colours"
 	"gioui.org/layout"
 	"gioui.org/op"
@@ -84,8 +83,8 @@ func (app *Application) LayoutView(gtx C, th *material.Theme) D {
 						btn = material.Button(th, &app.TabsList[i].Btn, app.TabsList[i].Name)
 						btn.CornerRadius = unit.Dp(1)
 						btn.Inset = layout.UniformInset(unit.Dp(10))
-						btn.Background = g.Colours[colours.WHITE]
-						btn.Color = g.Colours[colours.BLACK]
+						btn.Background = globals.Colours[colours.WHITE]
+						btn.Color = globals.Colours[colours.BLACK]
 						dims = btn.Layout(gtx)
 
 						if app.TabsList[i].Btn.Clicked() {
@@ -109,7 +108,7 @@ func (app *Application) LayoutView(gtx C, th *material.Theme) D {
 
 								return layout.Stack{Alignment: layout.S}.Layout(gtx,
 									layout.Expanded(func(gtx C) D {
-										return g.ColoredArea(gtx, size, g.Colours[colours.AERO_BLUE])
+										return globals.ColoredArea(gtx, size, globals.Colours[colours.AERO_BLUE])
 									}),
 									layout.Stacked(func(gtx C) D {
 										return layout.Flex{Axis: layout.Vertical}.Layout(gtx,
@@ -126,7 +125,7 @@ func (app *Application) LayoutView(gtx C, th *material.Theme) D {
 											layout.Rigid(func(gtx C) D {
 												return layout.Stack{}.Layout(gtx,
 													layout.Expanded(func(gtx C) D {
-														return g.ColoredArea(gtx, image.Pt(gtx.Constraints.Max.X, 3), g.Colours[colours.SEA_GREEN])
+														return globals.ColoredArea(gtx, image.Pt(gtx.Constraints.Max.X, 3), globals.Colours[colours.SEA_GREEN])
 													}))
 											}))
 									}))
@@ -157,12 +156,12 @@ func (app *Application) layDisableButton(th *material.Theme) layout.FlexChild {
 
 		if !app.isCPDisabled {
 			btn = material.Button(th, &app.DisableCPBtn, "Disable CP")
-			btn.Background = g.Colours[colours.FLAME_RED]
-			btn.Color = g.Colours[colours.WHITE]
+			btn.Background = globals.Colours[colours.FLAME_RED]
+			btn.Color = globals.Colours[colours.WHITE]
 		} else {
 			btn = material.Button(th, &app.DisableCPBtn, "Enable CP")
-			btn.Background = g.Colours[colours.SEA_GREEN]
-			btn.Color = g.Colours[colours.WHITE]
+			btn.Background = globals.Colours[colours.SEA_GREEN]
+			btn.Color = globals.Colours[colours.WHITE]
 		}
 		return btn.Layout(gtx)
 	})
@@ -218,7 +217,7 @@ func (app *Application) initApps() {
 					return layout.Stack{}.Layout(gtx,
 						layout.Expanded(func(gtx C) D {
 							size := image.Pt(gtx.Constraints.Max.X, gtx.Constraints.Max.Y)
-							return g.RColoredArea(gtx, size, 10, g.Colours[colours.WHITE])
+							return globals.RColoredArea(gtx, size, 10, globals.Colours[colours.WHITE])
 						}),
 						layout.Stacked(func(gtx C) D {
 							return D{}

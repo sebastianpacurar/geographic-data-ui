@@ -1,7 +1,7 @@
 package grid
 
 import (
-	g "gioui-experiment/globals"
+	"gioui-experiment/globals"
 	"gioui-experiment/themes/colours"
 	"gioui.org/font/gofont"
 	"gioui.org/layout"
@@ -11,15 +11,20 @@ import (
 	"gioui.org/widget/material"
 	"gioui.org/x/component"
 	"image"
+	"image/color"
 )
 
 type (
 	Card struct {
-		Name string
-		Flag image.Image
+		Name      string
+		Flag      image.Image
+		btn       widget.Clickable
+		container component.SurfaceStyle
+		shadow    component.ShadowStyle
 
-		Active   bool
-		Selected bool
+		Active          bool
+		ActiveContinent bool
+		Selected        bool
 
 		menu            component.MenuState
 		ctxArea         component.ContextArea
@@ -29,18 +34,20 @@ type (
 		selectBtn     widget.Clickable
 		deselectBtn   widget.Clickable
 		copyToClipBtn widget.Clickable
-		viewBtn       widget.Clickable
 	}
 )
 
 func (c *Card) LayCard(gtx C, th *material.Theme) D {
-	size := image.Pt(200, 250)
-	var container component.SurfaceStyle
+	size := image.Pt(gtx.Px(unit.Dp(float32(200))), gtx.Px(unit.Dp(float32(250))))
 
-	container.Theme = material.NewTheme(gofont.Collection())
-	container.Theme.Bg = g.Colours[colours.CARD_COLOR]
-	container.Elevation = unit.Dp(5)
-	container.ShadowStyle = component.Shadow(unit.Dp(5), unit.Dp(8))
+	c.container.Theme = material.NewTheme(gofont.Collection())
+	c.container.Theme.Bg = globals.Colours[colours.CARD_COLOR]
+	c.container.Elevation = unit.Dp(5)
+	c.shadow.CornerRadius = unit.Dp(5)
+	c.shadow.Elevation = unit.Dp(8)
+	c.shadow.AmbientColor = color.NRGBA{A: 0x10}
+	c.shadow.PenumbraColor = color.NRGBA{A: 0x20}
+	c.shadow.UmbraColor = color.NRGBA{A: 0x30}
 
 	if !c.isMenuTriggered {
 		lbl := "Select"
@@ -62,40 +69,61 @@ func (c *Card) LayCard(gtx C, th *material.Theme) D {
 			Options: []func(gtx C) D{
 				item.Layout,
 				component.MenuItem(th, &c.copyToClipBtn, "Copy as JSON").Layout,
-				component.MenuItem(th, &c.viewBtn, "View").Layout,
 			},
 		}
 	}
+
+	if c.Selected {
+		c.shadow.AmbientColor = color.NRGBA{G: 255, A: 85}
+		c.shadow.PenumbraColor = color.NRGBA{G: 255, A: 170}
+		c.shadow.UmbraColor = color.NRGBA{G: 255, A: 255}
+	}
+	if c.btn.Hovered() {
+		if c.Selected {
+			c.shadow.AmbientColor = color.NRGBA{R: 255, G: 107, B: 108, A: 85}
+			c.shadow.PenumbraColor = color.NRGBA{R: 255, G: 107, B: 108, A: 170}
+			c.shadow.UmbraColor = color.NRGBA{R: 255, G: 107, B: 108, A: 255}
+		} else {
+			c.shadow.AmbientColor = color.NRGBA{R: 233, G: 255, B: 219, A: 85}
+			c.shadow.PenumbraColor = color.NRGBA{R: 233, G: 255, B: 219, A: 170}
+			c.shadow.UmbraColor = color.NRGBA{R: 233, G: 255, B: 219, A: 255}
+		}
+	}
+
 	return layout.Stack{}.Layout(gtx,
 		layout.Stacked(func(gtx C) D {
-			return container.Layout(gtx, func(gtx C) D {
-				gtx.Constraints = layout.Exact(gtx.Constraints.Constrain(size))
-				return layout.UniformInset(unit.Dp(10)).Layout(gtx, func(gtx C) D {
-					//gtx.Constraints = layout.Exact(gtx.Constraints.Constrain(size))
-					return layout.Flex{Axis: layout.Vertical, Spacing: layout.SpaceAround}.Layout(gtx,
-						// country name
-						layout.Rigid(func(gtx C) D {
-							return layout.Flex{}.Layout(gtx,
-								layout.Flexed(1, func(gtx C) D {
-									return layout.Center.Layout(gtx, func(gtx C) D {
-										return material.Body2(th, c.Name).Layout(gtx)
-									})
-								}),
-							)
-						}),
+			c.container.ShadowStyle = c.shadow
 
-						// country flag image
-						layout.Rigid(func(gtx C) D {
-							return layout.Flex{}.Layout(gtx,
-								layout.Flexed(1, func(gtx C) D {
-									return layout.Center.Layout(gtx, func(gtx C) D {
-										return widget.Image{
-											Src: paint.NewImageOp(c.Flag),
-											Fit: widget.Contain,
-										}.Layout(gtx)
-									})
-								}))
-						}))
+			return c.container.Layout(gtx, func(gtx C) D {
+				return material.Clickable(gtx, &c.btn, func(gtx C) D {
+					gtx.Constraints = layout.Exact(gtx.Constraints.Constrain(size))
+					return layout.UniformInset(unit.Dp(10)).Layout(gtx, func(gtx C) D {
+						return layout.Flex{Axis: layout.Vertical, Spacing: layout.SpaceEvenly}.Layout(gtx,
+
+							// country name
+							layout.Rigid(func(gtx C) D {
+								return layout.Flex{}.Layout(gtx,
+									layout.Flexed(1, func(gtx C) D {
+										return layout.Center.Layout(gtx, func(gtx C) D {
+											return material.Body2(th, c.Name).Layout(gtx)
+										})
+									}),
+								)
+							}),
+
+							// country flag
+							layout.Rigid(func(gtx C) D {
+								return layout.Flex{}.Layout(gtx,
+									layout.Flexed(1, func(gtx C) D {
+										return layout.Center.Layout(gtx, func(gtx C) D {
+											return widget.Image{
+												Src: paint.NewImageOp(c.Flag),
+												Fit: widget.ScaleDown,
+											}.Layout(gtx)
+										})
+									}))
+							}))
+					})
 				})
 			})
 		}),

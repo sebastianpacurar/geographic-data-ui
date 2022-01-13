@@ -3,7 +3,7 @@ package grid
 import (
 	"encoding/json"
 	"gioui-experiment/apps/geography/data"
-	g "gioui-experiment/globals"
+	"gioui-experiment/globals"
 	"gioui.org/io/clipboard"
 	"gioui.org/layout"
 	"gioui.org/op"
@@ -45,6 +45,7 @@ func (gr *Grid) Layout(gtx C, th *material.Theme) D {
 	} else {
 		for i := range data.Cached {
 			gr.cards[i].Active = data.Cached[i].Active
+			gr.cards[i].ActiveContinent = data.Cached[i].ActiveContinent
 			gr.cards[i].Selected = data.Cached[i].Selected
 		}
 	}
@@ -59,10 +60,10 @@ func (gr *Grid) Layout(gtx C, th *material.Theme) D {
 				clipboard.WriteOp{
 					Text: string(res),
 				}.Add(gtx.Ops)
-				g.ClipBoardVal = string(res)
+				globals.ClipBoardVal = string(res)
 			}
 
-			if gr.cards[i].viewBtn.Clicked() {
+			if gr.cards[i].btn.Clicked() {
 				gr.Contextual = data.Cached[i] // interface to assert type when enabling ContextualAppBar
 				data.Cached[i].IsCtxtActive = true
 				op.InvalidateOp{}.Add(gtx.Ops)
@@ -70,11 +71,13 @@ func (gr *Grid) Layout(gtx C, th *material.Theme) D {
 
 			if gr.cards[i].selectBtn.Clicked() {
 				data.Cached[i].Selected = true
+				op.InvalidateOp{}.Add(gtx.Ops)
 			} else if gr.cards[i].deselectBtn.Clicked() {
 				data.Cached[i].Selected = false
+				op.InvalidateOp{}.Add(gtx.Ops)
 			}
 
-			if gr.cards[i].Active {
+			if gr.cards[i].Active && gr.cards[i].ActiveContinent {
 				content = layout.UniformInset(unit.Dp(15)).Layout(gtx, func(gtx C) D {
 					return gr.cards[i].LayCard(gtx, th)
 				})

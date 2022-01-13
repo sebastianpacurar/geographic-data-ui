@@ -1,7 +1,7 @@
 package apps
 
 import (
-	g "gioui-experiment/globals"
+	"gioui-experiment/globals"
 	"gioui-experiment/themes/colours"
 	"gioui.org/layout"
 	"gioui.org/op/clip"
@@ -46,7 +46,7 @@ func NewRouter() Router {
 	modalNav := component.ModalNavFrom(&nav, modal)
 
 	bar := component.NewAppBar(modal)
-	bar.NavigationIcon = g.MenuIcon
+	bar.NavigationIcon = globals.MenuIcon
 
 	na := component.VisibilityAnimation{
 		State:    component.Invisible,
@@ -112,10 +112,10 @@ func (r *Router) Layout(gtx C, th *material.Theme) D {
 					func(gtx C) D {
 						return layout.Stack{}.Layout(gtx,
 							layout.Expanded(func(gtx C) D {
-								container := g.ColoredArea(
+								container := globals.ColoredArea(
 									gtx,
 									gtx.Constraints.Max,
-									g.Colours[colours.ANTIQUE_WHITE],
+									globals.Colours[colours.ANTIQUE_WHITE],
 								)
 								return container
 							}),
@@ -137,17 +137,17 @@ func (r *Router) Layout(gtx C, th *material.Theme) D {
 					func(gtx C) D {
 						return layout.Stack{Alignment: layout.NW}.Layout(gtx,
 							layout.Expanded(func(gtx C) D {
-								return g.ColoredArea(
+								return globals.ColoredArea(
 									gtx,
 									gtx.Constraints.Max,
-									g.Colours[colours.AERO_BLUE],
+									globals.Colours[colours.AERO_BLUE],
 								)
 							}),
 							layout.Stacked(func(gtx C) D {
 								containerSize := image.Pt(gtx.Constraints.Max.X, gtx.Constraints.Max.Y)
 								gtx.Constraints = layout.Exact(gtx.Constraints.Constrain(containerSize))
 								border := widget.Border{
-									Color: g.Colours[colours.SEA_GREEN],
+									Color: globals.Colours[colours.SEA_GREEN],
 									Width: unit.Dp(1),
 								}
 								return border.Layout(gtx, func(gtx C) D {
@@ -174,10 +174,10 @@ func (r *Router) Layout(gtx C, th *material.Theme) D {
 				if r.current == "pg" && r.pages[r.current].IsCPDisabled() {
 					dims = layout.Stack{}.Layout(gtx,
 						layout.Expanded(func(gtx C) D {
-							container := g.ColoredArea(
+							container := globals.ColoredArea(
 								gtx,
 								gtx.Constraints.Max,
-								g.Colours[colours.ANTIQUE_WHITE],
+								globals.Colours[colours.ANTIQUE_WHITE],
 							)
 							return container
 						}),

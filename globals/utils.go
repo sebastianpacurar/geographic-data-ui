@@ -1,6 +1,5 @@
 package globals
 
-import "C"
 import (
 	"gioui.org/f32"
 	"gioui.org/layout"

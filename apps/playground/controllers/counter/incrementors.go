@@ -2,7 +2,7 @@ package counter
 
 import (
 	"gioui-experiment/apps/playground/data"
-	g "gioui-experiment/globals"
+	"gioui-experiment/globals"
 	"gioui.org/layout"
 	"gioui.org/unit"
 	"gioui.org/widget"
@@ -33,7 +33,7 @@ func (inc *Incrementor) Layout(gtx C, th *material.Theme) D {
 			inc.handleMinusBtn(pgv)
 		}
 		return layout.UniformInset(unit.Dp(10)).Layout(gtx,
-			material.IconButton(th, &inc.minusBtn, g.MinusIcon, "desc").Layout)
+			material.IconButton(th, &inc.minusBtn, globals.MinusIcon, "desc").Layout)
 	})
 
 	resetBtn := layout.Rigid(func(gtx C) D {
@@ -44,7 +44,7 @@ func (inc *Incrementor) Layout(gtx C, th *material.Theme) D {
 			inc.handleResetBtn(pgv)
 		}
 		return layout.UniformInset(unit.Dp(10)).Layout(gtx,
-			material.IconButton(th, &inc.resetBtn, g.RefreshIcon, "desc").Layout)
+			material.IconButton(th, &inc.resetBtn, globals.RefreshIcon, "desc").Layout)
 	})
 
 	plusBtn := layout.Rigid(func(gtx C) D {
@@ -55,13 +55,13 @@ func (inc *Incrementor) Layout(gtx C, th *material.Theme) D {
 			inc.handlePlusBtn(pgv)
 		}
 		return layout.UniformInset(unit.Dp(10)).Layout(gtx,
-			material.IconButton(th, &inc.plusBtn, g.PlusIcon, "desc").Layout)
+			material.IconButton(th, &inc.plusBtn, globals.PlusIcon, "desc").Layout)
 	})
 
 	// laying out minusBtn - space - resetBtn - space - plusBtn
 	// align them from the start
 	return layout.Flex{Spacing: layout.SpaceEvenly}.Layout(gtx,
-		minusBtn, g.SpacerX, resetBtn, g.SpacerX, plusBtn,
+		minusBtn, globals.SpacerX, resetBtn, globals.SpacerX, plusBtn,
 	)
 }
 
