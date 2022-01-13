@@ -1,7 +1,9 @@
 package data
 
 import (
+	"bytes"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"image"
 	"io"
@@ -9,6 +11,7 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"strings"
 )
 
 var (
@@ -28,7 +31,8 @@ type (
 
 	// CountryFlag - Used with v2 API - Caution: country naming discrepancies!
 	CountryFlag struct {
-		FlagField Flag `json:"flags"`
+		Alpha2Code string `json:"alpha2Code"`
+		FlagField  Flag   `json:"flags"`
 		// FlagImg - obtained after decoding the FlagField png
 		FlagImg image.Image
 	}
@@ -131,7 +135,7 @@ func (c *Countries) GetSelectedCount() int {
 }
 
 // ProcessFlagFromUrl - decode image directly from url  (very slow)
-func (c *Country) ProcessFlagFromUrl(url string) error {
+func downloadFlagFromUrl(url string) ([]byte, error) {
 	resp, e := http.Get(url)
 	if e != nil {
 		log.Fatalln(e)
@@ -142,10 +146,56 @@ func (c *Country) ProcessFlagFromUrl(url string) error {
 			log.Fatalln(err)
 		}
 	}(resp.Body)
+	var data bytes.Buffer
+	_, e = io.Copy(&data, resp.Body)
+	if e != nil {
+		return nil, e
+	}
+	return data.Bytes(), nil
+}
 
-	img, _, _ := image.Decode(resp.Body)
-	c.FlagImg = img
-	return nil
+// ProcessFlags - grab multiple flags at once
+func ProcessFlags(urls []string) {
+	cca2 := make(chan string, len(urls))
+	done := make(chan []byte, len(urls))
+	chanErr := make(chan error, len(urls))
+
+	for _, url := range urls {
+		arr := strings.Split(url, "/")
+		fmt.Println(arr[len(arr)-1][:2])
+		go func(url string) {
+			b, err := downloadFlagFromUrl(url)
+			if err != nil {
+				chanErr <- err
+				done <- nil
+				cca2 <- ""
+				return
+			}
+			done <- b
+			cca2 <- arr[len(arr)-1][:2]
+			chanErr <- nil
+		}(url)
+	}
+
+	var errStr string
+	for i := range Cached {
+		if Cached[i].Cca2 == <-cca2 {
+			data := <-done
+			if data == nil {
+				data = ReadFlagFromFile()
+			}
+			img, _, _ := image.Decode(bytes.NewReader(<-done))
+			Cached[i].FlagImg = img
+		}
+		if err := <-chanErr; err != nil {
+			errStr = errStr + " " + err.Error()
+		}
+	}
+
+	if errStr != "" {
+		_ = errors.New(errStr)
+	}
+
 }
 
 func (c *Countries) InitCountries() error {
@@ -214,26 +264,12 @@ func (c *Country) WriteFlagToFile() error {
 }
 
 // ReadFlagFromFile - Currently faster than ProcessFlagFromUrl, although it demands the png files present in output/flags
-func (c *Country) ReadFlagFromFile() error {
-	path := fmt.Sprintf("output/geography/flags/%s.png", c.Name.Common)
-
-	file, err := os.Open(path)
+func ReadFlagFromFile() []byte {
+	file, err := ioutil.ReadFile("output/geography/flags/placeholder/no-flag.png")
 	if err != nil {
-		_ = c.WriteFlagToFile()
+		log.Fatalln("Error opening no-flag.png path")
 	}
-
-	if _, err := os.Stat(path); os.IsNotExist(err) {
-		path = "output/geography/flags/placeholder/no-flag.png"
-	}
-
-	file, err = os.Open(path)
-	if err != nil {
-		log.Fatalln(fmt.Sprintf("Error opening path: %s", path))
-	}
-
-	img, _, _ := image.Decode(file)
-	c.FlagImg = img
-	return nil
+	return file
 }
 
 // fetchFlags - Fetches only the flags and saves them in CountryFlag

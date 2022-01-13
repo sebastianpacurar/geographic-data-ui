@@ -114,12 +114,18 @@ func (app *Application) LayoutView(gtx C, th *material.Theme) D {
 		app.SearchField.SingleLine = true
 
 		// initialize all flags
-		for i := range data.Cached {
-			//TODO: this one is really sloooow
-			//_ = data.Cached[i].ProcessFlagFromUrl(data.Cached[i].FlagField.Png)
-
-			_ = data.Cached[i].ReadFlagFromFile()
+		var flags []string
+		for i := range data.AllFlags {
+			flags = append(flags, data.AllFlags[i].FlagField.Png)
 		}
+		data.ProcessFlags(flags)
+
+		//for i := range data.Cached {
+		//	//TODO: this one is really sloooow
+		//	_ = data.Cached.ProcessFlagFromUrl(data.Cached[i].FlagField.Png)
+		//
+		//	//_ = data.Cached[i].ReadFlagFromFile()
+		//}
 
 		// initialize Table View at start
 		app.Selected = app.Display.Table
