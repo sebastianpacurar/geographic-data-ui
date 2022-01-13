@@ -3,6 +3,7 @@ package playground
 import (
 	"gioui-experiment/apps"
 	"gioui-experiment/apps/playground/data"
+	"gioui-experiment/globals"
 	"gioui-experiment/themes/colours"
 	"gioui.org/layout"
 	"gioui.org/op"

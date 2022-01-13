@@ -2,4 +2,7 @@
 
 # app file output
 /output/geography/flags/*.png
-output/geography/excel/*.xlsx
+/output/geography/excel/*.xlsx
+
+# wasm output
+/gioui-experiment

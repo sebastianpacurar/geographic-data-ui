@@ -6,6 +6,7 @@ import (
 	"gioui-experiment/apps/geography/data"
 	"gioui-experiment/apps/geography/grid"
 	"gioui-experiment/apps/geography/table"
+	"gioui-experiment/globals"
 	"gioui-experiment/themes/colours"
 	"gioui.org/layout"
 	"gioui.org/op"
