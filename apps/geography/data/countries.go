@@ -3,7 +3,6 @@ package data
 import (
 	"bytes"
 	"encoding/json"
-	"errors"
 	"fmt"
 	"image"
 	"io"
@@ -11,33 +10,17 @@ import (
 	"log"
 	"net/http"
 	"os"
-	"strings"
 )
 
 var (
 	allCountries = &Countries{}
 	Cached       = allCountries.CountriesList
-
-	// AllFlags - used only to get all flags correctly from stable v2 api version
-	AllFlags = allCountries.FlagsList
 )
 
 type (
 	Countries struct {
 		CountriesList []Country
-		FlagsList     []CountryFlag // used only to get all flags correctly from stable v2 api version
 		IsCached      bool
-	}
-
-	// CountryFlag - Used with v2 API - Caution: country naming discrepancies!
-	CountryFlag struct {
-		Alpha2Code string `json:"alpha2Code"`
-		FlagField  Flag   `json:"flags"`
-		// FlagImg - obtained after decoding the FlagField png
-		FlagImg image.Image
-	}
-	Flag struct {
-		Png string `json:"png"`
 	}
 
 	// Country - Used with v3.1 API
@@ -69,7 +52,10 @@ type (
 		Region         string                     `json:"region"`
 		Subregion      string                     `json:"subregion"`
 		Continents     []string                   `json:"continents"`
+		Flag           `json:"flags"`
 
+		// FlagImg - obtained after decoding the FlagField png
+		FlagImg image.Image
 		// Active - used for search rows/cards
 		Active bool
 		// Selected - used for CP
@@ -79,8 +65,6 @@ type (
 		IsCtxtActive bool
 		// for Continent Tab Selection
 		ActiveContinent bool
-
-		CountryFlag
 	}
 
 	Name struct {
@@ -111,6 +95,10 @@ type (
 	Car struct {
 		Signs []string `json:"signs"`
 		Side  string   `json:"side"`
+	}
+
+	Flag struct {
+		Png string `json:"png"`
 	}
 )
 
@@ -154,48 +142,32 @@ func downloadFlagFromUrl(url string) ([]byte, error) {
 	return data.Bytes(), nil
 }
 
-// ProcessFlags - grab multiple flags at once
-func ProcessFlags(urls []string) {
-	cca2 := make(chan string, len(urls))
-	done := make(chan []byte, len(urls))
-	chanErr := make(chan error, len(urls))
+// ProcessFlags - decode png image for 4 countries at once
+func ProcessFlags() {
+	firstBatch := make(chan image.Image, len(Cached)/4)
+	secondBatch := make(chan image.Image, len(Cached)/4)
+	thirdBatch := make(chan image.Image, len(Cached)/4)
+	fourthBatch := make(chan image.Image, len(Cached)/4)
 
-	for _, url := range urls {
-		arr := strings.Split(url, "/")
-		fmt.Println(arr[len(arr)-1][:2])
-		go func(url string) {
-			b, err := downloadFlagFromUrl(url)
-			if err != nil {
-				chanErr <- err
-				done <- nil
-				cca2 <- ""
-				return
-			}
-			done <- b
-			cca2 <- arr[len(arr)-1][:2]
-			chanErr <- nil
-		}(url)
-	}
+	go downloadAndDecodeFlag(Cached[:63], firstBatch)
+	go downloadAndDecodeFlag(Cached[63:126], secondBatch)
+	go downloadAndDecodeFlag(Cached[126:189], thirdBatch)
+	go downloadAndDecodeFlag(Cached[189:], fourthBatch)
+}
 
-	var errStr string
-	for i := range Cached {
-		if Cached[i].Cca2 == <-cca2 {
-			data := <-done
-			if data == nil {
-				data = ReadFlagFromFile()
-			}
-			img, _, _ := image.Decode(bytes.NewReader(<-done))
-			Cached[i].FlagImg = img
+// downloadAndDecodeFlag - download, decode and attach flag to country through channels
+func downloadAndDecodeFlag(countries []Country, done chan image.Image) {
+	for i := range countries {
+		b, err := downloadFlagFromUrl(countries[i].Png)
+		if err != nil {
+			done <- nil
+			return
 		}
-		if err := <-chanErr; err != nil {
-			errStr = errStr + " " + err.Error()
-		}
+		img, _, _ := image.Decode(bytes.NewReader(b))
+		done <- img
+		countries[i].FlagImg = <-done
 	}
-
-	if errStr != "" {
-		_ = errors.New(errStr)
-	}
-
+	close(done)
 }
 
 func (c *Countries) InitCountries() error {
@@ -210,22 +182,12 @@ func (c *Countries) InitCountries() error {
 			log.Fatalln("json Unmarshal RESTCountries for mutable: ", err)
 			return err
 		}
-
-		flags, err := c.fetchFlags()
-		if err != nil {
-			log.Fatalln("error fetching data from RESTCountries API ", err)
-			return err
-		}
-		err = json.Unmarshal(flags, &AllFlags)
-		if err != nil {
-			log.Fatalln("json Unmarshal RESTCountries for mutable: ", err)
-			return err
-		}
 		c.IsCached = true
 	}
 	return nil
 }
 
+// WriteFlagToFile - needed for slower OSes to store the flags locally, for quicker retrieval on next app start
 func (c *Country) WriteFlagToFile() error {
 	count, err := fileCount("output/geography/flags")
 	if err != nil {
@@ -233,7 +195,7 @@ func (c *Country) WriteFlagToFile() error {
 	}
 
 	if count < 250 {
-		resp, e := http.Get(c.FlagField.Png)
+		resp, e := http.Get(c.Png)
 		if e != nil {
 			log.Fatalln(e)
 		}
@@ -263,35 +225,13 @@ func (c *Country) WriteFlagToFile() error {
 	return nil
 }
 
-// ReadFlagFromFile - Currently faster than ProcessFlagFromUrl, although it demands the png files present in output/flags
+// ReadFlagFromFile - Currently faster than ProcessFlagFromUrl, useful for slower OSes
 func ReadFlagFromFile() []byte {
 	file, err := ioutil.ReadFile("output/geography/flags/placeholder/no-flag.png")
 	if err != nil {
 		log.Fatalln("Error opening no-flag.png path")
 	}
 	return file
-}
-
-// fetchFlags - Fetches only the flags and saves them in CountryFlag
-func (c *Countries) fetchFlags() ([]byte, error) {
-	URL := fmt.Sprintf("https://restcountries.com/v2/all")
-	res, err := http.Get(URL)
-	if err != nil {
-		log.Fatalln(fmt.Sprintf("http.Get(\"%s\") failed: %s", URL, err))
-		return []byte{}, err
-	}
-	defer func(Body io.ReadCloser) {
-		err = Body.Close()
-		if err != nil {
-			log.Fatalln(err)
-		}
-	}(res.Body)
-	body, err := ioutil.ReadAll(res.Body)
-	if err != nil {
-		log.Fatalln(err)
-		return []byte{}, err
-	}
-	return body, nil
 }
 
 // fetchCountries - Fetches All Country Data except the flag
