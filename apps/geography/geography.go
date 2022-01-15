@@ -61,7 +61,7 @@ type (
 		// mainly used to avoid overhead on "All Cards"
 		AllContinents  []string
 		Continents     []Continent
-		ContinentsList widget.List
+		ContinentsList layout.List
 
 		// api data
 		Api data.Countries
@@ -70,9 +70,8 @@ type (
 		ContextualSet     bool
 		ContextualCountry data.Country
 
-		InitialSetup bool
-
-		Slider Slider
+		initialSetup bool
+		slider       Slider
 	}
 
 	Continent struct {
@@ -136,7 +135,7 @@ func (app *Application) LayoutView(gtx C, th *material.Theme) D {
 	app.FilterData(table.NAME)
 
 	// run only once at start
-	if !app.InitialSetup {
+	if !app.initialSetup {
 		app.SearchField.SingleLine = true
 
 		// initialize all flags
@@ -161,7 +160,7 @@ func (app *Application) LayoutView(gtx C, th *material.Theme) D {
 		for i := range data.Cached {
 			data.Cached[i].Active = true
 		}
-		app.InitialSetup = true
+		app.initialSetup = true
 	}
 
 	for _, e := range app.AppBar.Events(gtx) {
@@ -233,7 +232,7 @@ func (app *Application) LayoutView(gtx C, th *material.Theme) D {
 				tblBtn := layout.Rigid(func(gtx C) D {
 					if app.Display.TableBtn.Clicked() {
 						app.Display.Selected = app.Display.Table
-						app.Display.Slider.PushRight()
+						app.Display.slider.PushRight()
 					}
 					switch app.Display.Selected.(type) {
 					case table.Table:
@@ -251,7 +250,7 @@ func (app *Application) LayoutView(gtx C, th *material.Theme) D {
 				grdBtn := layout.Rigid(func(gtx C) D {
 					if app.Display.GridBtn.Clicked() {
 						app.Display.Selected = app.Display.Grid
-						app.Display.Slider.PushLeft()
+						app.Display.slider.PushLeft()
 					}
 					switch app.Display.Selected.(type) {
 					case grid.Grid:
@@ -299,89 +298,91 @@ func (app *Application) LayoutView(gtx C, th *material.Theme) D {
 
 			// Select Continent
 			layout.Rigid(func(gtx C) D {
-				return layout.Flex{}.Layout(gtx,
-					layout.Rigid(func(gtx C) D {
-						return material.List(th, &app.ContinentsList).Layout(gtx, len(app.AllContinents), func(gtx C, i int) D {
-							var (
-								dim D
-								btn material.ButtonStyle
-							)
-							btn = material.Button(th, &app.Continents[i].Btn, app.Continents[i].Name)
-							btn.CornerRadius = unit.Dp(1)
-							btn.Inset = layout.UniformInset(unit.Dp(10))
-							btn.Background = globals.Colours[colours.WHITE]
-							btn.Color = globals.Colours[colours.BLACK]
-							dim = btn.Layout(gtx)
+				return layout.Inset{Bottom: unit.Dp(15)}.Layout(gtx, func(gtx C) D {
+					return layout.Flex{}.Layout(gtx,
+						layout.Rigid(func(gtx C) D {
+							return app.ContinentsList.Layout(gtx, len(app.AllContinents), func(gtx C, i int) D {
+								var (
+									dim D
+									btn material.ButtonStyle
+								)
+								btn = material.Button(th, &app.Continents[i].Btn, app.Continents[i].Name)
+								btn.CornerRadius = unit.Dp(1)
+								btn.Inset = layout.UniformInset(unit.Dp(10))
+								btn.Background = globals.Colours[colours.WHITE]
+								btn.Color = globals.Colours[colours.BLACK]
+								dim = btn.Layout(gtx)
 
-							if app.Continents[i].Btn.Clicked() {
-								name := app.Continents[i].Name
-								app.Continents[i].IsSelected = true
+								if app.Continents[i].Btn.Clicked() {
+									name := app.Continents[i].Name
+									app.Continents[i].IsSelected = true
 
-								// update the tab ui
-								for j := range app.Continents {
-									if name != app.Continents[j].Name {
-										app.Continents[j].IsSelected = false
-									}
-								}
-
-								// update ActiveContinent state
-								for j := range data.Cached {
-									if name == "All" {
-										data.Cached[j].ActiveContinent = true
-									} else {
-										continents := strings.Join(data.Cached[j].Continents, " ")
-										if strings.Contains(continents, app.Continents[i].Name) {
-											data.Cached[j].ActiveContinent = true
-										} else {
-											data.Cached[j].ActiveContinent = false
+									// update the tab ui
+									for j := range app.Continents {
+										if name != app.Continents[j].Name {
+											app.Continents[j].IsSelected = false
 										}
 									}
+
+									// update ActiveContinent state
+									for j := range data.Cached {
+										if name == "All" {
+											data.Cached[j].ActiveContinent = true
+										} else {
+											continents := strings.Join(data.Cached[j].Continents, " ")
+											if strings.Contains(continents, app.Continents[i].Name) {
+												data.Cached[j].ActiveContinent = true
+											} else {
+												data.Cached[j].ActiveContinent = false
+											}
+										}
+									}
+									op.InvalidateOp{}.Add(gtx.Ops)
 								}
-								op.InvalidateOp{}.Add(gtx.Ops)
-							}
 
-							if app.Continents[i].IsSelected {
-								dim = widget.Border{
-									Width:        unit.Dp(1),
-									CornerRadius: btn.CornerRadius,
-								}.Layout(gtx, func(gtx C) D {
-									size := image.Pt(dim.Size.X, dim.Size.Y)
-									gtx.Constraints = layout.Exact(gtx.Constraints.Constrain(size))
+								if app.Continents[i].IsSelected {
+									dim = widget.Border{
+										Width:        unit.Dp(1),
+										CornerRadius: btn.CornerRadius,
+									}.Layout(gtx, func(gtx C) D {
+										size := image.Pt(dim.Size.X, dim.Size.Y)
+										gtx.Constraints = layout.Exact(gtx.Constraints.Constrain(size))
 
-									return layout.Stack{Alignment: layout.S}.Layout(gtx,
-										layout.Expanded(func(gtx C) D {
-											return globals.ColoredArea(gtx, size, globals.Colours[colours.AERO_BLUE])
-										}),
-										layout.Stacked(func(gtx C) D {
-											return layout.Flex{Axis: layout.Vertical}.Layout(gtx,
-												layout.Flexed(1, func(gtx C) D {
-													var lbl material.LabelStyle
-													lbl = material.Body1(th, app.Continents[i].Name)
-													lbl.TextSize = btn.TextSize
+										return layout.Stack{Alignment: layout.S}.Layout(gtx,
+											layout.Expanded(func(gtx C) D {
+												return globals.ColoredArea(gtx, size, globals.Colours[colours.AERO_BLUE])
+											}),
+											layout.Stacked(func(gtx C) D {
+												return layout.Flex{Axis: layout.Vertical}.Layout(gtx,
+													layout.Flexed(1, func(gtx C) D {
+														var lbl material.LabelStyle
+														lbl = material.Body1(th, app.Continents[i].Name)
+														lbl.TextSize = btn.TextSize
 
-													return layout.Flex{}.Layout(gtx,
-														layout.Flexed(1, func(gtx C) D {
-															return layout.Center.Layout(gtx, lbl.Layout)
-														}))
-												}),
-												layout.Rigid(func(gtx C) D {
-													return layout.Stack{}.Layout(gtx,
-														layout.Expanded(func(gtx C) D {
-															return globals.ColoredArea(gtx, image.Pt(gtx.Constraints.Max.X, 3), globals.Colours[colours.SEA_GREEN])
-														}))
-												}))
-										}))
-								})
-							}
-							return dim
-						})
-					}),
-				)
+														return layout.Flex{}.Layout(gtx,
+															layout.Flexed(1, func(gtx C) D {
+																return layout.Center.Layout(gtx, lbl.Layout)
+															}))
+													}),
+													layout.Rigid(func(gtx C) D {
+														return layout.Stack{}.Layout(gtx,
+															layout.Expanded(func(gtx C) D {
+																return globals.ColoredArea(gtx, image.Pt(gtx.Constraints.Max.X, 3), globals.Colours[colours.SEA_GREEN])
+															}))
+													}))
+											}))
+									})
+								}
+								return dim
+							})
+						}),
+					)
+				})
 			}),
 
 			// Selected display
 			layout.Rigid(func(gtx C) D {
-				return app.Display.Slider.Layout(gtx, layout.Horizontal, func(gtx C) D {
+				return app.Display.slider.Layout(gtx, layout.Horizontal, func(gtx C) D {
 					var dims D
 					switch app.Display.Selected.(type) {
 					case grid.Grid:

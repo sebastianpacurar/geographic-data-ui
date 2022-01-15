@@ -27,12 +27,11 @@ type (
 )
 
 func (gr *Grid) Layout(gtx C, th *material.Theme) D {
-
-	gr.wrap.Alignment = layout.End
-	gr.list.Axis = layout.Vertical
-	gr.list.Alignment = layout.Middle
-
 	if !gr.loaded {
+		gr.wrap.Alignment = layout.End
+		gr.list.Axis = layout.Vertical
+		gr.list.Alignment = layout.Middle
+
 		for i := range data.Cached {
 			gr.cards = append(gr.cards, Card{
 				Name:     data.Cached[i].Name.Common,

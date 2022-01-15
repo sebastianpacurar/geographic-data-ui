@@ -3,8 +3,14 @@ package table
 import (
 	"gioui-experiment/apps/geography/data"
 	"gioui.org/layout"
+	"gioui.org/op/clip"
+	"gioui.org/op/paint"
+	"gioui.org/unit"
 	"gioui.org/widget"
 	"gioui.org/widget/material"
+	"gioui.org/x/component"
+	"image"
+	"image/color"
 )
 
 type (
@@ -12,21 +18,27 @@ type (
 	D = layout.Dimensions
 
 	Table struct {
-		rows       []Row
-		headerList layout.List
-		rowList    widget.List
-		columnList widget.List
-		loaded     bool
+		rows         []Row
+		headerList   layout.List
+		rowList      widget.List
+		columnList   widget.List
+		lockedColumn layout.List
+		loaded       bool
+
+		component.Resize
 	}
 )
 
 func (t *Table) Layout(gtx C, th *material.Theme, searchBy string) D {
-	t.rowList.Axis = layout.Vertical
-	t.rowList.Alignment = layout.Middle
-	t.columnList.Axis = layout.Horizontal
-	t.columnList.Alignment = layout.Middle
-
 	if !t.loaded {
+		t.rowList.Axis = layout.Vertical
+		t.rowList.Alignment = layout.Middle
+		t.columnList.Axis = layout.Horizontal
+		t.columnList.Alignment = layout.Middle
+		t.lockedColumn.Axis = layout.Vertical
+		t.lockedColumn.Alignment = layout.Middle
+		t.Resize = component.Resize{Ratio: 0.25}
+
 		for i := range data.Cached {
 			t.rows = append(t.rows, Row{
 				Name:            data.Cached[i].Name.Common,
@@ -70,33 +82,78 @@ func (t *Table) Layout(gtx C, th *material.Theme, searchBy string) D {
 		}
 	}
 
-	return material.List(th, &t.columnList).Layout(gtx, 1, func(gtx C, _ int) D {
-		return layout.Flex{Axis: layout.Vertical}.Layout(gtx,
+	return layout.Flex{}.Layout(gtx,
+		layout.Flexed(1, func(gtx C) D {
+			return t.Resize.Layout(gtx,
 
-			// Header Area
-			layout.Rigid(func(gtx C) D {
-				return t.headerList.Layout(gtx, 1, func(gtx C, i int) D {
-					return t.rows[i].LayRow(gtx, th, true)
-				})
-			}),
+				// the sticky Country Name column, which can be scrolled on the cross axis
+				func(gtx C) D {
+					return layout.Flex{Axis: layout.Vertical}.Layout(gtx,
+						// Header Area
+						layout.Rigid(func(gtx C) D {
+							return t.headerList.Layout(gtx, 1, func(gtx C, i int) D {
+								return t.rows[i].LayNameColumn(gtx, th, true)
+							})
+						}),
+						layout.Flexed(1, func(gtx C) D {
+							return material.List(th, &t.rowList).Layout(gtx, len(data.Cached), func(gtx C, i int) D {
+								var dims D
 
-			// Row Area
-			layout.Flexed(1, func(gtx C) D {
-				return material.List(th, &t.rowList).Layout(gtx, len(data.Cached), func(gtx C, i int) D {
-					var dims D
-					if t.rows[i].Active && t.rows[i].ActiveContinent {
-						if t.rows[i].Click.Clicked() {
-							if t.rows[i].Selected {
-								data.Cached[i].Selected = false
-							} else {
-								data.Cached[i].Selected = true
-							}
-						}
-						dims = t.rows[i].LayRow(gtx, th, false)
+								if t.rows[i].Active && t.rows[i].ActiveContinent {
+									if t.rows[i].Click.Clicked() {
+										if t.rows[i].Selected {
+											data.Cached[i].Selected = false
+										} else {
+											data.Cached[i].Selected = true
+										}
+									}
+									dims = t.rows[i].LayNameColumn(gtx, th, false)
+								}
+								return dims
+							})
+						}))
+				},
+
+				// the rest of the columns, which can be scrolled on the main axis
+				func(gtx C) D {
+					return material.List(th, &t.columnList).Layout(gtx, 1, func(gtx C, _ int) D {
+						return layout.Flex{Axis: layout.Vertical}.Layout(gtx,
+
+							// Header Area
+							layout.Rigid(func(gtx C) D {
+								return t.headerList.Layout(gtx, 1, func(gtx C, i int) D {
+									return t.rows[i].LayRow(gtx, th, true)
+								})
+							}),
+
+							// Row Area
+							layout.Flexed(1, func(gtx C) D {
+								return material.List(th, &t.rowList).Layout(gtx, len(data.Cached), func(gtx C, i int) D {
+									var dims D
+									if t.rows[i].Active && t.rows[i].ActiveContinent {
+										if t.rows[i].Click.Clicked() {
+											if t.rows[i].Selected {
+												data.Cached[i].Selected = false
+											} else {
+												data.Cached[i].Selected = true
+											}
+										}
+										dims = t.rows[i].LayRow(gtx, th, false)
+									}
+									return dims
+								})
+							}))
+					})
+				}, func(gtx C) D {
+					rect := image.Rectangle{
+						Max: image.Point{
+							X: gtx.Px(unit.Dp(6)),
+							Y: gtx.Constraints.Max.Y,
+						},
 					}
-					return dims
+					paint.FillShape(gtx.Ops, color.NRGBA{A: 200}, clip.Rect(rect).Op())
+					return D{Size: rect.Max}
 				})
-			}))
-	})
-
+		}),
+	)
 }

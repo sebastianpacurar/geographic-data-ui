@@ -56,10 +56,11 @@ type (
 		Selected        bool
 		IsCPViewed      bool
 
-		Click   widget.Clickable
-		colList layout.List
-		loaded  bool
-		Columns []Cell
+		Click        widget.Clickable
+		selectAllBtn widget.Clickable
+		colList      layout.List
+		loaded       bool
+		Columns      []Cell
 	}
 
 	Cell struct {
@@ -114,26 +115,78 @@ func (r *Row) LayRow(gtx C, th *material.Theme, isHeader bool) D {
 	})
 }
 
+// LayNameColumn - Lay sticky country name Column - TODO: simplify!
+func (r *Row) LayNameColumn(gtx C, th *material.Theme, isHeader bool) D {
+	cellColor := globals.Colours[colours.ANTIQUE_WHITE]
+	if !r.loaded {
+		r.generateColumns()
+		r.loaded = true
+	}
+
+	border := widget.Border{
+		Color: globals.Colours[colours.GREY],
+		Width: unit.Dp(1),
+	}
+
+	return border.Layout(gtx, func(gtx C) D {
+		if isHeader {
+			var btn widget.Clickable
+			return material.Clickable(gtx, &btn, func(gtx C) D {
+				gtx.Queue = nil
+				cellColor = globals.Colours[colours.LAVENDERBLUSH]
+				return layout.Stack{Alignment: layout.Center}.Layout(gtx,
+					layout.Expanded(func(gtx C) D {
+						return globals.ColoredArea(gtx, image.Pt(gtx.Constraints.Max.X, gtx.Constraints.Min.Y), cellColor)
+					}),
+					layout.Stacked(func(gtx C) D {
+						return material.Body1(th, "Country").Layout(gtx)
+					}))
+			})
+		} else {
+			return material.Clickable(gtx, &r.Click, func(gtx C) D {
+				if r.Selected {
+					cellColor = globals.Colours[colours.AERO_BLUE]
+				}
+				if r.Click.Hovered() {
+					if r.Selected {
+						cellColor = globals.Colours[colours.LIGHT_SALMON]
+					} else {
+						cellColor = globals.Colours[colours.NYANZA]
+					}
+				}
+				return layout.Stack{Alignment: layout.Center}.Layout(gtx,
+					layout.Expanded(func(gtx C) D {
+						return globals.ColoredArea(gtx, image.Pt(gtx.Constraints.Max.X, gtx.Constraints.Min.Y), cellColor)
+					}),
+					layout.Stacked(func(gtx C) D {
+						return material.Body1(th, r.Name).Layout(gtx)
+					}))
+			})
+		}
+
+	})
+}
+
 func (r *Row) generateColumns() {
 	for range ColNames {
 		r.Columns = append(r.Columns,
-			Cell{
-				HeadCell: "Name",
-				Size:     450,
-				Layout: func(gtx C, th *material.Theme, c *Cell, color color.NRGBA, isHeader bool) D {
-					return layout.Stack{Alignment: layout.Center}.Layout(gtx,
-						layout.Expanded(func(gtx C) D {
-							return globals.ColoredArea(gtx, image.Pt(gtx.Px(unit.Dp(float32(c.Size))), gtx.Constraints.Min.Y), color)
-						}),
-						layout.Stacked(func(gtx C) D {
-							res := r.Name
-							if isHeader {
-								res = c.HeadCell
-							}
-							return material.Body1(th, res).Layout(gtx)
-						}))
-				},
-			},
+			//Cell{
+			//	HeadCell: "Name",
+			//	Size:     450,
+			//	Layout: func(gtx C, th *material.Theme, c *Cell, color color.NRGBA, isHeader bool) D {
+			//		return layout.Stack{Alignment: layout.Center}.Layout(gtx,
+			//			layout.Expanded(func(gtx C) D {
+			//				return globals.ColoredArea(gtx, image.Pt(gtx.Px(unit.Dp(float32(c.Size))), gtx.Constraints.Min.Y), color)
+			//			}),
+			//			layout.Stacked(func(gtx C) D {
+			//				res := r.Name
+			//				if isHeader {
+			//					res = c.HeadCell
+			//				}
+			//				return material.Body1(th, res).Layout(gtx)
+			//			}))
+			//	},
+			//},
 			Cell{
 				HeadCell: "Official Name",
 				Size:     550,
