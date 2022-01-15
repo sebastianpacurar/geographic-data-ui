@@ -4,6 +4,7 @@ import (
 	"gioui-experiment/apps"
 	"gioui-experiment/globals"
 	"gioui-experiment/themes/colours"
+	"gioui.org/font/gofont"
 	"gioui.org/layout"
 	"gioui.org/text"
 	"gioui.org/unit"
@@ -11,6 +12,7 @@ import (
 	"gioui.org/widget/material"
 	"gioui.org/x/component"
 	"image"
+	"image/color"
 )
 
 type (
@@ -23,6 +25,7 @@ type (
 		ControlPanel
 		*apps.Router
 
+		DisableCPBtn widget.Clickable
 		isCPDisabled bool
 	}
 
@@ -37,18 +40,38 @@ type (
 		// menu options
 		PasteBtn widget.Clickable
 	}
-
-	isCPDisabled bool
 )
 
 func New(router *apps.Router) *Application {
 	return &Application{
 		Router: router,
+		th:     material.NewTheme(gofont.Collection()),
 	}
 }
 
 func (app *Application) Actions() []component.AppBarAction {
-	return []component.AppBarAction{}
+	return []component.AppBarAction{
+		{
+			OverflowAction: component.OverflowAction{
+				Tag: &app.DisableCPBtn,
+			},
+			Layout: func(gtx C, bg, fg color.NRGBA) D {
+				var (
+					lbl string
+				)
+				if app.DisableCPBtn.Clicked() {
+					app.isCPDisabled = !app.isCPDisabled
+				}
+
+				if !app.isCPDisabled {
+					lbl = "Disable CP"
+				} else {
+					lbl = "Enable CP"
+				}
+				return material.Button(app.th, &app.DisableCPBtn, lbl).Layout(gtx)
+			},
+		},
+	}
 }
 
 func (app *Application) Overflow() []component.OverflowAction {

@@ -171,7 +171,7 @@ func (r *Router) Layout(gtx C, th *material.Theme) D {
 						return D{Size: rect.Max}
 					})
 
-				if r.current == "pg" && r.pages[r.current].IsCPDisabled() {
+				if r.pages[r.current].IsCPDisabled() {
 					dims = layout.Stack{}.Layout(gtx,
 						layout.Expanded(func(gtx C) D {
 							container := globals.ColoredArea(

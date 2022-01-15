@@ -8,6 +8,7 @@ import (
 	"gioui-experiment/apps/geography/table"
 	"gioui-experiment/globals"
 	"gioui-experiment/themes/colours"
+	"gioui.org/font/gofont"
 	"gioui.org/layout"
 	"gioui.org/op"
 	"gioui.org/op/paint"
@@ -17,6 +18,7 @@ import (
 	"gioui.org/x/component"
 	"github.com/xuri/excelize/v2"
 	"image"
+	"image/color"
 	"log"
 	"strconv"
 	"strings"
@@ -33,6 +35,8 @@ type (
 		pinBtn widget.Clickable
 		*apps.Router
 
+		DisableCPBtn widget.Clickable
+		btnStyle     material.ButtonStyle
 		isCPDisabled bool
 	}
 
@@ -81,11 +85,33 @@ type (
 func New(router *apps.Router) *Application {
 	return &Application{
 		Router: router,
+		th:     material.NewTheme(gofont.Collection()),
 	}
 }
 
 func (app *Application) Actions() []component.AppBarAction {
-	return []component.AppBarAction{}
+	return []component.AppBarAction{
+		{
+			OverflowAction: component.OverflowAction{
+				Tag: &app.DisableCPBtn,
+			},
+			Layout: func(gtx C, bg, fg color.NRGBA) D {
+				var (
+					lbl string
+				)
+				if app.DisableCPBtn.Clicked() {
+					app.isCPDisabled = !app.isCPDisabled
+				}
+
+				if !app.isCPDisabled {
+					lbl = "Disable CP"
+				} else {
+					lbl = "Enable CP"
+				}
+				return material.Button(app.th, &app.DisableCPBtn, lbl).Layout(gtx)
+			},
+		},
+	}
 }
 
 func (app *Application) Overflow() []component.OverflowAction {

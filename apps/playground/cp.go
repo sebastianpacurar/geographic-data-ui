@@ -17,14 +17,12 @@ type (
 		vh       counter.ValueHandler
 		inc      counter.Incrementor
 		sequence counter.Sequence
-		filters  counter.Filters
 		status   counter.Status
 
 		// hardcoded in order to keep track of the specific current state
 		incState     component.DiscloserState
 		vhState      component.DiscloserState
 		displayState component.DiscloserState
-		filtersState component.DiscloserState
 		statusState  component.DiscloserState
 	}
 
@@ -61,21 +59,6 @@ func (cp *ControlPanel) Layout(gtx C, th *material.Theme) D {
 						func(gtx C) D {
 							return controllerInset.Layout(gtx, func(gtx C) D {
 								return cp.sequence.Layout(gtx, th)
-							})
-						})
-				})
-				return cp.LayOutset(gtx, content, divider)
-			},
-		},
-		{
-			name: "Filters",
-			layout: func(gtx C, c *Controller) D {
-				content := layout.Rigid(func(gtx C) D {
-					return component.SimpleDiscloser(th, &cp.filtersState).Layout(gtx,
-						material.Body1(th, c.name).Layout,
-						func(gtx C) D {
-							return controllerInset.Layout(gtx, func(gtx C) D {
-								return cp.filters.Layout(gtx, th)
 							})
 						})
 				})
