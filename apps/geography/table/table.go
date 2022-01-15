@@ -102,7 +102,7 @@ func (t *Table) Layout(gtx C, th *material.Theme, searchBy string) D {
 								var dims D
 
 								if t.rows[i].Active && t.rows[i].ActiveContinent {
-									if t.rows[i].Click.Clicked() {
+									if t.rows[i].btn.Clicked() {
 										if t.rows[i].Selected {
 											data.Cached[i].Selected = false
 										} else {
@@ -133,7 +133,7 @@ func (t *Table) Layout(gtx C, th *material.Theme, searchBy string) D {
 								return material.List(th, &t.rowList).Layout(gtx, len(data.Cached), func(gtx C, i int) D {
 									var dims D
 									if t.rows[i].Active && t.rows[i].ActiveContinent {
-										if t.rows[i].Click.Clicked() {
+										if t.rows[i].btn.Clicked() {
 											if t.rows[i].Selected {
 												data.Cached[i].Selected = false
 											} else {
