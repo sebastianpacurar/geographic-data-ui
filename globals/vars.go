@@ -22,6 +22,7 @@ var (
 		"nyanza":        {R: 233, G: 255, B: 219, A: 255},
 		"sea-green":     {R: 46, G: 139, B: 87, A: 255},
 		"deep-sky-blue": {R: 0, G: 191, B: 255, A: 255},
+		"electric-blue": {R: 125, G: 249, B: 255, A: 255},
 
 		"black":           {A: 255},
 		"dark-slate-grey": {R: 47, G: 79, B: 79, A: 255},

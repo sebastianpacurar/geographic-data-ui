@@ -56,11 +56,11 @@ type (
 		Selected        bool
 		IsCPViewed      bool
 
-		Click        widget.Clickable
-		selectAllBtn widget.Clickable
-		colList      layout.List
-		loaded       bool
-		Columns      []Cell
+		btn     widget.Clickable
+		colList layout.List
+		loaded  bool
+
+		columns []Cell
 	}
 
 	Cell struct {
@@ -91,11 +91,11 @@ func (r *Row) LayRow(gtx C, th *material.Theme, isHeader bool) D {
 
 	return border.Layout(gtx, func(gtx C) D {
 		if !isHeader {
-			return material.Clickable(gtx, &r.Click, func(gtx C) D {
+			return material.Clickable(gtx, &r.btn, func(gtx C) D {
 				if r.Selected {
 					rowColor = globals.Colours[colours.AERO_BLUE]
 				}
-				if r.Click.Hovered() {
+				if r.btn.Hovered() {
 					if r.Selected {
 						rowColor = globals.Colours[colours.LIGHT_SALMON]
 					} else {
@@ -103,13 +103,13 @@ func (r *Row) LayRow(gtx C, th *material.Theme, isHeader bool) D {
 					}
 				}
 				return r.colList.Layout(gtx, len(ColNames), func(gtx C, i int) D {
-					return r.Columns[i].Layout(gtx, th, &r.Columns[i], rowColor, isHeader)
+					return r.columns[i].Layout(gtx, th, &r.columns[i], rowColor, isHeader)
 				})
 			})
 		} else {
 			rowColor = globals.Colours[colours.LAVENDERBLUSH]
 			return r.colList.Layout(gtx, len(ColNames), func(gtx C, i int) D {
-				return r.Columns[i].Layout(gtx, th, &r.Columns[i], rowColor, isHeader)
+				return r.columns[i].Layout(gtx, th, &r.columns[i], rowColor, isHeader)
 			})
 		}
 	})
@@ -133,21 +133,20 @@ func (r *Row) LayNameColumn(gtx C, th *material.Theme, isHeader bool) D {
 			var btn widget.Clickable
 			return material.Clickable(gtx, &btn, func(gtx C) D {
 				gtx.Queue = nil
-				cellColor = globals.Colours[colours.LAVENDERBLUSH]
 				return layout.Stack{Alignment: layout.Center}.Layout(gtx,
 					layout.Expanded(func(gtx C) D {
-						return globals.ColoredArea(gtx, image.Pt(gtx.Constraints.Max.X, gtx.Constraints.Min.Y), cellColor)
+						return globals.ColoredArea(gtx, image.Pt(gtx.Constraints.Max.X, gtx.Constraints.Min.Y), globals.Colours[colours.ELECTRIC_BLUE])
 					}),
 					layout.Stacked(func(gtx C) D {
 						return material.Body1(th, "Country").Layout(gtx)
 					}))
 			})
 		} else {
-			return material.Clickable(gtx, &r.Click, func(gtx C) D {
+			return material.Clickable(gtx, &r.btn, func(gtx C) D {
 				if r.Selected {
 					cellColor = globals.Colours[colours.AERO_BLUE]
 				}
-				if r.Click.Hovered() {
+				if r.btn.Hovered() {
 					if r.Selected {
 						cellColor = globals.Colours[colours.LIGHT_SALMON]
 					} else {
@@ -169,7 +168,7 @@ func (r *Row) LayNameColumn(gtx C, th *material.Theme, isHeader bool) D {
 
 func (r *Row) generateColumns() {
 	for range ColNames {
-		r.Columns = append(r.Columns,
+		r.columns = append(r.columns,
 			//Cell{
 			//	HeadCell: "Name",
 			//	Size:     450,
@@ -653,7 +652,7 @@ func (r *Row) generateColumns() {
 						}),
 						layout.Stacked(func(gtx C) D {
 							res := "-"
-							if len(r.CarSigns) > 0 {
+							if len(r.CarSigns) > 0 || r.CarSigns != nil {
 								res = strings.Join(r.CarSigns, ", ")
 							}
 							if isHeader {

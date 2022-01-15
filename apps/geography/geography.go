@@ -18,7 +18,6 @@ import (
 	"gioui.org/x/component"
 	"github.com/xuri/excelize/v2"
 	"image"
-	"image/color"
 	"log"
 	"strconv"
 	"strings"
@@ -89,28 +88,7 @@ func New(router *apps.Router) *Application {
 }
 
 func (app *Application) Actions() []component.AppBarAction {
-	return []component.AppBarAction{
-		{
-			OverflowAction: component.OverflowAction{
-				Tag: &app.DisableCPBtn,
-			},
-			Layout: func(gtx C, bg, fg color.NRGBA) D {
-				var (
-					lbl string
-				)
-				if app.DisableCPBtn.Clicked() {
-					app.isCPDisabled = !app.isCPDisabled
-				}
-
-				if !app.isCPDisabled {
-					lbl = "Disable CP"
-				} else {
-					lbl = "Enable CP"
-				}
-				return material.Button(app.th, &app.DisableCPBtn, lbl).Layout(gtx)
-			},
-		},
-	}
+	return []component.AppBarAction{}
 }
 
 func (app *Application) Overflow() []component.OverflowAction {

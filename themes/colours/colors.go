@@ -11,6 +11,7 @@ const (
 	LIGHT_SALMON  = "light-salmon"
 	NYANZA        = "nyanza"
 	LAVENDERBLUSH = "lavenderblush"
+	ELECTRIC_BLUE = "electric-blue"
 
 	TEXT_SELECTION = "text_selection"
 	CARD_COLOR     = "card_color"

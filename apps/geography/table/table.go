@@ -83,19 +83,21 @@ func (t *Table) Layout(gtx C, th *material.Theme, searchBy string) D {
 	}
 
 	return layout.Flex{}.Layout(gtx,
-		layout.Flexed(1, func(gtx C) D {
+		layout.Rigid(func(gtx C) D {
 			return t.Resize.Layout(gtx,
 
 				// the sticky Country Name column, which can be scrolled on the cross axis
 				func(gtx C) D {
 					return layout.Flex{Axis: layout.Vertical}.Layout(gtx,
-						// Header Area
+						// Lay Blank Area
 						layout.Rigid(func(gtx C) D {
 							return t.headerList.Layout(gtx, 1, func(gtx C, i int) D {
 								return t.rows[i].LayNameColumn(gtx, th, true)
 							})
 						}),
-						layout.Flexed(1, func(gtx C) D {
+
+						// Lay Country Name (Common)
+						layout.Rigid(func(gtx C) D {
 							return material.List(th, &t.rowList).Layout(gtx, len(data.Cached), func(gtx C, i int) D {
 								var dims D
 
