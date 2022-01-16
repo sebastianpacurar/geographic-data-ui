@@ -3,7 +3,6 @@ package geography
 import (
 	"fmt"
 	"gioui-experiment/apps"
-	"gioui-experiment/apps/geography/controllers"
 	"gioui-experiment/apps/geography/data"
 	"gioui-experiment/apps/geography/grid"
 	"gioui-experiment/apps/geography/table"
@@ -130,7 +129,7 @@ func (app *Application) LayoutView(gtx C, th *material.Theme) D {
 	if err != nil {
 		return material.H2(th, fmt.Sprintf("Error when fetching countries: %s", err)).Layout(gtx)
 	}
-	app.FilterData(controllers.NAME)
+	app.FilterData(table.NAME)
 
 	// run only once at start
 	if !app.initialSetup {
@@ -412,11 +411,11 @@ func (d *Display) FilterData(FilterBy string) {
 				var res string
 
 				switch FilterBy {
-				case controllers.NAME:
+				case table.NAME:
 					res = data.Cached[i].Name.Common
-				case controllers.OFFICIAL_NAME:
+				case table.OFFICIAL_NAME:
 					res = data.Cached[i].Name.Official
-				case controllers.CAPITAL:
+				case table.CAPITAL:
 					res = data.Cached[i].Capital[0]
 				}
 
