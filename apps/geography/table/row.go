@@ -2,6 +2,7 @@ package table
 
 import (
 	"fmt"
+	cols "gioui-experiment/apps/geography/controllers"
 	"gioui-experiment/apps/geography/data"
 	"gioui-experiment/globals"
 	"gioui-experiment/themes/colours"
@@ -18,9 +19,10 @@ import (
 )
 
 var ColNames = []string{
-	"Official Name", "Capital", "Region", "Subregion", "Languages", "Continents", "IDD Root", "IDD Suffixes", "Top Level Domains",
-	"Independent", "Status", "United Nations Member", "Land Locked", "CCA 2", "CCA 3", "CCN 3", "IOC Code", "FIFA Code",
-	"Area", "Population", "Latitude", "Longitude", "Start of Week", "Car Signs", "Car Side",
+	cols.OFFICIAL_NAME, cols.CAPITAL, cols.REGION, cols.SUBREGION, cols.LANGUAGES, cols.CONTINENTS,
+	cols.IDD_ROOT, cols.IDD_SUFFIXES, cols.TOP_LEVEL_DOMAINS, cols.INDEPENDENT, cols.STATUS, cols.UNITED_NATIONS_MEMBER,
+	cols.LANDLOCKED, cols.CCA2, cols.CCA3, cols.CCN3, cols.CIOC, cols.FIFA, cols.AREA, cols.POPULATION, cols.LATITUDE,
+	cols.LONGITUDE, cols.START_OF_WEEK, cols.CAR_SIGNS, cols.CAR_SIDE,
 }
 
 type (
@@ -177,7 +179,7 @@ func (r *Row) generateColumns() {
 	for range ColNames {
 		r.columns = append(r.columns,
 			Cell{
-				headCell: "Official Name",
+				headCell: cols.OFFICIAL_NAME,
 				sizeX:    550,
 				Layout: func(gtx C, th *material.Theme, c *Cell, color color.NRGBA, isHeader bool) D {
 					res := r.OfficialName
@@ -194,7 +196,7 @@ func (r *Row) generateColumns() {
 				},
 			},
 			Cell{
-				headCell: "Capital",
+				headCell: cols.CAPITAL,
 				sizeX:    200,
 				Layout: func(gtx C, th *material.Theme, c *Cell, color color.NRGBA, isHeader bool) D {
 					capital := "-"
@@ -214,7 +216,7 @@ func (r *Row) generateColumns() {
 				},
 			},
 			Cell{
-				headCell: "Region",
+				headCell: cols.REGION,
 				sizeX:    175,
 				Layout: func(gtx C, th *material.Theme, c *Cell, color color.NRGBA, isHeader bool) D {
 					res := r.Region
@@ -231,7 +233,7 @@ func (r *Row) generateColumns() {
 				},
 			},
 			Cell{
-				headCell: "Subregion",
+				headCell: cols.SUBREGION,
 				sizeX:    225,
 				Layout: func(gtx C, th *material.Theme, c *Cell, color color.NRGBA, isHeader bool) D {
 					subregion := "-"
@@ -251,7 +253,7 @@ func (r *Row) generateColumns() {
 				},
 			},
 			Cell{
-				headCell: "Continents",
+				headCell: cols.CONTINENTS,
 				sizeX:    175,
 				Layout: func(gtx C, th *material.Theme, c *Cell, color color.NRGBA, isHeader bool) D {
 					res := strings.Join(r.Continents, ", ")
@@ -268,7 +270,7 @@ func (r *Row) generateColumns() {
 				},
 			},
 			Cell{
-				headCell: "Languages",
+				headCell: cols.LANGUAGES,
 				sizeX:    650,
 				Layout: func(gtx C, th *material.Theme, c *Cell, color color.NRGBA, isHeader bool) D {
 					res := "-"
@@ -302,7 +304,7 @@ func (r *Row) generateColumns() {
 				},
 			},
 			Cell{
-				headCell: "IDD Root",
+				headCell: cols.IDD_ROOT,
 				sizeX:    165,
 				Layout: func(gtx C, th *material.Theme, c *Cell, color color.NRGBA, isHeader bool) D {
 					res := "-"
@@ -322,7 +324,7 @@ func (r *Row) generateColumns() {
 				},
 			},
 			Cell{
-				headCell: "IDD Suffixes",
+				headCell: cols.IDD_SUFFIXES,
 				sizeX:    200,
 				Layout: func(gtx C, th *material.Theme, c *Cell, color color.NRGBA, isHeader bool) D {
 					res := "-"
@@ -348,7 +350,7 @@ func (r *Row) generateColumns() {
 				},
 			},
 			Cell{
-				headCell: "Top Level Domains",
+				headCell: cols.TOP_LEVEL_DOMAINS,
 				sizeX:    200,
 				Layout: func(gtx C, th *material.Theme, c *Cell, color color.NRGBA, isHeader bool) D {
 					res := "-"
@@ -386,7 +388,7 @@ func (r *Row) generateColumns() {
 				},
 			},
 			Cell{
-				headCell: "Independent",
+				headCell: cols.INDEPENDENT,
 				sizeX:    180,
 				Layout: func(gtx C, th *material.Theme, c *Cell, color color.NRGBA, isHeader bool) D {
 					independent := "No"
@@ -406,7 +408,7 @@ func (r *Row) generateColumns() {
 				},
 			},
 			Cell{
-				headCell: "Status",
+				headCell: cols.STATUS,
 				sizeX:    175,
 				Layout: func(gtx C, th *material.Theme, c *Cell, color color.NRGBA, isHeader bool) D {
 					res := r.Status
@@ -423,7 +425,7 @@ func (r *Row) generateColumns() {
 				},
 			},
 			Cell{
-				headCell: "United Nations Member",
+				headCell: cols.UNITED_NATIONS_MEMBER,
 				sizeX:    200,
 				Layout: func(gtx C, th *material.Theme, c *Cell, color color.NRGBA, isHeader bool) D {
 					unMember := "No"
@@ -443,7 +445,7 @@ func (r *Row) generateColumns() {
 				},
 			},
 			Cell{
-				headCell: "Land Locked",
+				headCell: cols.LANDLOCKED,
 				sizeX:    180,
 				Layout: func(gtx C, th *material.Theme, c *Cell, color color.NRGBA, isHeader bool) D {
 					landLocked := "No"
@@ -463,7 +465,7 @@ func (r *Row) generateColumns() {
 				},
 			},
 			Cell{
-				headCell: "CCA 2",
+				headCell: cols.CCA2,
 				sizeX:    85,
 				Layout: func(gtx C, th *material.Theme, c *Cell, color color.NRGBA, isHeader bool) D {
 					res := r.Cca2
@@ -480,7 +482,7 @@ func (r *Row) generateColumns() {
 				},
 			},
 			Cell{
-				headCell: "CCA 3",
+				headCell: cols.CCA3,
 				sizeX:    85,
 				Layout: func(gtx C, th *material.Theme, c *Cell, color color.NRGBA, isHeader bool) D {
 					res := r.Cca3
@@ -497,7 +499,7 @@ func (r *Row) generateColumns() {
 				},
 			},
 			Cell{
-				headCell: "CCN 3",
+				headCell: cols.CCN3,
 				sizeX:    85,
 				Layout: func(gtx C, th *material.Theme, c *Cell, color color.NRGBA, isHeader bool) D {
 					ccn := "-"
@@ -517,7 +519,7 @@ func (r *Row) generateColumns() {
 				},
 			},
 			Cell{
-				headCell: "IOC Code",
+				headCell: cols.CIOC,
 				sizeX:    95,
 				Layout: func(gtx C, th *material.Theme, c *Cell, color color.NRGBA, isHeader bool) D {
 					ioc := "-"
@@ -537,7 +539,7 @@ func (r *Row) generateColumns() {
 				},
 			},
 			Cell{
-				headCell: "FIFA Code",
+				headCell: cols.FIFA,
 				sizeX:    95,
 				Layout: func(gtx C, th *material.Theme, c *Cell, color color.NRGBA, isHeader bool) D {
 					fifa := "-"
@@ -557,7 +559,7 @@ func (r *Row) generateColumns() {
 				},
 			},
 			Cell{
-				headCell: "Area",
+				headCell: cols.AREA,
 				sizeX:    125,
 				Layout: func(gtx C, th *material.Theme, c *Cell, color color.NRGBA, isHeader bool) D {
 					res := strconv.FormatFloat(r.Area, 'f', -1, 32)
@@ -574,7 +576,7 @@ func (r *Row) generateColumns() {
 				},
 			},
 			Cell{
-				headCell: "Population",
+				headCell: cols.POPULATION,
 				sizeX:    150,
 				Layout: func(gtx C, th *material.Theme, c *Cell, color color.NRGBA, isHeader bool) D {
 					res := fmt.Sprintf("%d", int(r.Population))
@@ -591,7 +593,7 @@ func (r *Row) generateColumns() {
 				},
 			},
 			Cell{
-				headCell: "Latitude",
+				headCell: cols.LATITUDE,
 				sizeX:    150,
 				Layout: func(gtx C, th *material.Theme, c *Cell, color color.NRGBA, isHeader bool) D {
 					res := strconv.FormatFloat(r.Latitude, 'f', -1, 64)
@@ -608,7 +610,7 @@ func (r *Row) generateColumns() {
 				},
 			},
 			Cell{
-				headCell: "Longitude",
+				headCell: cols.LONGITUDE,
 				sizeX:    150,
 				Layout: func(gtx C, th *material.Theme, c *Cell, color color.NRGBA, isHeader bool) D {
 					res := strconv.FormatFloat(r.Longitude, 'f', -1, 64)
@@ -627,7 +629,7 @@ func (r *Row) generateColumns() {
 				},
 			},
 			Cell{
-				headCell: "Start of Week",
+				headCell: cols.START_OF_WEEK,
 				sizeX:    150,
 				Layout: func(gtx C, th *material.Theme, c *Cell, color color.NRGBA, isHeader bool) D {
 					res := r.StartOfWeek
@@ -644,7 +646,7 @@ func (r *Row) generateColumns() {
 				},
 			},
 			Cell{
-				headCell: "Car Signs",
+				headCell: cols.CAR_SIGNS,
 				sizeX:    150,
 				Layout: func(gtx C, th *material.Theme, c *Cell, color color.NRGBA, isHeader bool) D {
 					res := "-"
@@ -664,7 +666,7 @@ func (r *Row) generateColumns() {
 				},
 			},
 			Cell{
-				headCell: "Car Side",
+				headCell: cols.CAR_SIDE,
 				sizeX:    100,
 				Layout: func(gtx C, th *material.Theme, c *Cell, color color.NRGBA, isHeader bool) D {
 					res := r.CarSide

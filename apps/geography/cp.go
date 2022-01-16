@@ -14,11 +14,11 @@ type (
 		controllers []Controller
 		list        widget.List
 
-		CDetails   controllers2.CountryDetails
 		SCountries controllers2.SelectedCountries
+		SCState    component.DiscloserState
 
-		CDState component.DiscloserState
-		SCState component.DiscloserState
+		DColumns controllers2.DisplayedColumns
+		DCState  component.DiscloserState
 	}
 
 	Controller struct {
@@ -61,14 +61,14 @@ func (cp *ControlPanel) Layout(gtx C, th *material.Theme) D {
 			},
 		},
 		{
-			name: "Country Details",
+			name: "Displayed Columns",
 			layout: func(gtx C, c *Controller) D {
 				content := layout.Rigid(func(gtx C) D {
-					return component.SimpleDiscloser(th, &cp.CDState).Layout(gtx,
+					return component.SimpleDiscloser(th, &cp.DCState).Layout(gtx,
 						material.Body1(th, c.name).Layout,
 						func(gtx C) D {
 							return controllerInset.Layout(gtx, func(gtx C) D {
-								return cp.CDetails.Layout(gtx, th)
+								return cp.DColumns.Layout(gtx, th)
 							})
 						})
 				})

@@ -13,6 +13,7 @@ const (
 	LAVENDERBLUSH = "lavenderblush"
 	ELECTRIC_BLUE = "electric-blue"
 
+	CP_RESIZER     = "cp_resizer"
 	TEXT_SELECTION = "text_selection"
 	CARD_COLOR     = "card_color"
 )

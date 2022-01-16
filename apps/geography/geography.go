@@ -3,6 +3,7 @@ package geography
 import (
 	"fmt"
 	"gioui-experiment/apps"
+	"gioui-experiment/apps/geography/controllers"
 	"gioui-experiment/apps/geography/data"
 	"gioui-experiment/apps/geography/grid"
 	"gioui-experiment/apps/geography/table"
@@ -18,6 +19,7 @@ import (
 	"gioui.org/x/component"
 	"github.com/xuri/excelize/v2"
 	"image"
+	"image/color"
 	"log"
 	"strconv"
 	"strings"
@@ -88,7 +90,25 @@ func New(router *apps.Router) *Application {
 }
 
 func (app *Application) Actions() []component.AppBarAction {
-	return []component.AppBarAction{}
+	return []component.AppBarAction{
+		{
+			OverflowAction: component.OverflowAction{
+				Tag: &app.DisableCPBtn,
+			},
+			Layout: func(gtx C, bg, fg color.NRGBA) D {
+				var lbl string
+				if app.DisableCPBtn.Clicked() {
+					app.isCPDisabled = !app.isCPDisabled
+				}
+				if !app.isCPDisabled {
+					lbl = "Disable CP"
+				} else {
+					lbl = "Enable CP"
+				}
+				return material.Button(app.th, &app.DisableCPBtn, lbl).Layout(gtx)
+			},
+		},
+	}
 }
 
 func (app *Application) Overflow() []component.OverflowAction {
@@ -110,7 +130,7 @@ func (app *Application) LayoutView(gtx C, th *material.Theme) D {
 	if err != nil {
 		return material.H2(th, fmt.Sprintf("Error when fetching countries: %s", err)).Layout(gtx)
 	}
-	app.FilterData(table.NAME)
+	app.FilterData(controllers.NAME)
 
 	// run only once at start
 	if !app.initialSetup {
@@ -191,12 +211,16 @@ func (app *Application) LayoutView(gtx C, th *material.Theme) D {
 			layout.Rigid(material.Body2(th, app.Display.ContextualCountry.Cca3).Layout),
 			layout.Rigid(material.Body2(th, app.Display.ContextualCountry.Ccn3).Layout),
 			layout.Rigid(material.Body2(th, strconv.FormatFloat(app.Display.ContextualCountry.Area, 'f', -1, 32)).Layout),
-			layout.Flexed(1, func(gtx C) D {
-				return widget.Image{
-					Src: paint.NewImageOp(app.Display.ContextualCountry.FlagImg),
-					Fit: widget.Contain,
-				}.Layout(gtx)
+			layout.Rigid(func(gtx C) D {
+				return layout.Flex{}.Layout(gtx,
+					layout.Flexed(1, func(gtx C) D {
+						return widget.Image{
+							Src: paint.NewImageOp(app.Display.ContextualCountry.FlagImg),
+							Fit: widget.Contain,
+						}.Layout(gtx)
+					}))
 			}))
+
 	case nil:
 		dims = layout.Flex{Axis: layout.Vertical}.Layout(gtx,
 			layout.Rigid(func(gtx C) D {
@@ -388,11 +412,11 @@ func (d *Display) FilterData(FilterBy string) {
 				var res string
 
 				switch FilterBy {
-				case table.NAME:
+				case controllers.NAME:
 					res = data.Cached[i].Name.Common
-				case table.OFFICIAL_NAME:
+				case controllers.OFFICIAL_NAME:
 					res = data.Cached[i].Name.Official
-				case table.CAPITAL:
+				case controllers.CAPITAL:
 					res = data.Cached[i].Capital[0]
 				}
 

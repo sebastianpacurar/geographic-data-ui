@@ -25,7 +25,7 @@ var (
 		"electric-blue": {R: 125, G: 249, B: 255, A: 255},
 
 		"black":           {A: 255},
-		"dark-slate-grey": {R: 47, G: 79, B: 79, A: 255},
+		"dark-slate-grey": {R: 40, G: 70, B: 70, A: 175},
 		"grey":            {R: 128, G: 128, B: 128, A: 255},
 		"dark-red":        {R: 139, A: 255},
 		"dark-green":      {G: 180, A: 255},
@@ -33,6 +33,7 @@ var (
 
 		"text_selection": {R: 191, G: 255, B: 209, A: 255},
 		"card_color":     {R: 237, G: 237, B: 237, A: 255},
+		"cp_resizer":     {R: 40, G: 70, B: 70, A: 175},
 	}
 	SpacerX = layout.Rigid(layout.Spacer{Width: unit.Dp(10)}.Layout)
 )

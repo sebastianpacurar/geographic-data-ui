@@ -23,7 +23,7 @@ type (
 		IsCached      bool
 	}
 
-	// Country - Used with v3.1 API
+	// Country - Adapted for v3.1 API. Example: https://restcountries.com/v3.1/name/netherlands
 	Country struct {
 		Name           Name                       `json:"name"`
 		TopLevelDomain []string                   `json:"tld"`
@@ -185,7 +185,7 @@ func downloadAndDecodeFlag(countries []Country, done chan image.Image) {
 
 func (c *Countries) InitCountries() error {
 	if !c.IsCached {
-		countries, err := c.fetchCountries("all")
+		countries, err := fetchCountries("all")
 		if err != nil {
 			log.Fatalln("error fetching data from RESTCountries API ", err)
 			return err
@@ -198,6 +198,42 @@ func (c *Countries) InitCountries() error {
 		c.IsCached = true
 	}
 	return nil
+}
+
+// fetchCountries - Fetches All Country Data except the flag
+func fetchCountries(location string) ([]byte, error) {
+	URL := fmt.Sprintf("https://restcountries.com/v3.1/%s", location)
+	res, err := http.Get(URL)
+	if err != nil {
+		log.Fatalln(fmt.Sprintf("http.Get(\"%s\") failed: %s", URL, err))
+		return []byte{}, err
+	}
+	defer func(Body io.ReadCloser) {
+		err = Body.Close()
+		if err != nil {
+			log.Fatalln("error at deferred func, at the end: ", err)
+		}
+	}(res.Body)
+	body, err := ioutil.ReadAll(res.Body)
+	if err != nil {
+		log.Fatalln("error at res.Body reading: ", err)
+		return []byte{}, err
+	}
+	return body, nil
+}
+
+func fileCount(path string) (int, error) {
+	i := 0
+	entry, err := ioutil.ReadDir(path)
+	if err != nil {
+		log.Fatalln(fmt.Sprintf("Error when reading directory %s", err))
+	}
+	for _, f := range entry {
+		if !f.IsDir() {
+			i++
+		}
+	}
+	return i, nil
 }
 
 // WriteFlagToFile - needed for slower OSes to store the flags locally, for quicker retrieval on next app start
@@ -245,40 +281,4 @@ func ReadFlagFromFile() []byte {
 		log.Fatalln("Error opening no-flag.png path")
 	}
 	return file
-}
-
-// fetchCountries - Fetches All Country Data except the flag
-func (c *Countries) fetchCountries(location string) ([]byte, error) {
-	URL := fmt.Sprintf("https://restcountries.com/v3.1/%s", location)
-	res, err := http.Get(URL)
-	if err != nil {
-		log.Fatalln(fmt.Sprintf("http.Get(\"%s\") failed: %s", URL, err))
-		return []byte{}, err
-	}
-	defer func(Body io.ReadCloser) {
-		err = Body.Close()
-		if err != nil {
-			log.Fatalln("error at deferred func, at the end: ", err)
-		}
-	}(res.Body)
-	body, err := ioutil.ReadAll(res.Body)
-	if err != nil {
-		log.Fatalln("error at res.Body reading: ", err)
-		return []byte{}, err
-	}
-	return body, nil
-}
-
-func fileCount(path string) (int, error) {
-	i := 0
-	entry, err := ioutil.ReadDir(path)
-	if err != nil {
-		log.Fatalln(fmt.Sprintf("Error when reading directory %s", err))
-	}
-	for _, f := range entry {
-		if !f.IsDir() {
-			i++
-		}
-	}
-	return i, nil
 }
