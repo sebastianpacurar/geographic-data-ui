@@ -35,9 +35,9 @@ func Run(w *app.Window) error {
 	th := material.NewTheme(gofont.Collection())
 
 	router := application.NewRouter()
-	router.Register("pg", playground.New(&router))
 	router.Register(1, geography.New(&router))
 	router.Register(2, editor.New(&router))
+	router.Register("pg", playground.New(&router))
 
 	for {
 		select {

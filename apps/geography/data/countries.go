@@ -102,7 +102,8 @@ type (
 	}
 )
 
-func (c *Countries) GetSelected() []Country {
+// GetSelected - used for selected country pills
+func GetSelected() []Country {
 	res := make([]Country, 0)
 	for i := range Cached {
 		if Cached[i].Selected {
@@ -112,10 +113,22 @@ func (c *Countries) GetSelected() []Country {
 	return res
 }
 
-func (c *Countries) GetSelectedCount() int {
+// GetSelectedCount - returns the number of Selected countries
+func GetSelectedCount() int {
 	count := 0
 	for i := range Cached {
 		if Cached[i].Selected {
+			count++
+		}
+	}
+	return count
+}
+
+// GetDisplayedCount - returns the number of displayed countries as rows or cards
+func GetDisplayedCount() int {
+	count := 0
+	for i := range Cached {
+		if Cached[i].Active && Cached[i].ActiveContinent {
 			count++
 		}
 	}

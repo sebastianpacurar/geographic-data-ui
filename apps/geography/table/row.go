@@ -2,6 +2,7 @@ package table
 
 import (
 	"fmt"
+	"gioui-experiment/apps/geography/data"
 	"gioui-experiment/globals"
 	"gioui-experiment/themes/colours"
 	"gioui.org/layout"
@@ -66,7 +67,7 @@ type (
 	}
 
 	Cell struct {
-		HeadCell  string
+		headCell  string
 		sizeX     int
 		IsEnabled bool
 		Layout    func(C, *material.Theme, *Cell, color.NRGBA, bool) D
@@ -142,9 +143,7 @@ func (r *Row) LayNameColumn(gtx C, th *material.Theme, isHeader bool) D {
 						r.headerSizeY = gtx.Constraints.Min.Y
 						return globals.ColoredArea(gtx, image.Pt(gtx.Constraints.Max.X, gtx.Constraints.Min.Y), globals.Colours[colours.ELECTRIC_BLUE])
 					}),
-					layout.Stacked(func(gtx C) D {
-						return material.Body1(th, "Country").Layout(gtx)
-					}))
+					layout.Stacked(material.Body1(th, fmt.Sprintf("Country (%d)", data.GetDisplayedCount())).Layout))
 			})
 		} else {
 			return material.Clickable(gtx, &r.btn, func(gtx C) D {
@@ -170,39 +169,21 @@ func (r *Row) LayNameColumn(gtx C, th *material.Theme, isHeader bool) D {
 					}))
 			})
 		}
-
 	})
 }
 
 func (r *Row) generateColumns() {
 	r.columns = make([]Cell, 0, len(ColNames))
-	for _ = range ColNames {
+	for range ColNames {
 		r.columns = append(r.columns,
-			//Cell{
-			//	HeadCell: "Name",
-			//	sizeX:     450,
-			//	Layout: func(gtx C, th *material.Theme, c *Cell, color color.NRGBA, isHeader bool) D {
-			//		return layout.Stack{Alignment: layout.Center}.Layout(gtx,
-			//			layout.Expanded(func(gtx C) D {
-			//				return globals.ColoredArea(gtx, image.Pt(gtx.Px(unit.Dp(float32(c.sizeX))), r.sizeY), color)
-			//			}),
-			//			layout.Stacked(func(gtx C) D {
-			//				res := r.Name
-			//				if isHeader {
-			//					res = c.HeadCell
-			//				}
-			//				return material.Body1(th, res).Layout(gtx)
-			//			}))
-			//	},
-			//},
 			Cell{
-				HeadCell: "Official Name",
+				headCell: "Official Name",
 				sizeX:    550,
 				Layout: func(gtx C, th *material.Theme, c *Cell, color color.NRGBA, isHeader bool) D {
 					res := r.OfficialName
 					sizeCross := r.sizeY
 					if isHeader {
-						res = c.HeadCell
+						res = c.headCell
 						sizeCross = r.headerSizeY
 					}
 					return layout.Stack{Alignment: layout.Center}.Layout(gtx,
@@ -213,7 +194,7 @@ func (r *Row) generateColumns() {
 				},
 			},
 			Cell{
-				HeadCell: "Capital",
+				headCell: "Capital",
 				sizeX:    200,
 				Layout: func(gtx C, th *material.Theme, c *Cell, color color.NRGBA, isHeader bool) D {
 					capital := "-"
@@ -222,7 +203,7 @@ func (r *Row) generateColumns() {
 						capital = r.Capital[0]
 					}
 					if isHeader {
-						capital = c.HeadCell
+						capital = c.headCell
 						sizeCross = r.headerSizeY
 					}
 					return layout.Stack{Alignment: layout.Center}.Layout(gtx,
@@ -233,13 +214,13 @@ func (r *Row) generateColumns() {
 				},
 			},
 			Cell{
-				HeadCell: "Region",
+				headCell: "Region",
 				sizeX:    175,
 				Layout: func(gtx C, th *material.Theme, c *Cell, color color.NRGBA, isHeader bool) D {
 					res := r.Region
 					sizeCross := r.sizeY
 					if isHeader {
-						res = c.HeadCell
+						res = c.headCell
 						sizeCross = r.headerSizeY
 					}
 					return layout.Stack{Alignment: layout.Center}.Layout(gtx,
@@ -250,7 +231,7 @@ func (r *Row) generateColumns() {
 				},
 			},
 			Cell{
-				HeadCell: "Subregion",
+				headCell: "Subregion",
 				sizeX:    225,
 				Layout: func(gtx C, th *material.Theme, c *Cell, color color.NRGBA, isHeader bool) D {
 					subregion := "-"
@@ -259,7 +240,7 @@ func (r *Row) generateColumns() {
 						subregion = r.Subregion
 					}
 					if isHeader {
-						subregion = c.HeadCell
+						subregion = c.headCell
 						sizeCross = r.headerSizeY
 					}
 					return layout.Stack{Alignment: layout.Center}.Layout(gtx,
@@ -270,13 +251,13 @@ func (r *Row) generateColumns() {
 				},
 			},
 			Cell{
-				HeadCell: "Continents",
+				headCell: "Continents",
 				sizeX:    175,
 				Layout: func(gtx C, th *material.Theme, c *Cell, color color.NRGBA, isHeader bool) D {
 					res := strings.Join(r.Continents, ", ")
 					sizeCross := r.sizeY
 					if isHeader {
-						res = c.HeadCell
+						res = c.headCell
 						sizeCross = r.headerSizeY
 					}
 					return layout.Stack{Alignment: layout.Center}.Layout(gtx,
@@ -287,27 +268,30 @@ func (r *Row) generateColumns() {
 				},
 			},
 			Cell{
-				HeadCell: "Languages",
+				headCell: "Languages",
 				sizeX:    650,
 				Layout: func(gtx C, th *material.Theme, c *Cell, color color.NRGBA, isHeader bool) D {
-					res := ""
+					res := "-"
 					sizeCross := r.sizeY
-					langs := make([]string, 0, len(r.Languages))
 
-					for _, v := range r.Languages {
-						langs = append(langs, v)
-					}
-					sort.Strings(langs)
-					if len(langs) <= 5 {
-						res = strings.Join(langs, ", ")
-					} else {
+					if r.Languages != nil {
+						langs := make([]string, 0, len(r.Languages))
 
-						// first 5 + (all - 5) more
-						res = strings.Join(langs[:5], ", ")
-						res += fmt.Sprintf(" + %d more", len(langs[5:]))
+						for _, v := range r.Languages {
+							langs = append(langs, v)
+						}
+						sort.Strings(langs)
+						if len(langs) <= 5 {
+							res = strings.Join(langs, ", ")
+						} else {
+
+							// first 5 + (all - 5) more
+							res = strings.Join(langs[:5], ", ")
+							res += fmt.Sprintf(" + %d more", len(langs[5:]))
+						}
 					}
 					if isHeader {
-						res = c.HeadCell
+						res = c.headCell
 						sizeCross = r.headerSizeY
 					}
 					return layout.Stack{Alignment: layout.Center}.Layout(gtx,
@@ -318,13 +302,16 @@ func (r *Row) generateColumns() {
 				},
 			},
 			Cell{
-				HeadCell: "IDD Root",
+				headCell: "IDD Root",
 				sizeX:    165,
 				Layout: func(gtx C, th *material.Theme, c *Cell, color color.NRGBA, isHeader bool) D {
-					res := r.IddRoot
+					res := "-"
+					if len(r.IddRoot) > 0 {
+						res = r.IddRoot
+					}
 					sizeCross := r.sizeY
 					if isHeader {
-						res = c.HeadCell
+						res = c.headCell
 						sizeCross = r.headerSizeY
 					}
 					return layout.Stack{Alignment: layout.Center}.Layout(gtx,
@@ -335,20 +322,22 @@ func (r *Row) generateColumns() {
 				},
 			},
 			Cell{
-				HeadCell: "IDD Suffixes",
+				headCell: "IDD Suffixes",
 				sizeX:    200,
 				Layout: func(gtx C, th *material.Theme, c *Cell, color color.NRGBA, isHeader bool) D {
-					res := ""
+					res := "-"
 					sizeCross := r.sizeY
-					if r.Name == "United States" {
-						limits := []string{r.IddSuffixes[0]}
-						limits = append(limits, r.IddSuffixes[len(r.IddSuffixes)-1])
-						res = strings.Join(limits, "-")
-					} else {
-						res = strings.Join(r.IddSuffixes, ", ")
+					if len(r.IddSuffixes) > 0 && len(r.IddSuffixes[0]) > 0 {
+						if r.Name == "United States" {
+							limits := []string{r.IddSuffixes[0]}
+							limits = append(limits, r.IddSuffixes[len(r.IddSuffixes)-1])
+							res = strings.Join(limits, "-")
+						} else {
+							res = strings.Join(r.IddSuffixes, ", ")
+						}
 					}
 					if isHeader {
-						res = c.HeadCell
+						res = c.headCell
 						sizeCross = r.headerSizeY
 					}
 					return layout.Stack{Alignment: layout.Center}.Layout(gtx,
@@ -359,7 +348,7 @@ func (r *Row) generateColumns() {
 				},
 			},
 			Cell{
-				HeadCell: "Top Level Domains",
+				headCell: "Top Level Domains",
 				sizeX:    200,
 				Layout: func(gtx C, th *material.Theme, c *Cell, color color.NRGBA, isHeader bool) D {
 					res := "-"
@@ -386,7 +375,7 @@ func (r *Row) generateColumns() {
 						}
 					}
 					if isHeader {
-						res = c.HeadCell
+						res = c.headCell
 						sizeCross = r.headerSizeY
 					}
 					return layout.Stack{Alignment: layout.Center}.Layout(gtx,
@@ -397,7 +386,7 @@ func (r *Row) generateColumns() {
 				},
 			},
 			Cell{
-				HeadCell: "Independent",
+				headCell: "Independent",
 				sizeX:    180,
 				Layout: func(gtx C, th *material.Theme, c *Cell, color color.NRGBA, isHeader bool) D {
 					independent := "No"
@@ -406,7 +395,7 @@ func (r *Row) generateColumns() {
 						independent = "Yes"
 					}
 					if isHeader {
-						independent = c.HeadCell
+						independent = c.headCell
 						sizeCross = r.headerSizeY
 					}
 					return layout.Stack{Alignment: layout.Center}.Layout(gtx,
@@ -417,13 +406,13 @@ func (r *Row) generateColumns() {
 				},
 			},
 			Cell{
-				HeadCell: "Status",
+				headCell: "Status",
 				sizeX:    175,
 				Layout: func(gtx C, th *material.Theme, c *Cell, color color.NRGBA, isHeader bool) D {
 					res := r.Status
 					sizeCross := r.sizeY
 					if isHeader {
-						res = c.HeadCell
+						res = c.headCell
 						sizeCross = r.headerSizeY
 					}
 					return layout.Stack{Alignment: layout.Center}.Layout(gtx,
@@ -434,17 +423,17 @@ func (r *Row) generateColumns() {
 				},
 			},
 			Cell{
-				HeadCell: "United Nations Member",
+				headCell: "United Nations Member",
 				sizeX:    200,
 				Layout: func(gtx C, th *material.Theme, c *Cell, color color.NRGBA, isHeader bool) D {
 					unMember := "No"
 					sizeCross := r.sizeY
 					if r.UNMember {
 						unMember = "Yes"
-						sizeCross = r.headerSizeY
 					}
 					if isHeader {
-						unMember = c.HeadCell
+						unMember = c.headCell
+						sizeCross = r.headerSizeY
 					}
 					return layout.Stack{Alignment: layout.Center}.Layout(gtx,
 						layout.Expanded(func(gtx C) D {
@@ -454,7 +443,7 @@ func (r *Row) generateColumns() {
 				},
 			},
 			Cell{
-				HeadCell: "Land Locked",
+				headCell: "Land Locked",
 				sizeX:    180,
 				Layout: func(gtx C, th *material.Theme, c *Cell, color color.NRGBA, isHeader bool) D {
 					landLocked := "No"
@@ -463,7 +452,7 @@ func (r *Row) generateColumns() {
 						landLocked = "Yes"
 					}
 					if isHeader {
-						landLocked = c.HeadCell
+						landLocked = c.headCell
 						sizeCross = r.headerSizeY
 					}
 					return layout.Stack{Alignment: layout.Center}.Layout(gtx,
@@ -474,13 +463,13 @@ func (r *Row) generateColumns() {
 				},
 			},
 			Cell{
-				HeadCell: "CCA 2",
+				headCell: "CCA 2",
 				sizeX:    85,
 				Layout: func(gtx C, th *material.Theme, c *Cell, color color.NRGBA, isHeader bool) D {
 					res := r.Cca2
 					sizeCross := r.sizeY
 					if isHeader {
-						res = c.HeadCell
+						res = c.headCell
 						sizeCross = r.headerSizeY
 					}
 					return layout.Stack{Alignment: layout.Center}.Layout(gtx,
@@ -491,13 +480,13 @@ func (r *Row) generateColumns() {
 				},
 			},
 			Cell{
-				HeadCell: "CCA 3",
+				headCell: "CCA 3",
 				sizeX:    85,
 				Layout: func(gtx C, th *material.Theme, c *Cell, color color.NRGBA, isHeader bool) D {
 					res := r.Cca3
 					sizeCross := r.sizeY
 					if isHeader {
-						res = c.HeadCell
+						res = c.headCell
 						sizeCross = r.headerSizeY
 					}
 					return layout.Stack{Alignment: layout.Center}.Layout(gtx,
@@ -508,7 +497,7 @@ func (r *Row) generateColumns() {
 				},
 			},
 			Cell{
-				HeadCell: "CCN 3",
+				headCell: "CCN 3",
 				sizeX:    85,
 				Layout: func(gtx C, th *material.Theme, c *Cell, color color.NRGBA, isHeader bool) D {
 					ccn := "-"
@@ -517,7 +506,7 @@ func (r *Row) generateColumns() {
 						ccn = r.Ccn3
 					}
 					if isHeader {
-						ccn = c.HeadCell
+						ccn = c.headCell
 						sizeCross = r.headerSizeY
 					}
 					return layout.Stack{Alignment: layout.Center}.Layout(gtx,
@@ -528,7 +517,7 @@ func (r *Row) generateColumns() {
 				},
 			},
 			Cell{
-				HeadCell: "IOC Code",
+				headCell: "IOC Code",
 				sizeX:    95,
 				Layout: func(gtx C, th *material.Theme, c *Cell, color color.NRGBA, isHeader bool) D {
 					ioc := "-"
@@ -537,7 +526,7 @@ func (r *Row) generateColumns() {
 						ioc = r.Cioc
 					}
 					if isHeader {
-						ioc = c.HeadCell
+						ioc = c.headCell
 						sizeCross = r.headerSizeY
 					}
 					return layout.Stack{Alignment: layout.Center}.Layout(gtx,
@@ -548,7 +537,7 @@ func (r *Row) generateColumns() {
 				},
 			},
 			Cell{
-				HeadCell: "FIFA Code",
+				headCell: "FIFA Code",
 				sizeX:    95,
 				Layout: func(gtx C, th *material.Theme, c *Cell, color color.NRGBA, isHeader bool) D {
 					fifa := "-"
@@ -557,7 +546,7 @@ func (r *Row) generateColumns() {
 						fifa = r.Fifa
 					}
 					if isHeader {
-						fifa = c.HeadCell
+						fifa = c.headCell
 						sizeCross = r.headerSizeY
 					}
 					return layout.Stack{Alignment: layout.Center}.Layout(gtx,
@@ -568,13 +557,13 @@ func (r *Row) generateColumns() {
 				},
 			},
 			Cell{
-				HeadCell: "Area",
+				headCell: "Area",
 				sizeX:    125,
 				Layout: func(gtx C, th *material.Theme, c *Cell, color color.NRGBA, isHeader bool) D {
 					res := strconv.FormatFloat(r.Area, 'f', -1, 32)
 					sizeCross := r.sizeY
 					if isHeader {
-						res = c.HeadCell
+						res = c.headCell
 						sizeCross = r.headerSizeY
 					}
 					return layout.Stack{Alignment: layout.Center}.Layout(gtx,
@@ -585,13 +574,13 @@ func (r *Row) generateColumns() {
 				},
 			},
 			Cell{
-				HeadCell: "Population",
+				headCell: "Population",
 				sizeX:    150,
 				Layout: func(gtx C, th *material.Theme, c *Cell, color color.NRGBA, isHeader bool) D {
 					res := fmt.Sprintf("%d", int(r.Population))
 					sizeCross := r.sizeY
 					if isHeader {
-						res = c.HeadCell
+						res = c.headCell
 						sizeCross = r.headerSizeY
 					}
 					return layout.Stack{Alignment: layout.Center}.Layout(gtx,
@@ -602,13 +591,13 @@ func (r *Row) generateColumns() {
 				},
 			},
 			Cell{
-				HeadCell: "Latitude",
+				headCell: "Latitude",
 				sizeX:    150,
 				Layout: func(gtx C, th *material.Theme, c *Cell, color color.NRGBA, isHeader bool) D {
 					res := strconv.FormatFloat(r.Latitude, 'f', -1, 64)
 					sizeCross := r.sizeY
 					if isHeader {
-						res = c.HeadCell
+						res = c.headCell
 						sizeCross = r.headerSizeY
 					}
 					return layout.Stack{Alignment: layout.Center}.Layout(gtx,
@@ -619,13 +608,13 @@ func (r *Row) generateColumns() {
 				},
 			},
 			Cell{
-				HeadCell: "Longitude",
+				headCell: "Longitude",
 				sizeX:    150,
 				Layout: func(gtx C, th *material.Theme, c *Cell, color color.NRGBA, isHeader bool) D {
 					res := strconv.FormatFloat(r.Longitude, 'f', -1, 64)
 					sizeCross := r.sizeY
 					if isHeader {
-						res = c.HeadCell
+						res = c.headCell
 						sizeCross = r.headerSizeY
 					}
 					return layout.Stack{Alignment: layout.Center}.Layout(gtx,
@@ -638,13 +627,13 @@ func (r *Row) generateColumns() {
 				},
 			},
 			Cell{
-				HeadCell: "Start of Week",
+				headCell: "Start of Week",
 				sizeX:    150,
 				Layout: func(gtx C, th *material.Theme, c *Cell, color color.NRGBA, isHeader bool) D {
 					res := r.StartOfWeek
 					sizeCross := r.sizeY
 					if isHeader {
-						res = c.HeadCell
+						res = c.headCell
 						sizeCross = r.headerSizeY
 					}
 					return layout.Stack{Alignment: layout.Center}.Layout(gtx,
@@ -655,16 +644,16 @@ func (r *Row) generateColumns() {
 				},
 			},
 			Cell{
-				HeadCell: "Car Signs",
+				headCell: "Car Signs",
 				sizeX:    150,
 				Layout: func(gtx C, th *material.Theme, c *Cell, color color.NRGBA, isHeader bool) D {
 					res := "-"
 					sizeCross := r.sizeY
-					if len(r.CarSigns) > 0 || r.CarSigns != nil {
+					if len(r.CarSigns) > 0 && len(r.CarSigns[0]) > 0 {
 						res = strings.Join(r.CarSigns, ", ")
 					}
 					if isHeader {
-						res = c.HeadCell
+						res = c.headCell
 						sizeCross = r.headerSizeY
 					}
 					return layout.Stack{Alignment: layout.Center}.Layout(gtx,
@@ -675,13 +664,13 @@ func (r *Row) generateColumns() {
 				},
 			},
 			Cell{
-				HeadCell: "Car Side",
+				headCell: "Car Side",
 				sizeX:    100,
 				Layout: func(gtx C, th *material.Theme, c *Cell, color color.NRGBA, isHeader bool) D {
 					res := r.CarSide
 					sizeCross := r.sizeY
 					if isHeader {
-						res = c.HeadCell
+						res = c.headCell
 						sizeCross = r.headerSizeY
 					}
 					return layout.Stack{Alignment: layout.Center}.Layout(gtx,

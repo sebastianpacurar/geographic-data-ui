@@ -30,9 +30,9 @@ type (
 func (sc *SelectedCountries) Layout(gtx C, th *material.Theme) D {
 
 	// avoid continuous reiteration
-	selectedCount := sc.api.GetSelectedCount()
+	selectedCount := data.GetSelectedCount()
 	if sc.count != selectedCount {
-		selected := sc.api.GetSelected()
+		selected := data.GetSelected()
 		sc.pills = make([]pill, selectedCount)
 		for i := range sc.pills {
 			sc.pills[i].name = selected[i].Name.Common

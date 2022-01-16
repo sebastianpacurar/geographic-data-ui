@@ -18,12 +18,11 @@ type (
 	D = layout.Dimensions
 
 	Table struct {
-		rows         []Row
-		headerList   layout.List
-		rowList      widget.List
-		columnList   widget.List
-		lockedColumn layout.List
-		loaded       bool
+		rows       []Row
+		headerList layout.List
+		rowList    widget.List
+		columnList widget.List
+		loaded     bool
 
 		component.Resize
 	}
@@ -35,8 +34,6 @@ func (t *Table) Layout(gtx C, th *material.Theme, searchBy string) D {
 		t.rowList.Alignment = layout.Middle
 		t.columnList.Axis = layout.Horizontal
 		t.columnList.Alignment = layout.Middle
-		t.lockedColumn.Axis = layout.Vertical
-		t.lockedColumn.Alignment = layout.Middle
 		t.Resize = component.Resize{Ratio: 0.25}
 
 		for i := range data.Cached {
