@@ -75,7 +75,6 @@ func (t *Table) Layout(gtx C, th *material.Theme, searchBy string) D {
 			t.rows[i].Active = data.Cached[i].Active
 			t.rows[i].ActiveContinent = data.Cached[i].ActiveContinent
 			t.rows[i].Selected = data.Cached[i].Selected
-			t.rows[i].IsCPViewed = data.Cached[i].IsCPViewed
 		}
 	}
 

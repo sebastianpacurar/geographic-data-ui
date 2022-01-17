@@ -17,11 +17,13 @@ import (
 	"unicode"
 )
 
-var ColNames = []string{
-	OFFICIAL_NAME, CAPITAL, REGION, SUBREGION, LANGUAGES, CONTINENTS, IDD_ROOT, IDD_SUFFIXES, TOP_LEVEL_DOMAINS,
-	INDEPENDENT, STATUS, UNITED_NATIONS_MEMBER, LANDLOCKED, CCA2, CCA3, CCN3, CIOC, FIFA, AREA, POPULATION, LATITUDE,
-	LONGITUDE, START_OF_WEEK, CAR_SIGNS, CAR_SIDE,
-}
+var (
+	ColNames = []string{
+		OFFICIAL_NAME, CAPITAL, REGION, SUBREGION, LANGUAGES, CONTINENTS, IDD_ROOT, IDD_SUFFIXES, TOP_LEVEL_DOMAINS,
+		INDEPENDENT, STATUS, UNITED_NATIONS_MEMBER, LANDLOCKED, CCA2, CCA3, CCN3, CIOC, FIFA, AREA, POPULATION, LATITUDE,
+		LONGITUDE, START_OF_WEEK, CAR_SIGNS, CAR_SIDE,
+	}
+)
 
 type (
 	Row struct {
@@ -55,7 +57,6 @@ type (
 		Active          bool
 		ActiveContinent bool
 		Selected        bool
-		IsCPViewed      bool
 
 		btn         widget.Clickable
 		colList     layout.List
@@ -107,7 +108,7 @@ func (r *Row) LayRow(gtx C, th *material.Theme, isHeader bool) D {
 				}
 				return r.colList.Layout(gtx, len(ColNames), func(gtx C, i int) D {
 					var dim D
-					if r.Columns[i].IsEnabled {
+					if ColsState[r.Columns[i].HeadCell] {
 						dim = r.Columns[i].Layout(gtx, th, &r.Columns[i], rowColor, isHeader)
 					}
 					return dim
@@ -117,7 +118,7 @@ func (r *Row) LayRow(gtx C, th *material.Theme, isHeader bool) D {
 			rowColor = globals.Colours[colours.LAVENDERBLUSH]
 			return r.colList.Layout(gtx, len(ColNames), func(gtx C, i int) D {
 				var dim D
-				if r.Columns[i].IsEnabled {
+				if ColsState[r.Columns[i].HeadCell] {
 					dim = r.Columns[i].Layout(gtx, th, &r.Columns[i], rowColor, isHeader)
 				}
 				return dim
@@ -143,7 +144,7 @@ func (r *Row) LayNameColumn(gtx C, th *material.Theme, isHeader bool) D {
 				return layout.Stack{}.Layout(gtx,
 					layout.Expanded(func(gtx C) D {
 
-						// maintain header row at the same size on cross axis, no matter the resize boundaries
+						// maintain header row at the same size on cross-axis, no matter the resize boundaries
 						r.headerSizeY = gtx.Constraints.Min.Y
 						return globals.ColoredArea(gtx, image.Pt(gtx.Constraints.Max.X, gtx.Constraints.Min.Y), globals.Colours[colours.ELECTRIC_BLUE])
 					}),
@@ -164,7 +165,7 @@ func (r *Row) LayNameColumn(gtx C, th *material.Theme, isHeader bool) D {
 				return layout.Stack{}.Layout(gtx,
 					layout.Expanded(func(gtx C) D {
 
-						// resize entire row based on sticky column cross axis size
+						// resize entire row based on sticky column cross-axis row size
 						r.sizeY = gtx.Constraints.Min.Y
 						return globals.ColoredArea(gtx, image.Pt(gtx.Constraints.Max.X, gtx.Constraints.Min.Y), cellColor)
 					}),
@@ -177,539 +178,537 @@ func (r *Row) LayNameColumn(gtx C, th *material.Theme, isHeader bool) D {
 }
 
 func (r *Row) GenerateColumns() {
-	if len(r.Columns) == 0 {
-		r.Columns = make([]Cell, 0, len(ColNames))
-		for range ColNames {
-			r.Columns = append(r.Columns,
-				Cell{
-					HeadCell:  OFFICIAL_NAME,
-					sizeX:     550,
-					IsEnabled: true,
-					Layout: func(gtx C, th *material.Theme, c *Cell, color color.NRGBA, isHeader bool) D {
-						res := r.OfficialName
-						sizeCross := r.sizeY
-						if isHeader {
-							res = c.HeadCell
-							sizeCross = r.headerSizeY
-						}
-						return layout.Stack{Alignment: layout.Center}.Layout(gtx,
-							layout.Expanded(func(gtx C) D {
-								return globals.ColoredArea(gtx, image.Pt(gtx.Px(unit.Dp(float32(c.sizeX))), sizeCross), color)
-							}),
-							layout.Stacked(material.Body1(th, res).Layout))
-					},
+	r.Columns = make([]Cell, 0, len(ColNames))
+	for range ColNames {
+		r.Columns = append(r.Columns,
+			Cell{
+				HeadCell:  OFFICIAL_NAME,
+				sizeX:     550,
+				IsEnabled: true,
+				Layout: func(gtx C, th *material.Theme, c *Cell, color color.NRGBA, isHeader bool) D {
+					res := r.OfficialName
+					sizeCross := r.sizeY
+					if isHeader {
+						res = c.HeadCell
+						sizeCross = r.headerSizeY
+					}
+					return layout.Stack{Alignment: layout.Center}.Layout(gtx,
+						layout.Expanded(func(gtx C) D {
+							return globals.ColoredArea(gtx, image.Pt(gtx.Px(unit.Dp(float32(c.sizeX))), sizeCross), color)
+						}),
+						layout.Stacked(material.Body1(th, res).Layout))
 				},
-				Cell{
-					HeadCell:  CAPITAL,
-					sizeX:     200,
-					IsEnabled: true,
-					Layout: func(gtx C, th *material.Theme, c *Cell, color color.NRGBA, isHeader bool) D {
-						capital := "-"
-						sizeCross := r.sizeY
-						if len(r.Capital) > 0 {
-							capital = r.Capital[0]
-						}
-						if isHeader {
-							capital = c.HeadCell
-							sizeCross = r.headerSizeY
-						}
-						return layout.Stack{Alignment: layout.Center}.Layout(gtx,
-							layout.Expanded(func(gtx C) D {
-								return globals.ColoredArea(gtx, image.Pt(gtx.Px(unit.Dp(float32(c.sizeX))), sizeCross), color)
-							}),
-							layout.Stacked(material.Body1(th, capital).Layout))
-					},
+			},
+			Cell{
+				HeadCell:  CAPITAL,
+				sizeX:     200,
+				IsEnabled: true,
+				Layout: func(gtx C, th *material.Theme, c *Cell, color color.NRGBA, isHeader bool) D {
+					capital := "-"
+					sizeCross := r.sizeY
+					if len(r.Capital) > 0 {
+						capital = r.Capital[0]
+					}
+					if isHeader {
+						capital = c.HeadCell
+						sizeCross = r.headerSizeY
+					}
+					return layout.Stack{Alignment: layout.Center}.Layout(gtx,
+						layout.Expanded(func(gtx C) D {
+							return globals.ColoredArea(gtx, image.Pt(gtx.Px(unit.Dp(float32(c.sizeX))), sizeCross), color)
+						}),
+						layout.Stacked(material.Body1(th, capital).Layout))
 				},
-				Cell{
-					HeadCell:  REGION,
-					sizeX:     175,
-					IsEnabled: true,
-					Layout: func(gtx C, th *material.Theme, c *Cell, color color.NRGBA, isHeader bool) D {
-						res := r.Region
-						sizeCross := r.sizeY
-						if isHeader {
-							res = c.HeadCell
-							sizeCross = r.headerSizeY
-						}
-						return layout.Stack{Alignment: layout.Center}.Layout(gtx,
-							layout.Expanded(func(gtx C) D {
-								return globals.ColoredArea(gtx, image.Pt(gtx.Px(unit.Dp(float32(c.sizeX))), sizeCross), color)
-							}),
-							layout.Stacked(material.Body1(th, res).Layout))
-					},
+			},
+			Cell{
+				HeadCell:  REGION,
+				sizeX:     175,
+				IsEnabled: true,
+				Layout: func(gtx C, th *material.Theme, c *Cell, color color.NRGBA, isHeader bool) D {
+					res := r.Region
+					sizeCross := r.sizeY
+					if isHeader {
+						res = c.HeadCell
+						sizeCross = r.headerSizeY
+					}
+					return layout.Stack{Alignment: layout.Center}.Layout(gtx,
+						layout.Expanded(func(gtx C) D {
+							return globals.ColoredArea(gtx, image.Pt(gtx.Px(unit.Dp(float32(c.sizeX))), sizeCross), color)
+						}),
+						layout.Stacked(material.Body1(th, res).Layout))
 				},
-				Cell{
-					HeadCell:  SUBREGION,
-					sizeX:     225,
-					IsEnabled: true,
-					Layout: func(gtx C, th *material.Theme, c *Cell, color color.NRGBA, isHeader bool) D {
-						subregion := "-"
-						sizeCross := r.sizeY
-						if len(r.Subregion) > 0 {
-							subregion = r.Subregion
-						}
-						if isHeader {
-							subregion = c.HeadCell
-							sizeCross = r.headerSizeY
-						}
-						return layout.Stack{Alignment: layout.Center}.Layout(gtx,
-							layout.Expanded(func(gtx C) D {
-								return globals.ColoredArea(gtx, image.Pt(gtx.Px(unit.Dp(float32(c.sizeX))), sizeCross), color)
-							}),
-							layout.Stacked(material.Body1(th, subregion).Layout))
-					},
+			},
+			Cell{
+				HeadCell:  SUBREGION,
+				sizeX:     225,
+				IsEnabled: true,
+				Layout: func(gtx C, th *material.Theme, c *Cell, color color.NRGBA, isHeader bool) D {
+					subregion := "-"
+					sizeCross := r.sizeY
+					if len(r.Subregion) > 0 {
+						subregion = r.Subregion
+					}
+					if isHeader {
+						subregion = c.HeadCell
+						sizeCross = r.headerSizeY
+					}
+					return layout.Stack{Alignment: layout.Center}.Layout(gtx,
+						layout.Expanded(func(gtx C) D {
+							return globals.ColoredArea(gtx, image.Pt(gtx.Px(unit.Dp(float32(c.sizeX))), sizeCross), color)
+						}),
+						layout.Stacked(material.Body1(th, subregion).Layout))
 				},
-				Cell{
-					HeadCell:  CONTINENTS,
-					sizeX:     175,
-					IsEnabled: true,
-					Layout: func(gtx C, th *material.Theme, c *Cell, color color.NRGBA, isHeader bool) D {
-						res := strings.Join(r.Continents, ", ")
-						sizeCross := r.sizeY
-						if isHeader {
-							res = c.HeadCell
-							sizeCross = r.headerSizeY
-						}
-						return layout.Stack{Alignment: layout.Center}.Layout(gtx,
-							layout.Expanded(func(gtx C) D {
-								return globals.ColoredArea(gtx, image.Pt(gtx.Px(unit.Dp(float32(c.sizeX))), sizeCross), color)
-							}),
-							layout.Stacked(material.Body1(th, res).Layout))
-					},
+			},
+			Cell{
+				HeadCell:  CONTINENTS,
+				sizeX:     175,
+				IsEnabled: true,
+				Layout: func(gtx C, th *material.Theme, c *Cell, color color.NRGBA, isHeader bool) D {
+					res := strings.Join(r.Continents, ", ")
+					sizeCross := r.sizeY
+					if isHeader {
+						res = c.HeadCell
+						sizeCross = r.headerSizeY
+					}
+					return layout.Stack{Alignment: layout.Center}.Layout(gtx,
+						layout.Expanded(func(gtx C) D {
+							return globals.ColoredArea(gtx, image.Pt(gtx.Px(unit.Dp(float32(c.sizeX))), sizeCross), color)
+						}),
+						layout.Stacked(material.Body1(th, res).Layout))
 				},
-				Cell{
-					HeadCell:  LANGUAGES,
-					sizeX:     650,
-					IsEnabled: true,
-					Layout: func(gtx C, th *material.Theme, c *Cell, color color.NRGBA, isHeader bool) D {
-						res := "-"
-						sizeCross := r.sizeY
+			},
+			Cell{
+				HeadCell:  LANGUAGES,
+				sizeX:     650,
+				IsEnabled: true,
+				Layout: func(gtx C, th *material.Theme, c *Cell, color color.NRGBA, isHeader bool) D {
+					res := "-"
+					sizeCross := r.sizeY
 
-						if r.Languages != nil {
-							langs := make([]string, 0, len(r.Languages))
+					if r.Languages != nil {
+						langs := make([]string, 0, len(r.Languages))
 
-							for _, v := range r.Languages {
-								langs = append(langs, v)
-							}
-							sort.Strings(langs)
-							if len(langs) <= 5 {
-								res = strings.Join(langs, ", ")
-							} else {
+						for _, v := range r.Languages {
+							langs = append(langs, v)
+						}
+						sort.Strings(langs)
+						if len(langs) <= 5 {
+							res = strings.Join(langs, ", ")
+						} else {
 
-								// first 5 + (all - 5) more
-								res = strings.Join(langs[:5], ", ")
-								res += fmt.Sprintf(" + %d more", len(langs[5:]))
-							}
+							// first 5 + (all - 5) more
+							res = strings.Join(langs[:5], ", ")
+							res += fmt.Sprintf(" + %d more", len(langs[5:]))
 						}
-						if isHeader {
-							res = c.HeadCell
-							sizeCross = r.headerSizeY
-						}
-						return layout.Stack{Alignment: layout.Center}.Layout(gtx,
-							layout.Expanded(func(gtx C) D {
-								return globals.ColoredArea(gtx, image.Pt(gtx.Px(unit.Dp(float32(c.sizeX))), sizeCross), color)
-							}),
-							layout.Stacked(material.Body1(th, res).Layout))
-					},
+					}
+					if isHeader {
+						res = c.HeadCell
+						sizeCross = r.headerSizeY
+					}
+					return layout.Stack{Alignment: layout.Center}.Layout(gtx,
+						layout.Expanded(func(gtx C) D {
+							return globals.ColoredArea(gtx, image.Pt(gtx.Px(unit.Dp(float32(c.sizeX))), sizeCross), color)
+						}),
+						layout.Stacked(material.Body1(th, res).Layout))
 				},
-				Cell{
-					HeadCell:  IDD_ROOT,
-					sizeX:     165,
-					IsEnabled: true,
-					Layout: func(gtx C, th *material.Theme, c *Cell, color color.NRGBA, isHeader bool) D {
-						res := "-"
-						if len(r.IddRoot) > 0 {
-							res = r.IddRoot
-						}
-						sizeCross := r.sizeY
-						if isHeader {
-							res = c.HeadCell
-							sizeCross = r.headerSizeY
-						}
-						return layout.Stack{Alignment: layout.Center}.Layout(gtx,
-							layout.Expanded(func(gtx C) D {
-								return globals.ColoredArea(gtx, image.Pt(gtx.Px(unit.Dp(float32(c.sizeX))), sizeCross), color)
-							}),
-							layout.Stacked(material.Body1(th, res).Layout))
-					},
+			},
+			Cell{
+				HeadCell:  IDD_ROOT,
+				sizeX:     165,
+				IsEnabled: true,
+				Layout: func(gtx C, th *material.Theme, c *Cell, color color.NRGBA, isHeader bool) D {
+					res := "-"
+					if len(r.IddRoot) > 0 {
+						res = r.IddRoot
+					}
+					sizeCross := r.sizeY
+					if isHeader {
+						res = c.HeadCell
+						sizeCross = r.headerSizeY
+					}
+					return layout.Stack{Alignment: layout.Center}.Layout(gtx,
+						layout.Expanded(func(gtx C) D {
+							return globals.ColoredArea(gtx, image.Pt(gtx.Px(unit.Dp(float32(c.sizeX))), sizeCross), color)
+						}),
+						layout.Stacked(material.Body1(th, res).Layout))
 				},
-				Cell{
-					HeadCell:  IDD_SUFFIXES,
-					sizeX:     200,
-					IsEnabled: true,
-					Layout: func(gtx C, th *material.Theme, c *Cell, color color.NRGBA, isHeader bool) D {
-						res := "-"
-						sizeCross := r.sizeY
-						if len(r.IddSuffixes) > 0 && len(r.IddSuffixes[0]) > 0 {
-							if r.Name == "United States" {
-								limits := []string{r.IddSuffixes[0]}
-								limits = append(limits, r.IddSuffixes[len(r.IddSuffixes)-1])
-								res = strings.Join(limits, "-")
-							} else {
-								res = strings.Join(r.IddSuffixes, ", ")
-							}
+			},
+			Cell{
+				HeadCell:  IDD_SUFFIXES,
+				sizeX:     200,
+				IsEnabled: true,
+				Layout: func(gtx C, th *material.Theme, c *Cell, color color.NRGBA, isHeader bool) D {
+					res := "-"
+					sizeCross := r.sizeY
+					if len(r.IddSuffixes) > 0 && len(r.IddSuffixes[0]) > 0 {
+						if r.Name == "United States" {
+							limits := []string{r.IddSuffixes[0]}
+							limits = append(limits, r.IddSuffixes[len(r.IddSuffixes)-1])
+							res = strings.Join(limits, "-")
+						} else {
+							res = strings.Join(r.IddSuffixes, ", ")
 						}
-						if isHeader {
-							res = c.HeadCell
-							sizeCross = r.headerSizeY
-						}
-						return layout.Stack{Alignment: layout.Center}.Layout(gtx,
-							layout.Expanded(func(gtx C) D {
-								return globals.ColoredArea(gtx, image.Pt(gtx.Px(unit.Dp(float32(c.sizeX))), sizeCross), color)
-							}),
-							layout.Stacked(material.Body1(th, res).Layout))
-					},
+					}
+					if isHeader {
+						res = c.HeadCell
+						sizeCross = r.headerSizeY
+					}
+					return layout.Stack{Alignment: layout.Center}.Layout(gtx,
+						layout.Expanded(func(gtx C) D {
+							return globals.ColoredArea(gtx, image.Pt(gtx.Px(unit.Dp(float32(c.sizeX))), sizeCross), color)
+						}),
+						layout.Stacked(material.Body1(th, res).Layout))
 				},
-				Cell{
-					HeadCell:  TOP_LEVEL_DOMAINS,
-					sizeX:     200,
-					IsEnabled: true,
-					Layout: func(gtx C, th *material.Theme, c *Cell, color color.NRGBA, isHeader bool) D {
-						res := "-"
-						sizeCross := r.sizeY
-						if len(r.TopLevelDomains) > 0 || r.TopLevelDomains != nil {
+			},
+			Cell{
+				HeadCell:  TOP_LEVEL_DOMAINS,
+				sizeX:     200,
+				IsEnabled: true,
+				Layout: func(gtx C, th *material.Theme, c *Cell, color color.NRGBA, isHeader bool) D {
+					res := "-"
+					sizeCross := r.sizeY
+					if len(r.TopLevelDomains) > 0 || r.TopLevelDomains != nil {
 
-							// exclude non latin characters, for now
-							latinList := make([]string, 0, len(r.TopLevelDomains))
-							for i := range r.TopLevelDomains {
-								isLatin := true
-								for _, v := range r.TopLevelDomains[i][1:] {
-									if !unicode.In(v, unicode.Latin) {
-										isLatin = false
-										break
-									}
-								}
-								if isLatin {
-									latinList = append(latinList, r.TopLevelDomains[i])
+						// exclude non latin characters, for now
+						latinList := make([]string, 0, len(r.TopLevelDomains))
+						for i := range r.TopLevelDomains {
+							isLatin := true
+							for _, v := range r.TopLevelDomains[i][1:] {
+								if !unicode.In(v, unicode.Latin) {
+									isLatin = false
+									break
 								}
 							}
-
-							if len(latinList) >= 0 {
-								res = strings.Join(latinList, ", ")
+							if isLatin {
+								latinList = append(latinList, r.TopLevelDomains[i])
 							}
 						}
-						if isHeader {
-							res = c.HeadCell
-							sizeCross = r.headerSizeY
+
+						if len(latinList) >= 0 {
+							res = strings.Join(latinList, ", ")
 						}
-						return layout.Stack{Alignment: layout.Center}.Layout(gtx,
-							layout.Expanded(func(gtx C) D {
-								return globals.ColoredArea(gtx, image.Pt(gtx.Px(unit.Dp(float32(c.sizeX))), sizeCross), color)
-							}),
-							layout.Stacked(material.Body1(th, res).Layout))
-					},
+					}
+					if isHeader {
+						res = c.HeadCell
+						sizeCross = r.headerSizeY
+					}
+					return layout.Stack{Alignment: layout.Center}.Layout(gtx,
+						layout.Expanded(func(gtx C) D {
+							return globals.ColoredArea(gtx, image.Pt(gtx.Px(unit.Dp(float32(c.sizeX))), sizeCross), color)
+						}),
+						layout.Stacked(material.Body1(th, res).Layout))
 				},
-				Cell{
-					HeadCell:  INDEPENDENT,
-					sizeX:     180,
-					IsEnabled: true,
-					Layout: func(gtx C, th *material.Theme, c *Cell, color color.NRGBA, isHeader bool) D {
-						independent := "No"
-						sizeCross := r.sizeY
-						if r.Independent {
-							independent = "Yes"
-						}
-						if isHeader {
-							independent = c.HeadCell
-							sizeCross = r.headerSizeY
-						}
-						return layout.Stack{Alignment: layout.Center}.Layout(gtx,
-							layout.Expanded(func(gtx C) D {
-								return globals.ColoredArea(gtx, image.Pt(gtx.Px(unit.Dp(float32(c.sizeX))), sizeCross), color)
-							}),
-							layout.Stacked(material.Body1(th, independent).Layout))
-					},
+			},
+			Cell{
+				HeadCell:  INDEPENDENT,
+				sizeX:     180,
+				IsEnabled: true,
+				Layout: func(gtx C, th *material.Theme, c *Cell, color color.NRGBA, isHeader bool) D {
+					independent := "No"
+					sizeCross := r.sizeY
+					if r.Independent {
+						independent = "Yes"
+					}
+					if isHeader {
+						independent = c.HeadCell
+						sizeCross = r.headerSizeY
+					}
+					return layout.Stack{Alignment: layout.Center}.Layout(gtx,
+						layout.Expanded(func(gtx C) D {
+							return globals.ColoredArea(gtx, image.Pt(gtx.Px(unit.Dp(float32(c.sizeX))), sizeCross), color)
+						}),
+						layout.Stacked(material.Body1(th, independent).Layout))
 				},
-				Cell{
-					HeadCell:  STATUS,
-					sizeX:     175,
-					IsEnabled: true,
-					Layout: func(gtx C, th *material.Theme, c *Cell, color color.NRGBA, isHeader bool) D {
-						res := r.Status
-						sizeCross := r.sizeY
-						if isHeader {
-							res = c.HeadCell
-							sizeCross = r.headerSizeY
-						}
-						return layout.Stack{Alignment: layout.Center}.Layout(gtx,
-							layout.Expanded(func(gtx C) D {
-								return globals.ColoredArea(gtx, image.Pt(gtx.Px(unit.Dp(float32(c.sizeX))), sizeCross), color)
-							}),
-							layout.Stacked(material.Body1(th, res).Layout))
-					},
+			},
+			Cell{
+				HeadCell:  STATUS,
+				sizeX:     175,
+				IsEnabled: true,
+				Layout: func(gtx C, th *material.Theme, c *Cell, color color.NRGBA, isHeader bool) D {
+					res := r.Status
+					sizeCross := r.sizeY
+					if isHeader {
+						res = c.HeadCell
+						sizeCross = r.headerSizeY
+					}
+					return layout.Stack{Alignment: layout.Center}.Layout(gtx,
+						layout.Expanded(func(gtx C) D {
+							return globals.ColoredArea(gtx, image.Pt(gtx.Px(unit.Dp(float32(c.sizeX))), sizeCross), color)
+						}),
+						layout.Stacked(material.Body1(th, res).Layout))
 				},
-				Cell{
-					HeadCell:  UNITED_NATIONS_MEMBER,
-					sizeX:     200,
-					IsEnabled: true,
-					Layout: func(gtx C, th *material.Theme, c *Cell, color color.NRGBA, isHeader bool) D {
-						unMember := "No"
-						sizeCross := r.sizeY
-						if r.UNMember {
-							unMember = "Yes"
-						}
-						if isHeader {
-							unMember = c.HeadCell
-							sizeCross = r.headerSizeY
-						}
-						return layout.Stack{Alignment: layout.Center}.Layout(gtx,
-							layout.Expanded(func(gtx C) D {
-								return globals.ColoredArea(gtx, image.Pt(gtx.Px(unit.Dp(float32(c.sizeX))), sizeCross), color)
-							}),
-							layout.Stacked(material.Body1(th, unMember).Layout))
-					},
+			},
+			Cell{
+				HeadCell:  UNITED_NATIONS_MEMBER,
+				sizeX:     200,
+				IsEnabled: true,
+				Layout: func(gtx C, th *material.Theme, c *Cell, color color.NRGBA, isHeader bool) D {
+					unMember := "No"
+					sizeCross := r.sizeY
+					if r.UNMember {
+						unMember = "Yes"
+					}
+					if isHeader {
+						unMember = c.HeadCell
+						sizeCross = r.headerSizeY
+					}
+					return layout.Stack{Alignment: layout.Center}.Layout(gtx,
+						layout.Expanded(func(gtx C) D {
+							return globals.ColoredArea(gtx, image.Pt(gtx.Px(unit.Dp(float32(c.sizeX))), sizeCross), color)
+						}),
+						layout.Stacked(material.Body1(th, unMember).Layout))
 				},
-				Cell{
-					HeadCell:  LANDLOCKED,
-					sizeX:     180,
-					IsEnabled: true,
-					Layout: func(gtx C, th *material.Theme, c *Cell, color color.NRGBA, isHeader bool) D {
-						landLocked := "No"
-						sizeCross := r.sizeY
-						if r.Landlocked {
-							landLocked = "Yes"
-						}
-						if isHeader {
-							landLocked = c.HeadCell
-							sizeCross = r.headerSizeY
-						}
-						return layout.Stack{Alignment: layout.Center}.Layout(gtx,
-							layout.Expanded(func(gtx C) D {
-								return globals.ColoredArea(gtx, image.Pt(gtx.Px(unit.Dp(float32(c.sizeX))), sizeCross), color)
-							}),
-							layout.Stacked(material.Body1(th, landLocked).Layout))
-					},
+			},
+			Cell{
+				HeadCell:  LANDLOCKED,
+				sizeX:     180,
+				IsEnabled: true,
+				Layout: func(gtx C, th *material.Theme, c *Cell, color color.NRGBA, isHeader bool) D {
+					landLocked := "No"
+					sizeCross := r.sizeY
+					if r.Landlocked {
+						landLocked = "Yes"
+					}
+					if isHeader {
+						landLocked = c.HeadCell
+						sizeCross = r.headerSizeY
+					}
+					return layout.Stack{Alignment: layout.Center}.Layout(gtx,
+						layout.Expanded(func(gtx C) D {
+							return globals.ColoredArea(gtx, image.Pt(gtx.Px(unit.Dp(float32(c.sizeX))), sizeCross), color)
+						}),
+						layout.Stacked(material.Body1(th, landLocked).Layout))
 				},
-				Cell{
-					HeadCell:  CCA2,
-					sizeX:     85,
-					IsEnabled: true,
-					Layout: func(gtx C, th *material.Theme, c *Cell, color color.NRGBA, isHeader bool) D {
-						res := r.Cca2
-						sizeCross := r.sizeY
-						if isHeader {
-							res = c.HeadCell
-							sizeCross = r.headerSizeY
-						}
-						return layout.Stack{Alignment: layout.Center}.Layout(gtx,
-							layout.Expanded(func(gtx C) D {
-								return globals.ColoredArea(gtx, image.Pt(gtx.Px(unit.Dp(float32(c.sizeX))), sizeCross), color)
-							}),
-							layout.Stacked(material.Body1(th, res).Layout))
-					},
+			},
+			Cell{
+				HeadCell:  CCA2,
+				sizeX:     85,
+				IsEnabled: true,
+				Layout: func(gtx C, th *material.Theme, c *Cell, color color.NRGBA, isHeader bool) D {
+					res := r.Cca2
+					sizeCross := r.sizeY
+					if isHeader {
+						res = c.HeadCell
+						sizeCross = r.headerSizeY
+					}
+					return layout.Stack{Alignment: layout.Center}.Layout(gtx,
+						layout.Expanded(func(gtx C) D {
+							return globals.ColoredArea(gtx, image.Pt(gtx.Px(unit.Dp(float32(c.sizeX))), sizeCross), color)
+						}),
+						layout.Stacked(material.Body1(th, res).Layout))
 				},
-				Cell{
-					HeadCell:  CCA3,
-					sizeX:     85,
-					IsEnabled: true,
-					Layout: func(gtx C, th *material.Theme, c *Cell, color color.NRGBA, isHeader bool) D {
-						res := r.Cca3
-						sizeCross := r.sizeY
-						if isHeader {
-							res = c.HeadCell
-							sizeCross = r.headerSizeY
-						}
-						return layout.Stack{Alignment: layout.Center}.Layout(gtx,
-							layout.Expanded(func(gtx C) D {
-								return globals.ColoredArea(gtx, image.Pt(gtx.Px(unit.Dp(float32(c.sizeX))), sizeCross), color)
-							}),
-							layout.Stacked(material.Body1(th, res).Layout))
-					},
+			},
+			Cell{
+				HeadCell:  CCA3,
+				sizeX:     85,
+				IsEnabled: true,
+				Layout: func(gtx C, th *material.Theme, c *Cell, color color.NRGBA, isHeader bool) D {
+					res := r.Cca3
+					sizeCross := r.sizeY
+					if isHeader {
+						res = c.HeadCell
+						sizeCross = r.headerSizeY
+					}
+					return layout.Stack{Alignment: layout.Center}.Layout(gtx,
+						layout.Expanded(func(gtx C) D {
+							return globals.ColoredArea(gtx, image.Pt(gtx.Px(unit.Dp(float32(c.sizeX))), sizeCross), color)
+						}),
+						layout.Stacked(material.Body1(th, res).Layout))
 				},
-				Cell{
-					HeadCell:  CCN3,
-					sizeX:     85,
-					IsEnabled: true,
-					Layout: func(gtx C, th *material.Theme, c *Cell, color color.NRGBA, isHeader bool) D {
-						ccn := "-"
-						sizeCross := r.sizeY
-						if len(r.Ccn3) > 0 {
-							ccn = r.Ccn3
-						}
-						if isHeader {
-							ccn = c.HeadCell
-							sizeCross = r.headerSizeY
-						}
-						return layout.Stack{Alignment: layout.Center}.Layout(gtx,
-							layout.Expanded(func(gtx C) D {
-								return globals.ColoredArea(gtx, image.Pt(gtx.Px(unit.Dp(float32(c.sizeX))), sizeCross), color)
-							}),
-							layout.Stacked(material.Body1(th, ccn).Layout))
-					},
+			},
+			Cell{
+				HeadCell:  CCN3,
+				sizeX:     85,
+				IsEnabled: true,
+				Layout: func(gtx C, th *material.Theme, c *Cell, color color.NRGBA, isHeader bool) D {
+					ccn := "-"
+					sizeCross := r.sizeY
+					if len(r.Ccn3) > 0 {
+						ccn = r.Ccn3
+					}
+					if isHeader {
+						ccn = c.HeadCell
+						sizeCross = r.headerSizeY
+					}
+					return layout.Stack{Alignment: layout.Center}.Layout(gtx,
+						layout.Expanded(func(gtx C) D {
+							return globals.ColoredArea(gtx, image.Pt(gtx.Px(unit.Dp(float32(c.sizeX))), sizeCross), color)
+						}),
+						layout.Stacked(material.Body1(th, ccn).Layout))
 				},
-				Cell{
-					HeadCell:  CIOC,
-					sizeX:     95,
-					IsEnabled: true,
-					Layout: func(gtx C, th *material.Theme, c *Cell, color color.NRGBA, isHeader bool) D {
-						ioc := "-"
-						sizeCross := r.sizeY
-						if len(r.Cioc) > 0 {
-							ioc = r.Cioc
-						}
-						if isHeader {
-							ioc = c.HeadCell
-							sizeCross = r.headerSizeY
-						}
-						return layout.Stack{Alignment: layout.Center}.Layout(gtx,
-							layout.Expanded(func(gtx C) D {
-								return globals.ColoredArea(gtx, image.Pt(gtx.Px(unit.Dp(float32(c.sizeX))), sizeCross), color)
-							}),
-							layout.Stacked(material.Body1(th, ioc).Layout))
-					},
+			},
+			Cell{
+				HeadCell:  CIOC,
+				sizeX:     95,
+				IsEnabled: true,
+				Layout: func(gtx C, th *material.Theme, c *Cell, color color.NRGBA, isHeader bool) D {
+					ioc := "-"
+					sizeCross := r.sizeY
+					if len(r.Cioc) > 0 {
+						ioc = r.Cioc
+					}
+					if isHeader {
+						ioc = c.HeadCell
+						sizeCross = r.headerSizeY
+					}
+					return layout.Stack{Alignment: layout.Center}.Layout(gtx,
+						layout.Expanded(func(gtx C) D {
+							return globals.ColoredArea(gtx, image.Pt(gtx.Px(unit.Dp(float32(c.sizeX))), sizeCross), color)
+						}),
+						layout.Stacked(material.Body1(th, ioc).Layout))
 				},
-				Cell{
-					HeadCell:  FIFA,
-					sizeX:     95,
-					IsEnabled: true,
-					Layout: func(gtx C, th *material.Theme, c *Cell, color color.NRGBA, isHeader bool) D {
-						fifa := "-"
-						sizeCross := r.sizeY
-						if len(r.Fifa) > 0 {
-							fifa = r.Fifa
-						}
-						if isHeader {
-							fifa = c.HeadCell
-							sizeCross = r.headerSizeY
-						}
-						return layout.Stack{Alignment: layout.Center}.Layout(gtx,
-							layout.Expanded(func(gtx C) D {
-								return globals.ColoredArea(gtx, image.Pt(gtx.Px(unit.Dp(float32(c.sizeX))), sizeCross), color)
-							}),
-							layout.Stacked(material.Body1(th, fifa).Layout))
-					},
+			},
+			Cell{
+				HeadCell:  FIFA,
+				sizeX:     95,
+				IsEnabled: true,
+				Layout: func(gtx C, th *material.Theme, c *Cell, color color.NRGBA, isHeader bool) D {
+					fifa := "-"
+					sizeCross := r.sizeY
+					if len(r.Fifa) > 0 {
+						fifa = r.Fifa
+					}
+					if isHeader {
+						fifa = c.HeadCell
+						sizeCross = r.headerSizeY
+					}
+					return layout.Stack{Alignment: layout.Center}.Layout(gtx,
+						layout.Expanded(func(gtx C) D {
+							return globals.ColoredArea(gtx, image.Pt(gtx.Px(unit.Dp(float32(c.sizeX))), sizeCross), color)
+						}),
+						layout.Stacked(material.Body1(th, fifa).Layout))
 				},
-				Cell{
-					HeadCell:  AREA,
-					sizeX:     125,
-					IsEnabled: true,
-					Layout: func(gtx C, th *material.Theme, c *Cell, color color.NRGBA, isHeader bool) D {
-						res := strconv.FormatFloat(r.Area, 'f', -1, 32)
-						sizeCross := r.sizeY
-						if isHeader {
-							res = c.HeadCell
-							sizeCross = r.headerSizeY
-						}
-						return layout.Stack{Alignment: layout.Center}.Layout(gtx,
-							layout.Expanded(func(gtx C) D {
-								return globals.ColoredArea(gtx, image.Pt(gtx.Px(unit.Dp(float32(c.sizeX))), sizeCross), color)
-							}),
-							layout.Stacked(material.Body1(th, res).Layout))
-					},
+			},
+			Cell{
+				HeadCell:  AREA,
+				sizeX:     125,
+				IsEnabled: true,
+				Layout: func(gtx C, th *material.Theme, c *Cell, color color.NRGBA, isHeader bool) D {
+					res := strconv.FormatFloat(r.Area, 'f', -1, 32)
+					sizeCross := r.sizeY
+					if isHeader {
+						res = c.HeadCell
+						sizeCross = r.headerSizeY
+					}
+					return layout.Stack{Alignment: layout.Center}.Layout(gtx,
+						layout.Expanded(func(gtx C) D {
+							return globals.ColoredArea(gtx, image.Pt(gtx.Px(unit.Dp(float32(c.sizeX))), sizeCross), color)
+						}),
+						layout.Stacked(material.Body1(th, res).Layout))
 				},
-				Cell{
-					HeadCell:  POPULATION,
-					sizeX:     150,
-					IsEnabled: true,
-					Layout: func(gtx C, th *material.Theme, c *Cell, color color.NRGBA, isHeader bool) D {
-						res := fmt.Sprintf("%d", int(r.Population))
-						sizeCross := r.sizeY
-						if isHeader {
-							res = c.HeadCell
-							sizeCross = r.headerSizeY
-						}
-						return layout.Stack{Alignment: layout.Center}.Layout(gtx,
-							layout.Expanded(func(gtx C) D {
-								return globals.ColoredArea(gtx, image.Pt(gtx.Px(unit.Dp(float32(c.sizeX))), sizeCross), color)
-							}),
-							layout.Stacked(material.Body1(th, res).Layout))
-					},
+			},
+			Cell{
+				HeadCell:  POPULATION,
+				sizeX:     150,
+				IsEnabled: true,
+				Layout: func(gtx C, th *material.Theme, c *Cell, color color.NRGBA, isHeader bool) D {
+					res := fmt.Sprintf("%d", int(r.Population))
+					sizeCross := r.sizeY
+					if isHeader {
+						res = c.HeadCell
+						sizeCross = r.headerSizeY
+					}
+					return layout.Stack{Alignment: layout.Center}.Layout(gtx,
+						layout.Expanded(func(gtx C) D {
+							return globals.ColoredArea(gtx, image.Pt(gtx.Px(unit.Dp(float32(c.sizeX))), sizeCross), color)
+						}),
+						layout.Stacked(material.Body1(th, res).Layout))
 				},
-				Cell{
-					HeadCell:  LATITUDE,
-					sizeX:     150,
-					IsEnabled: true,
-					Layout: func(gtx C, th *material.Theme, c *Cell, color color.NRGBA, isHeader bool) D {
-						res := strconv.FormatFloat(r.Latitude, 'f', -1, 64)
-						sizeCross := r.sizeY
-						if isHeader {
-							res = c.HeadCell
-							sizeCross = r.headerSizeY
-						}
-						return layout.Stack{Alignment: layout.Center}.Layout(gtx,
-							layout.Expanded(func(gtx C) D {
-								return globals.ColoredArea(gtx, image.Pt(gtx.Px(unit.Dp(float32(c.sizeX))), sizeCross), color)
-							}),
-							layout.Stacked(material.Body1(th, res).Layout))
-					},
+			},
+			Cell{
+				HeadCell:  LATITUDE,
+				sizeX:     150,
+				IsEnabled: true,
+				Layout: func(gtx C, th *material.Theme, c *Cell, color color.NRGBA, isHeader bool) D {
+					res := strconv.FormatFloat(r.Latitude, 'f', -1, 64)
+					sizeCross := r.sizeY
+					if isHeader {
+						res = c.HeadCell
+						sizeCross = r.headerSizeY
+					}
+					return layout.Stack{Alignment: layout.Center}.Layout(gtx,
+						layout.Expanded(func(gtx C) D {
+							return globals.ColoredArea(gtx, image.Pt(gtx.Px(unit.Dp(float32(c.sizeX))), sizeCross), color)
+						}),
+						layout.Stacked(material.Body1(th, res).Layout))
 				},
-				Cell{
-					HeadCell:  LONGITUDE,
-					sizeX:     150,
-					IsEnabled: true,
-					Layout: func(gtx C, th *material.Theme, c *Cell, color color.NRGBA, isHeader bool) D {
-						res := strconv.FormatFloat(r.Longitude, 'f', -1, 64)
-						sizeCross := r.sizeY
-						if isHeader {
-							res = c.HeadCell
-							sizeCross = r.headerSizeY
-						}
-						return layout.Stack{Alignment: layout.Center}.Layout(gtx,
-							layout.Expanded(func(gtx C) D {
-								return globals.ColoredArea(gtx, image.Pt(gtx.Px(unit.Dp(float32(c.sizeX))), sizeCross), color)
-							}),
-							layout.Stacked(func(gtx C) D {
-								return material.Body1(th, res).Layout(gtx)
-							}))
-					},
+			},
+			Cell{
+				HeadCell:  LONGITUDE,
+				sizeX:     150,
+				IsEnabled: true,
+				Layout: func(gtx C, th *material.Theme, c *Cell, color color.NRGBA, isHeader bool) D {
+					res := strconv.FormatFloat(r.Longitude, 'f', -1, 64)
+					sizeCross := r.sizeY
+					if isHeader {
+						res = c.HeadCell
+						sizeCross = r.headerSizeY
+					}
+					return layout.Stack{Alignment: layout.Center}.Layout(gtx,
+						layout.Expanded(func(gtx C) D {
+							return globals.ColoredArea(gtx, image.Pt(gtx.Px(unit.Dp(float32(c.sizeX))), sizeCross), color)
+						}),
+						layout.Stacked(func(gtx C) D {
+							return material.Body1(th, res).Layout(gtx)
+						}))
 				},
-				Cell{
-					HeadCell:  START_OF_WEEK,
-					sizeX:     150,
-					IsEnabled: true,
-					Layout: func(gtx C, th *material.Theme, c *Cell, color color.NRGBA, isHeader bool) D {
-						res := r.StartOfWeek
-						sizeCross := r.sizeY
-						if isHeader {
-							res = c.HeadCell
-							sizeCross = r.headerSizeY
-						}
-						return layout.Stack{Alignment: layout.Center}.Layout(gtx,
-							layout.Expanded(func(gtx C) D {
-								return globals.ColoredArea(gtx, image.Pt(gtx.Px(unit.Dp(float32(c.sizeX))), sizeCross), color)
-							}),
-							layout.Stacked(material.Body1(th, res).Layout))
-					},
+			},
+			Cell{
+				HeadCell:  START_OF_WEEK,
+				sizeX:     150,
+				IsEnabled: true,
+				Layout: func(gtx C, th *material.Theme, c *Cell, color color.NRGBA, isHeader bool) D {
+					res := r.StartOfWeek
+					sizeCross := r.sizeY
+					if isHeader {
+						res = c.HeadCell
+						sizeCross = r.headerSizeY
+					}
+					return layout.Stack{Alignment: layout.Center}.Layout(gtx,
+						layout.Expanded(func(gtx C) D {
+							return globals.ColoredArea(gtx, image.Pt(gtx.Px(unit.Dp(float32(c.sizeX))), sizeCross), color)
+						}),
+						layout.Stacked(material.Body1(th, res).Layout))
 				},
-				Cell{
-					HeadCell:  CAR_SIGNS,
-					sizeX:     150,
-					IsEnabled: true,
-					Layout: func(gtx C, th *material.Theme, c *Cell, color color.NRGBA, isHeader bool) D {
-						res := "-"
-						sizeCross := r.sizeY
-						if len(r.CarSigns) > 0 && len(r.CarSigns[0]) > 0 {
-							res = strings.Join(r.CarSigns, ", ")
-						}
-						if isHeader {
-							res = c.HeadCell
-							sizeCross = r.headerSizeY
-						}
-						return layout.Stack{Alignment: layout.Center}.Layout(gtx,
-							layout.Expanded(func(gtx C) D {
-								return globals.ColoredArea(gtx, image.Pt(gtx.Px(unit.Dp(float32(c.sizeX))), sizeCross), color)
-							}),
-							layout.Stacked(material.Body1(th, res).Layout))
-					},
+			},
+			Cell{
+				HeadCell:  CAR_SIGNS,
+				sizeX:     150,
+				IsEnabled: true,
+				Layout: func(gtx C, th *material.Theme, c *Cell, color color.NRGBA, isHeader bool) D {
+					res := "-"
+					sizeCross := r.sizeY
+					if len(r.CarSigns) > 0 && len(r.CarSigns[0]) > 0 {
+						res = strings.Join(r.CarSigns, ", ")
+					}
+					if isHeader {
+						res = c.HeadCell
+						sizeCross = r.headerSizeY
+					}
+					return layout.Stack{Alignment: layout.Center}.Layout(gtx,
+						layout.Expanded(func(gtx C) D {
+							return globals.ColoredArea(gtx, image.Pt(gtx.Px(unit.Dp(float32(c.sizeX))), sizeCross), color)
+						}),
+						layout.Stacked(material.Body1(th, res).Layout))
 				},
-				Cell{
-					HeadCell:  CAR_SIDE,
-					sizeX:     100,
-					IsEnabled: true,
-					Layout: func(gtx C, th *material.Theme, c *Cell, color color.NRGBA, isHeader bool) D {
-						res := r.CarSide
-						sizeCross := r.sizeY
-						if isHeader {
-							res = c.HeadCell
-							sizeCross = r.headerSizeY
-						}
-						return layout.Stack{Alignment: layout.Center}.Layout(gtx,
-							layout.Expanded(func(gtx C) D {
-								return globals.ColoredArea(gtx, image.Pt(gtx.Px(unit.Dp(float32(c.sizeX))), sizeCross), color)
-							}),
-							layout.Stacked(material.Body1(th, res).Layout))
-					},
-				})
-		}
+			},
+			Cell{
+				HeadCell:  CAR_SIDE,
+				sizeX:     100,
+				IsEnabled: true,
+				Layout: func(gtx C, th *material.Theme, c *Cell, color color.NRGBA, isHeader bool) D {
+					res := r.CarSide
+					sizeCross := r.sizeY
+					if isHeader {
+						res = c.HeadCell
+						sizeCross = r.headerSizeY
+					}
+					return layout.Stack{Alignment: layout.Center}.Layout(gtx,
+						layout.Expanded(func(gtx C) D {
+							return globals.ColoredArea(gtx, image.Pt(gtx.Px(unit.Dp(float32(c.sizeX))), sizeCross), color)
+						}),
+						layout.Stacked(material.Body1(th, res).Layout))
+				},
+			})
 	}
 }

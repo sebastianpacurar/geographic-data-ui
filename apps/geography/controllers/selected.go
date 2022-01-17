@@ -56,15 +56,16 @@ func (sc *SelectedCountries) Layout(gtx C, th *material.Theme) D {
 						}
 					}
 
+					// TODO: find something useful for this
 					if sc.pills[i].btn.Clicked() {
-						name := sc.pills[i].name
-						for i := range data.Cached {
-							if data.Cached[i].Name.Common == name {
-								data.Cached[i].IsCPViewed = true
-							} else {
-								data.Cached[i].IsCPViewed = false
-							}
-						}
+						//name := sc.pills[i].name
+						//for i := range data.Cached {
+						//	if data.Cached[i].Name.Common == name {
+						//		data.Cached[i].IsCPViewed = true
+						//	} else {
+						//		data.Cached[i].IsCPViewed = false
+						//	}
+						//}
 					}
 
 					var area D

@@ -54,14 +54,13 @@ type (
 		Continents     []string                   `json:"continents"`
 		Flag           `json:"flags"`
 
-		// FlagImg - obtained after decoding the FlagField png
+		// FlagImg - obtained after decoding the png
 		FlagImg image.Image
 		// Active - used for search rows/cards
 		Active bool
-		// Selected - used for CP
+		// Selected - used for CP selected pills
 		Selected bool
-		// for CP details and contextual view
-		IsCPViewed   bool
+		// for contextual view
 		IsCtxtActive bool
 		// for Continent Tab Selection
 		ActiveContinent bool

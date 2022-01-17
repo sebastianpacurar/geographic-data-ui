@@ -13,7 +13,6 @@ type (
 	D = layout.Dimensions
 
 	DisplayedColumns struct {
-		table.Row
 		list       layout.List
 		checkboxes []checkBox
 
@@ -35,10 +34,9 @@ func (dc *DisplayedColumns) Layout(gtx C, th *material.Theme) D {
 		for i := range dc.checkboxes {
 			dc.checkboxes[i] = checkBox{
 				name: table.ColNames[i],
-				box:  widget.Bool{Value: true},
+				box:  widget.Bool{Value: table.ColsState[table.ColNames[i]]},
 			}
 		}
-		dc.Row.GenerateColumns()
 		dc.loaded = true
 	}
 	return dc.list.Layout(gtx, len(table.ColNames), func(gtx C, i int) D {
@@ -46,13 +44,9 @@ func (dc *DisplayedColumns) Layout(gtx C, th *material.Theme) D {
 		cb = material.CheckBox(th, &dc.checkboxes[i].box, dc.checkboxes[i].name)
 
 		if cb.CheckBox.Changed() {
-			for j := range dc.Row.Columns {
-				if dc.Row.Columns[j].HeadCell == dc.checkboxes[i].name {
-					dc.Row.Columns[j].IsEnabled = cb.CheckBox.Value
-				}
-			}
+			table.ColsState[dc.checkboxes[i].name] = cb.CheckBox.Value
+			op.InvalidateOp{}.Add(gtx.Ops)
 		}
-		op.InvalidateOp{}.Add(gtx.Ops)
 		return cb.Layout(gtx)
 	})
 }
