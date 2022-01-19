@@ -29,8 +29,8 @@ const (
 	CAR_SIDE              = "Car Side"
 )
 
-// ColsState - used to show/hide columns from CP
-var ColsState = map[string]bool{
+// ColState - used to show/hide columns from CP
+var ColState = map[string]bool{
 	NAME:                  true,
 	OFFICIAL_NAME:         false,
 	CAPITAL:               true,

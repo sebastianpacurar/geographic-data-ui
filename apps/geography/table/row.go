@@ -108,7 +108,7 @@ func (r *Row) LayRow(gtx C, th *material.Theme, isHeader bool) D {
 				}
 				return r.colList.Layout(gtx, len(ColNames), func(gtx C, i int) D {
 					var dim D
-					if ColsState[r.Columns[i].HeadCell] {
+					if ColState[r.Columns[i].HeadCell] {
 						dim = r.Columns[i].Layout(gtx, th, &r.Columns[i], rowColor, isHeader)
 					}
 					return dim
@@ -118,7 +118,7 @@ func (r *Row) LayRow(gtx C, th *material.Theme, isHeader bool) D {
 			rowColor = globals.Colours[colours.LAVENDERBLUSH]
 			return r.colList.Layout(gtx, len(ColNames), func(gtx C, i int) D {
 				var dim D
-				if ColsState[r.Columns[i].HeadCell] {
+				if ColState[r.Columns[i].HeadCell] {
 					dim = r.Columns[i].Layout(gtx, th, &r.Columns[i], rowColor, isHeader)
 				}
 				return dim

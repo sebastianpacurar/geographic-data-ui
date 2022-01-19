@@ -34,7 +34,7 @@ func (dc *DisplayedColumns) Layout(gtx C, th *material.Theme) D {
 		for i := range dc.checkboxes {
 			dc.checkboxes[i] = checkBox{
 				name: table.ColNames[i],
-				box:  widget.Bool{Value: table.ColsState[table.ColNames[i]]},
+				box:  widget.Bool{Value: table.ColState[table.ColNames[i]]},
 			}
 		}
 		dc.loaded = true
@@ -44,7 +44,7 @@ func (dc *DisplayedColumns) Layout(gtx C, th *material.Theme) D {
 		cb = material.CheckBox(th, &dc.checkboxes[i].box, dc.checkboxes[i].name)
 
 		if cb.CheckBox.Changed() {
-			table.ColsState[dc.checkboxes[i].name] = cb.CheckBox.Value
+			table.ColState[dc.checkboxes[i].name] = cb.CheckBox.Value
 			op.InvalidateOp{}.Add(gtx.Ops)
 		}
 		return cb.Layout(gtx)

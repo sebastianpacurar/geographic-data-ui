@@ -2,6 +2,7 @@ package data
 
 import (
 	"bytes"
+	"context"
 	"encoding/json"
 	"fmt"
 	"image"
@@ -189,12 +190,11 @@ func (c *Countries) InitCountries() error {
 	if !c.IsCached {
 		countries, err := fetchCountries("all")
 		if err != nil {
-			log.Fatalln("error fetching data from RESTCountries API ", err)
 			return err
 		}
 		err = json.Unmarshal(countries, &Cached)
 		if err != nil {
-			log.Fatalln("json Unmarshal RESTCountries for mutable: ", err)
+			log.Print("json Unmarshal RESTCountries for mutable: ", err)
 			return err
 		}
 		c.IsCached = true
@@ -204,12 +204,22 @@ func (c *Countries) InitCountries() error {
 
 // fetchCountries - Fetches All Country Data except the flag
 func fetchCountries(location string) ([]byte, error) {
+	client := &http.Client{}
 	URL := fmt.Sprintf("https://restcountries.com/v3.1/%s", location)
-	res, err := http.Get(URL)
+	req, err := http.NewRequest(http.MethodGet, URL, nil)
 	if err != nil {
 		log.Fatalln(fmt.Sprintf("http.Get(\"%s\") failed: %s", URL, err))
 		return []byte{}, err
 	}
+
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
+	req = req.WithContext(ctx)
+	res, err := client.Do(req)
+	if err != nil {
+		return []byte{}, err
+	}
+
 	defer func(Body io.ReadCloser) {
 		err = Body.Close()
 		if err != nil {

@@ -1,8 +1,7 @@
 /.idea
 
 # app file output
-/output/geography/flags/*.png
-/output/geography/excel/*.xlsx
+/output
 
 # wasm output
 /gioui-experiment
