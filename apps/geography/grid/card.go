@@ -116,10 +116,16 @@ func (c *Card) LayCard(gtx C, th *material.Theme) D {
 								return layout.Flex{}.Layout(gtx,
 									layout.Flexed(1, func(gtx C) D {
 										return layout.Center.Layout(gtx, func(gtx C) D {
-											return widget.Image{
-												Src: paint.NewImageOp(c.Flag),
-												Fit: widget.ScaleDown,
-											}.Layout(gtx)
+											var flag D
+											if c.Flag == nil {
+												flag = material.Loader(th).Layout(gtx)
+											} else {
+												flag = widget.Image{
+													Src: paint.NewImageOp(c.Flag),
+													Fit: widget.ScaleDown,
+												}.Layout(gtx)
+											}
+											return flag
 										})
 									}))
 							}))

@@ -156,19 +156,22 @@ func downloadFlagFromUrl(url string) ([]byte, error) {
 
 // ProcessFlags - decode png image for 4 countries at once
 func ProcessFlags() {
-	firstBatch := make(chan image.Image, len(Cached)/4)
-	secondBatch := make(chan image.Image, len(Cached)/4)
-	thirdBatch := make(chan image.Image, len(Cached)/4)
-	fourthBatch := make(chan image.Image, len(Cached)/4)
+	length := len(Cached) / 5
+	firstBatch := make(chan image.Image, length)
+	secondBatch := make(chan image.Image, length)
+	thirdBatch := make(chan image.Image, length)
+	fourthBatch := make(chan image.Image, length)
+	fifthBatch := make(chan image.Image, length)
 
-	go downloadAndDecodeFlag(Cached[:63], firstBatch)
-	go downloadAndDecodeFlag(Cached[63:126], secondBatch)
-	go downloadAndDecodeFlag(Cached[126:189], thirdBatch)
-	go downloadAndDecodeFlag(Cached[189:], fourthBatch)
+	go DownloadAndDecodeFlag(Cached[:50], firstBatch)
+	go DownloadAndDecodeFlag(Cached[50:100], secondBatch)
+	go DownloadAndDecodeFlag(Cached[100:150], thirdBatch)
+	go DownloadAndDecodeFlag(Cached[150:200], fourthBatch)
+	go DownloadAndDecodeFlag(Cached[200:], fifthBatch)
 }
 
-// downloadAndDecodeFlag - download, decode and attach flag to country through channels
-func downloadAndDecodeFlag(countries []Country, done chan image.Image) {
+// DownloadAndDecodeFlag - download, decode and attach flag to country through channels
+func DownloadAndDecodeFlag(countries []Country, done chan image.Image) {
 	for i := range countries {
 		b, err := downloadFlagFromUrl(countries[i].Png)
 		if err != nil {
@@ -235,8 +238,8 @@ func fileCount(path string) (int, error) {
 	return i, nil
 }
 
-// WriteFlagToFile - needed for slower OSes to store the flags locally, for quicker retrieval on next app start
-func (c *Country) WriteFlagToFile() error {
+// writeFlagToFile - needed for slower OSes to store the flags locally, for quicker retrieval on next app start
+func (c *Country) writeFlagToFile() error {
 	count, err := fileCount("output/geography/flags")
 	if err != nil {
 		log.Fatalln(fmt.Sprintf("Error at counting files in output/geography/flags: %s", err))
@@ -273,8 +276,8 @@ func (c *Country) WriteFlagToFile() error {
 	return nil
 }
 
-// ReadFlagFromFile - Currently faster than ProcessFlagFromUrl, useful for slower OSes
-func ReadFlagFromFile() []byte {
+// decodeNoFlagPng - Currently faster than ProcessFlagFromUrl, useful for slower OSes
+func decodeNoFlagPng() []byte {
 	file, err := ioutil.ReadFile("output/geography/flags/placeholder/no-flag.png")
 	if err != nil {
 		log.Fatalln("Error opening no-flag.png path")

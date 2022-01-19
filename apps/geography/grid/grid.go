@@ -46,6 +46,7 @@ func (gr *Grid) Layout(gtx C, th *material.Theme) D {
 			gr.cards[i].Active = data.Cached[i].Active
 			gr.cards[i].ActiveContinent = data.Cached[i].ActiveContinent
 			gr.cards[i].Selected = data.Cached[i].Selected
+			gr.cards[i].Flag = data.Cached[i].FlagImg
 		}
 	}
 
