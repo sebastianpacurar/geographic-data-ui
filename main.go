@@ -20,7 +20,7 @@ func main() {
 	go func() {
 		w := app.NewWindow(
 			app.Title("Gio UI Experiment"),
-			app.Size(unit.Dp(1000), unit.Dp(800)),
+			app.Size(unit.Dp(1400), unit.Dp(900)),
 		)
 		if err := Run(w); err != nil {
 			log.Fatal(err)

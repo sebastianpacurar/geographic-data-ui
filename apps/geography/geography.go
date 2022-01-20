@@ -55,9 +55,6 @@ type (
 		Table    table.Table
 		Selected interface{}
 
-		// FilterBy - used to search countries
-		FilterBy string
-
 		// mainly used to avoid overhead on "All Cards"
 		AllContinents  []string
 		Continents     []Continent
@@ -130,7 +127,7 @@ func (app *Application) LayoutView(gtx C, th *material.Theme) D {
 		// in case of no internet connection, or if the main request fails
 		return material.H6(th, fmt.Sprintf("Error when fetching countries: %s", err)).Layout(gtx)
 	} else {
-		app.FilterData(table.NAME)
+		app.SearchByColumn(table.SearchBy)
 
 		// run only once at start
 		if !app.initialSetup {
@@ -390,7 +387,7 @@ func (app *Application) LayoutView(gtx C, th *material.Theme) D {
 						case grid.Grid:
 							dims = app.Display.Grid.Layout(gtx, th)
 						case table.Table:
-							dims = app.Display.Table.Layout(gtx, th, app.FilterBy)
+							dims = app.Display.Table.Layout(gtx, th, table.SearchBy)
 						}
 						return dims
 					})
@@ -405,14 +402,14 @@ func (app *Application) LayoutController(gtx C, th *material.Theme) D {
 	return app.ControlPanel.Layout(gtx, th)
 }
 
-// FilterData - filter countries based on data.Cached and data.Cached manipulation
-func (d *Display) FilterData(FilterBy string) {
+// SearchByColumn - filter countries based on data.Cached and data.Cached manipulation
+func (d *Display) SearchByColumn(SearchBy string) {
 	if d.CurrentStr != d.SearchField.Text() {
 		if d.SearchField.Len() > 0 {
 			for i := range data.Cached {
 				var res string
 
-				switch FilterBy {
+				switch SearchBy {
 				case table.NAME:
 					res = data.Cached[i].Name.Common
 				case table.OFFICIAL_NAME:

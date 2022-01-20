@@ -17,14 +17,6 @@ import (
 	"unicode"
 )
 
-var (
-	ColNames = []string{
-		OFFICIAL_NAME, CAPITAL, REGION, SUBREGION, LANGUAGES, CONTINENTS, IDD_ROOT, IDD_SUFFIXES, TOP_LEVEL_DOMAINS,
-		INDEPENDENT, STATUS, UNITED_NATIONS_MEMBER, LANDLOCKED, CCA2, CCA3, CCN3, CIOC, FIFA, AREA, POPULATION, LATITUDE,
-		LONGITUDE, START_OF_WEEK, CAR_SIGNS, CAR_SIDE,
-	}
-)
-
 type (
 	Row struct {
 		Name            string
@@ -182,9 +174,8 @@ func (r *Row) GenerateColumns() {
 	for range ColNames {
 		r.Columns = append(r.Columns,
 			Cell{
-				HeadCell:  OFFICIAL_NAME,
-				sizeX:     550,
-				IsEnabled: true,
+				HeadCell: OFFICIAL_NAME,
+				sizeX:    550,
 				Layout: func(gtx C, th *material.Theme, c *Cell, color color.NRGBA, isHeader bool) D {
 					res := r.OfficialName
 					sizeCross := r.sizeY
@@ -200,9 +191,8 @@ func (r *Row) GenerateColumns() {
 				},
 			},
 			Cell{
-				HeadCell:  CAPITAL,
-				sizeX:     200,
-				IsEnabled: true,
+				HeadCell: CAPITAL,
+				sizeX:    200,
 				Layout: func(gtx C, th *material.Theme, c *Cell, color color.NRGBA, isHeader bool) D {
 					capital := "-"
 					sizeCross := r.sizeY
@@ -221,9 +211,8 @@ func (r *Row) GenerateColumns() {
 				},
 			},
 			Cell{
-				HeadCell:  REGION,
-				sizeX:     175,
-				IsEnabled: true,
+				HeadCell: REGION,
+				sizeX:    175,
 				Layout: func(gtx C, th *material.Theme, c *Cell, color color.NRGBA, isHeader bool) D {
 					res := r.Region
 					sizeCross := r.sizeY
@@ -239,9 +228,8 @@ func (r *Row) GenerateColumns() {
 				},
 			},
 			Cell{
-				HeadCell:  SUBREGION,
-				sizeX:     225,
-				IsEnabled: true,
+				HeadCell: SUBREGION,
+				sizeX:    225,
 				Layout: func(gtx C, th *material.Theme, c *Cell, color color.NRGBA, isHeader bool) D {
 					subregion := "-"
 					sizeCross := r.sizeY
@@ -260,9 +248,8 @@ func (r *Row) GenerateColumns() {
 				},
 			},
 			Cell{
-				HeadCell:  CONTINENTS,
-				sizeX:     175,
-				IsEnabled: true,
+				HeadCell: CONTINENTS,
+				sizeX:    175,
 				Layout: func(gtx C, th *material.Theme, c *Cell, color color.NRGBA, isHeader bool) D {
 					res := strings.Join(r.Continents, ", ")
 					sizeCross := r.sizeY
@@ -278,9 +265,8 @@ func (r *Row) GenerateColumns() {
 				},
 			},
 			Cell{
-				HeadCell:  LANGUAGES,
-				sizeX:     650,
-				IsEnabled: true,
+				HeadCell: LANGUAGES,
+				sizeX:    650,
 				Layout: func(gtx C, th *material.Theme, c *Cell, color color.NRGBA, isHeader bool) D {
 					res := "-"
 					sizeCross := r.sizeY
@@ -313,9 +299,8 @@ func (r *Row) GenerateColumns() {
 				},
 			},
 			Cell{
-				HeadCell:  IDD_ROOT,
-				sizeX:     165,
-				IsEnabled: true,
+				HeadCell: IDD_ROOT,
+				sizeX:    165,
 				Layout: func(gtx C, th *material.Theme, c *Cell, color color.NRGBA, isHeader bool) D {
 					res := "-"
 					if len(r.IddRoot) > 0 {
@@ -334,9 +319,8 @@ func (r *Row) GenerateColumns() {
 				},
 			},
 			Cell{
-				HeadCell:  IDD_SUFFIXES,
-				sizeX:     200,
-				IsEnabled: true,
+				HeadCell: IDD_SUFFIXES,
+				sizeX:    200,
 				Layout: func(gtx C, th *material.Theme, c *Cell, color color.NRGBA, isHeader bool) D {
 					res := "-"
 					sizeCross := r.sizeY
@@ -361,9 +345,8 @@ func (r *Row) GenerateColumns() {
 				},
 			},
 			Cell{
-				HeadCell:  TOP_LEVEL_DOMAINS,
-				sizeX:     200,
-				IsEnabled: true,
+				HeadCell: TOP_LEVEL_DOMAINS,
+				sizeX:    200,
 				Layout: func(gtx C, th *material.Theme, c *Cell, color color.NRGBA, isHeader bool) D {
 					res := "-"
 					sizeCross := r.sizeY
@@ -400,9 +383,8 @@ func (r *Row) GenerateColumns() {
 				},
 			},
 			Cell{
-				HeadCell:  INDEPENDENT,
-				sizeX:     180,
-				IsEnabled: true,
+				HeadCell: INDEPENDENT,
+				sizeX:    180,
 				Layout: func(gtx C, th *material.Theme, c *Cell, color color.NRGBA, isHeader bool) D {
 					independent := "No"
 					sizeCross := r.sizeY
@@ -421,9 +403,8 @@ func (r *Row) GenerateColumns() {
 				},
 			},
 			Cell{
-				HeadCell:  STATUS,
-				sizeX:     175,
-				IsEnabled: true,
+				HeadCell: STATUS,
+				sizeX:    175,
 				Layout: func(gtx C, th *material.Theme, c *Cell, color color.NRGBA, isHeader bool) D {
 					res := r.Status
 					sizeCross := r.sizeY
@@ -439,9 +420,8 @@ func (r *Row) GenerateColumns() {
 				},
 			},
 			Cell{
-				HeadCell:  UNITED_NATIONS_MEMBER,
-				sizeX:     200,
-				IsEnabled: true,
+				HeadCell: UNITED_NATIONS_MEMBER,
+				sizeX:    200,
 				Layout: func(gtx C, th *material.Theme, c *Cell, color color.NRGBA, isHeader bool) D {
 					unMember := "No"
 					sizeCross := r.sizeY
@@ -460,9 +440,8 @@ func (r *Row) GenerateColumns() {
 				},
 			},
 			Cell{
-				HeadCell:  LANDLOCKED,
-				sizeX:     180,
-				IsEnabled: true,
+				HeadCell: LANDLOCKED,
+				sizeX:    180,
 				Layout: func(gtx C, th *material.Theme, c *Cell, color color.NRGBA, isHeader bool) D {
 					landLocked := "No"
 					sizeCross := r.sizeY
@@ -481,9 +460,8 @@ func (r *Row) GenerateColumns() {
 				},
 			},
 			Cell{
-				HeadCell:  CCA2,
-				sizeX:     85,
-				IsEnabled: true,
+				HeadCell: CCA2,
+				sizeX:    85,
 				Layout: func(gtx C, th *material.Theme, c *Cell, color color.NRGBA, isHeader bool) D {
 					res := r.Cca2
 					sizeCross := r.sizeY
@@ -499,9 +477,8 @@ func (r *Row) GenerateColumns() {
 				},
 			},
 			Cell{
-				HeadCell:  CCA3,
-				sizeX:     85,
-				IsEnabled: true,
+				HeadCell: CCA3,
+				sizeX:    85,
 				Layout: func(gtx C, th *material.Theme, c *Cell, color color.NRGBA, isHeader bool) D {
 					res := r.Cca3
 					sizeCross := r.sizeY
@@ -517,9 +494,8 @@ func (r *Row) GenerateColumns() {
 				},
 			},
 			Cell{
-				HeadCell:  CCN3,
-				sizeX:     85,
-				IsEnabled: true,
+				HeadCell: CCN3,
+				sizeX:    85,
 				Layout: func(gtx C, th *material.Theme, c *Cell, color color.NRGBA, isHeader bool) D {
 					ccn := "-"
 					sizeCross := r.sizeY
@@ -538,9 +514,8 @@ func (r *Row) GenerateColumns() {
 				},
 			},
 			Cell{
-				HeadCell:  CIOC,
-				sizeX:     95,
-				IsEnabled: true,
+				HeadCell: CIOC,
+				sizeX:    95,
 				Layout: func(gtx C, th *material.Theme, c *Cell, color color.NRGBA, isHeader bool) D {
 					ioc := "-"
 					sizeCross := r.sizeY
@@ -559,9 +534,8 @@ func (r *Row) GenerateColumns() {
 				},
 			},
 			Cell{
-				HeadCell:  FIFA,
-				sizeX:     95,
-				IsEnabled: true,
+				HeadCell: FIFA,
+				sizeX:    95,
 				Layout: func(gtx C, th *material.Theme, c *Cell, color color.NRGBA, isHeader bool) D {
 					fifa := "-"
 					sizeCross := r.sizeY
@@ -580,9 +554,8 @@ func (r *Row) GenerateColumns() {
 				},
 			},
 			Cell{
-				HeadCell:  AREA,
-				sizeX:     125,
-				IsEnabled: true,
+				HeadCell: AREA,
+				sizeX:    125,
 				Layout: func(gtx C, th *material.Theme, c *Cell, color color.NRGBA, isHeader bool) D {
 					res := strconv.FormatFloat(r.Area, 'f', -1, 32)
 					sizeCross := r.sizeY
@@ -598,9 +571,8 @@ func (r *Row) GenerateColumns() {
 				},
 			},
 			Cell{
-				HeadCell:  POPULATION,
-				sizeX:     150,
-				IsEnabled: true,
+				HeadCell: POPULATION,
+				sizeX:    150,
 				Layout: func(gtx C, th *material.Theme, c *Cell, color color.NRGBA, isHeader bool) D {
 					res := fmt.Sprintf("%d", int(r.Population))
 					sizeCross := r.sizeY
@@ -616,9 +588,8 @@ func (r *Row) GenerateColumns() {
 				},
 			},
 			Cell{
-				HeadCell:  LATITUDE,
-				sizeX:     150,
-				IsEnabled: true,
+				HeadCell: LATITUDE,
+				sizeX:    150,
 				Layout: func(gtx C, th *material.Theme, c *Cell, color color.NRGBA, isHeader bool) D {
 					res := strconv.FormatFloat(r.Latitude, 'f', -1, 64)
 					sizeCross := r.sizeY
@@ -634,9 +605,8 @@ func (r *Row) GenerateColumns() {
 				},
 			},
 			Cell{
-				HeadCell:  LONGITUDE,
-				sizeX:     150,
-				IsEnabled: true,
+				HeadCell: LONGITUDE,
+				sizeX:    150,
 				Layout: func(gtx C, th *material.Theme, c *Cell, color color.NRGBA, isHeader bool) D {
 					res := strconv.FormatFloat(r.Longitude, 'f', -1, 64)
 					sizeCross := r.sizeY
@@ -654,9 +624,8 @@ func (r *Row) GenerateColumns() {
 				},
 			},
 			Cell{
-				HeadCell:  START_OF_WEEK,
-				sizeX:     150,
-				IsEnabled: true,
+				HeadCell: START_OF_WEEK,
+				sizeX:    150,
 				Layout: func(gtx C, th *material.Theme, c *Cell, color color.NRGBA, isHeader bool) D {
 					res := r.StartOfWeek
 					sizeCross := r.sizeY
@@ -672,9 +641,8 @@ func (r *Row) GenerateColumns() {
 				},
 			},
 			Cell{
-				HeadCell:  CAR_SIGNS,
-				sizeX:     150,
-				IsEnabled: true,
+				HeadCell: CAR_SIGNS,
+				sizeX:    150,
 				Layout: func(gtx C, th *material.Theme, c *Cell, color color.NRGBA, isHeader bool) D {
 					res := "-"
 					sizeCross := r.sizeY
@@ -693,9 +661,8 @@ func (r *Row) GenerateColumns() {
 				},
 			},
 			Cell{
-				HeadCell:  CAR_SIDE,
-				sizeX:     100,
-				IsEnabled: true,
+				HeadCell: CAR_SIDE,
+				sizeX:    100,
 				Layout: func(gtx C, th *material.Theme, c *Cell, color color.NRGBA, isHeader bool) D {
 					res := r.CarSide
 					sizeCross := r.sizeY
