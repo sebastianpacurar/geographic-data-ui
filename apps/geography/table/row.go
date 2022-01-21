@@ -144,6 +144,9 @@ func (r *Row) LayNameColumn(gtx C, th *material.Theme, isHeader bool) D {
 			})
 		} else {
 			return material.Clickable(gtx, &r.btn, func(gtx C) D {
+				if SearchBy == "Name" {
+					cellColor = globals.Colours[colours.LIGHT_YELLOW]
+				}
 				if r.Selected {
 					cellColor = globals.Colours[colours.AERO_BLUE]
 				}
@@ -183,6 +186,9 @@ func (r *Row) GenerateColumns() {
 						res = c.HeadCell
 						sizeCross = r.headerSizeY
 					}
+					if SearchBy == c.HeadCell && !isHeader && !r.Selected {
+						color = globals.Colours[colours.LIGHT_YELLOW]
+					}
 					return layout.Stack{Alignment: layout.Center}.Layout(gtx,
 						layout.Expanded(func(gtx C) D {
 							return globals.ColoredArea(gtx, image.Pt(gtx.Px(unit.Dp(float32(c.sizeX))), sizeCross), color)
@@ -203,6 +209,9 @@ func (r *Row) GenerateColumns() {
 						capital = c.HeadCell
 						sizeCross = r.headerSizeY
 					}
+					if SearchBy == c.HeadCell && !isHeader && !r.Selected && !r.Selected {
+						color = globals.Colours[colours.LIGHT_YELLOW]
+					}
 					return layout.Stack{Alignment: layout.Center}.Layout(gtx,
 						layout.Expanded(func(gtx C) D {
 							return globals.ColoredArea(gtx, image.Pt(gtx.Px(unit.Dp(float32(c.sizeX))), sizeCross), color)
@@ -219,6 +228,9 @@ func (r *Row) GenerateColumns() {
 					if isHeader {
 						res = c.HeadCell
 						sizeCross = r.headerSizeY
+					}
+					if SearchBy == c.HeadCell && !isHeader && !r.Selected {
+						color = globals.Colours[colours.LIGHT_YELLOW]
 					}
 					return layout.Stack{Alignment: layout.Center}.Layout(gtx,
 						layout.Expanded(func(gtx C) D {
@@ -240,6 +252,9 @@ func (r *Row) GenerateColumns() {
 						subregion = c.HeadCell
 						sizeCross = r.headerSizeY
 					}
+					if SearchBy == c.HeadCell && !isHeader && !r.Selected {
+						color = globals.Colours[colours.LIGHT_YELLOW]
+					}
 					return layout.Stack{Alignment: layout.Center}.Layout(gtx,
 						layout.Expanded(func(gtx C) D {
 							return globals.ColoredArea(gtx, image.Pt(gtx.Px(unit.Dp(float32(c.sizeX))), sizeCross), color)
@@ -256,6 +271,9 @@ func (r *Row) GenerateColumns() {
 					if isHeader {
 						res = c.HeadCell
 						sizeCross = r.headerSizeY
+					}
+					if SearchBy == c.HeadCell && !isHeader && !r.Selected {
+						color = globals.Colours[colours.LIGHT_YELLOW]
 					}
 					return layout.Stack{Alignment: layout.Center}.Layout(gtx,
 						layout.Expanded(func(gtx C) D {
@@ -291,6 +309,9 @@ func (r *Row) GenerateColumns() {
 						res = c.HeadCell
 						sizeCross = r.headerSizeY
 					}
+					if SearchBy == c.HeadCell && !isHeader && !r.Selected {
+						color = globals.Colours[colours.LIGHT_YELLOW]
+					}
 					return layout.Stack{Alignment: layout.Center}.Layout(gtx,
 						layout.Expanded(func(gtx C) D {
 							return globals.ColoredArea(gtx, image.Pt(gtx.Px(unit.Dp(float32(c.sizeX))), sizeCross), color)
@@ -310,6 +331,9 @@ func (r *Row) GenerateColumns() {
 					if isHeader {
 						res = c.HeadCell
 						sizeCross = r.headerSizeY
+					}
+					if SearchBy == c.HeadCell && !isHeader && !r.Selected {
+						color = globals.Colours[colours.LIGHT_YELLOW]
 					}
 					return layout.Stack{Alignment: layout.Center}.Layout(gtx,
 						layout.Expanded(func(gtx C) D {
@@ -336,6 +360,9 @@ func (r *Row) GenerateColumns() {
 					if isHeader {
 						res = c.HeadCell
 						sizeCross = r.headerSizeY
+					}
+					if SearchBy == c.HeadCell && !isHeader && !r.Selected {
+						color = globals.Colours[colours.LIGHT_YELLOW]
 					}
 					return layout.Stack{Alignment: layout.Center}.Layout(gtx,
 						layout.Expanded(func(gtx C) D {
@@ -375,6 +402,9 @@ func (r *Row) GenerateColumns() {
 						res = c.HeadCell
 						sizeCross = r.headerSizeY
 					}
+					if SearchBy == c.HeadCell && !isHeader && !r.Selected {
+						color = globals.Colours[colours.LIGHT_YELLOW]
+					}
 					return layout.Stack{Alignment: layout.Center}.Layout(gtx,
 						layout.Expanded(func(gtx C) D {
 							return globals.ColoredArea(gtx, image.Pt(gtx.Px(unit.Dp(float32(c.sizeX))), sizeCross), color)
@@ -395,6 +425,9 @@ func (r *Row) GenerateColumns() {
 						independent = c.HeadCell
 						sizeCross = r.headerSizeY
 					}
+					if SearchBy == c.HeadCell && !isHeader && !r.Selected {
+						color = globals.Colours[colours.LIGHT_YELLOW]
+					}
 					return layout.Stack{Alignment: layout.Center}.Layout(gtx,
 						layout.Expanded(func(gtx C) D {
 							return globals.ColoredArea(gtx, image.Pt(gtx.Px(unit.Dp(float32(c.sizeX))), sizeCross), color)
@@ -411,6 +444,9 @@ func (r *Row) GenerateColumns() {
 					if isHeader {
 						res = c.HeadCell
 						sizeCross = r.headerSizeY
+					}
+					if SearchBy == c.HeadCell && !isHeader && !r.Selected {
+						color = globals.Colours[colours.LIGHT_YELLOW]
 					}
 					return layout.Stack{Alignment: layout.Center}.Layout(gtx,
 						layout.Expanded(func(gtx C) D {
@@ -432,6 +468,9 @@ func (r *Row) GenerateColumns() {
 						unMember = c.HeadCell
 						sizeCross = r.headerSizeY
 					}
+					if SearchBy == c.HeadCell && !isHeader && !r.Selected {
+						color = globals.Colours[colours.LIGHT_YELLOW]
+					}
 					return layout.Stack{Alignment: layout.Center}.Layout(gtx,
 						layout.Expanded(func(gtx C) D {
 							return globals.ColoredArea(gtx, image.Pt(gtx.Px(unit.Dp(float32(c.sizeX))), sizeCross), color)
@@ -452,6 +491,9 @@ func (r *Row) GenerateColumns() {
 						landLocked = c.HeadCell
 						sizeCross = r.headerSizeY
 					}
+					if SearchBy == c.HeadCell && !isHeader && !r.Selected {
+						color = globals.Colours[colours.LIGHT_YELLOW]
+					}
 					return layout.Stack{Alignment: layout.Center}.Layout(gtx,
 						layout.Expanded(func(gtx C) D {
 							return globals.ColoredArea(gtx, image.Pt(gtx.Px(unit.Dp(float32(c.sizeX))), sizeCross), color)
@@ -468,6 +510,9 @@ func (r *Row) GenerateColumns() {
 					if isHeader {
 						res = c.HeadCell
 						sizeCross = r.headerSizeY
+					}
+					if SearchBy == c.HeadCell && !isHeader && !r.Selected {
+						color = globals.Colours[colours.LIGHT_YELLOW]
 					}
 					return layout.Stack{Alignment: layout.Center}.Layout(gtx,
 						layout.Expanded(func(gtx C) D {
@@ -486,10 +531,14 @@ func (r *Row) GenerateColumns() {
 						res = c.HeadCell
 						sizeCross = r.headerSizeY
 					}
+					if SearchBy == c.HeadCell && !isHeader && !r.Selected {
+						color = globals.Colours[colours.LIGHT_YELLOW]
+					}
 					return layout.Stack{Alignment: layout.Center}.Layout(gtx,
 						layout.Expanded(func(gtx C) D {
 							return globals.ColoredArea(gtx, image.Pt(gtx.Px(unit.Dp(float32(c.sizeX))), sizeCross), color)
 						}),
+
 						layout.Stacked(material.Body1(th, res).Layout))
 				},
 			},
@@ -505,6 +554,9 @@ func (r *Row) GenerateColumns() {
 					if isHeader {
 						ccn = c.HeadCell
 						sizeCross = r.headerSizeY
+					}
+					if SearchBy == c.HeadCell && !isHeader && !r.Selected {
+						color = globals.Colours[colours.LIGHT_YELLOW]
 					}
 					return layout.Stack{Alignment: layout.Center}.Layout(gtx,
 						layout.Expanded(func(gtx C) D {
@@ -633,6 +685,9 @@ func (r *Row) GenerateColumns() {
 						res = c.HeadCell
 						sizeCross = r.headerSizeY
 					}
+					if SearchBy == c.HeadCell && !isHeader && !r.Selected {
+						color = globals.Colours[colours.LIGHT_YELLOW]
+					}
 					return layout.Stack{Alignment: layout.Center}.Layout(gtx,
 						layout.Expanded(func(gtx C) D {
 							return globals.ColoredArea(gtx, image.Pt(gtx.Px(unit.Dp(float32(c.sizeX))), sizeCross), color)
@@ -653,6 +708,9 @@ func (r *Row) GenerateColumns() {
 						res = c.HeadCell
 						sizeCross = r.headerSizeY
 					}
+					if SearchBy == c.HeadCell && !isHeader && !r.Selected {
+						color = globals.Colours[colours.LIGHT_YELLOW]
+					}
 					return layout.Stack{Alignment: layout.Center}.Layout(gtx,
 						layout.Expanded(func(gtx C) D {
 							return globals.ColoredArea(gtx, image.Pt(gtx.Px(unit.Dp(float32(c.sizeX))), sizeCross), color)
@@ -669,6 +727,9 @@ func (r *Row) GenerateColumns() {
 					if isHeader {
 						res = c.HeadCell
 						sizeCross = r.headerSizeY
+					}
+					if SearchBy == c.HeadCell && !isHeader && !r.Selected {
+						color = globals.Colours[colours.LIGHT_YELLOW]
 					}
 					return layout.Stack{Alignment: layout.Center}.Layout(gtx,
 						layout.Expanded(func(gtx C) D {

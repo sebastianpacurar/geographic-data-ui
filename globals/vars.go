@@ -17,6 +17,7 @@ var (
 		"white":         {R: 255, G: 255, B: 255, A: 255},
 		"lavenderblush": {R: 255, G: 240, B: 245, A: 255},
 		"antique-white": {R: 250, G: 235, B: 215, A: 255},
+		"light-yellow":  {R: 255, G: 255, B: 152, A: 255},
 		"aero-blue":     {R: 201, G: 255, B: 229, A: 255},
 		"light-salmon":  {R: 255, G: 207, B: 188, A: 255},
 		"nyanza":        {R: 233, G: 255, B: 219, A: 255},

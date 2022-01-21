@@ -1,3 +1,7 @@
+setup:
+	go get -u -t
+	go mod tidy
+
 me:
 	go run ./main.go
 

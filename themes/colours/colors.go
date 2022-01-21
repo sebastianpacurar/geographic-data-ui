@@ -12,6 +12,7 @@ const (
 	NYANZA        = "nyanza"
 	LAVENDERBLUSH = "lavenderblush"
 	ELECTRIC_BLUE = "electric-blue"
+	LIGHT_YELLOW  = "light-yellow"
 
 	CP_RESIZER     = "cp_resizer"
 	TEXT_SELECTION = "text_selection"

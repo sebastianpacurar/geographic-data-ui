@@ -224,7 +224,7 @@ func (app *Application) LayoutView(gtx C, th *material.Theme) D {
 
 					// search field
 					search := layout.Flexed(1, func(gtx C) D {
-						return app.Display.SearchField.Layout(gtx, th, "Search country")
+						return app.Display.SearchField.Layout(gtx, th, fmt.Sprintf("Search by %s", table.SearchBy))
 					})
 
 					// Table button
@@ -409,6 +409,7 @@ func (d *Display) SearchByColumn(SearchBy string) {
 			for i := range data.Cached {
 				var res string
 
+				// TODO: fix different data handling
 				switch SearchBy {
 				case table.NAME:
 					res = data.Cached[i].Name.Common
@@ -416,6 +417,34 @@ func (d *Display) SearchByColumn(SearchBy string) {
 					res = data.Cached[i].Name.Official
 				case table.CAPITAL:
 					res = data.Cached[i].Capital[0]
+				case table.TOP_LEVEL_DOMAINS:
+					res = data.Cached[i].TopLevelDomain[0]
+				case table.INDEPENDENT:
+					if data.Cached[i].Independent {
+						res = "yes"
+					} else {
+						res = "no"
+					}
+				case table.UNITED_NATIONS_MEMBER:
+					if data.Cached[i].UNMember {
+						res = "yes"
+					} else {
+						res = "no"
+					}
+				case table.LANDLOCKED:
+					if data.Cached[i].Landlocked {
+						res = "yes"
+					} else {
+						res = "no"
+					}
+				case table.CCA2:
+					res = data.Cached[i].Cca2
+				case table.CCA3:
+					res = data.Cached[i].Cca3
+				case table.CCN3:
+					res = data.Cached[i].Ccn3
+				case table.CAR_SIDE:
+					res = data.Cached[i].Car.Side
 				}
 
 				if strings.HasPrefix(strings.ToLower(res), strings.ToLower(d.SearchField.Text())) {

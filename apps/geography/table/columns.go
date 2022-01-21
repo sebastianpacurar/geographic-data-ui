@@ -30,8 +30,8 @@ const (
 )
 
 var (
-	// SearchBy - used to search countries
-	SearchBy string
+	// SearchBy - used to search countries and defaults to Country.Name.Common
+	SearchBy = NAME
 
 	ColNames = []string{
 		OFFICIAL_NAME, CAPITAL, REGION, SUBREGION, LANGUAGES, CONTINENTS, IDD_ROOT, IDD_SUFFIXES, TOP_LEVEL_DOMAINS,
@@ -41,7 +41,8 @@ var (
 
 	// SearchByCols - used to Search By a specific column
 	SearchByCols = []string{
-		NAME, OFFICIAL_NAME, CAPITAL, TOP_LEVEL_DOMAINS, CCA2, CCA3, CCN3, LATITUDE, LONGITUDE, CAR_SIGNS, CAR_SIDE,
+		NAME, OFFICIAL_NAME, CAPITAL, TOP_LEVEL_DOMAINS, INDEPENDENT, UNITED_NATIONS_MEMBER, LANDLOCKED, CCA2, CCA3,
+		CCN3, LATITUDE, LONGITUDE, START_OF_WEEK, CAR_SIGNS, CAR_SIDE,
 	}
 
 	// ColState - used to show/hide columns from CP

@@ -35,11 +35,7 @@ func (ft *FilterTable) Layout(gtx C, th *material.Theme) D {
 	if !ft.loaded {
 		ft.leftList.Axis = layout.Vertical
 		ft.rightList.Axis = layout.Vertical
-		if len(ft.radioBtns.Value) == 0 {
-			// set default of SearchBy to Common Name
-			ft.radioBtns.Value = table.NAME
-		}
-
+		ft.radioBtns.Value = table.SearchBy
 		ft.checkboxes = make([]checkBox, len(table.ColNames))
 		for i := range ft.checkboxes {
 			ft.checkboxes[i] = checkBox{
