@@ -39,7 +39,7 @@ type (
 		Currencies     map[string]Currency        `json:"currencies"`
 		Idd            InternationalDirectDialing `json:"idd"`
 		Car            Car                        `json:"car"`
-		Capital        []string                   `json:"capital"`
+		Capitals       []string                   `json:"capital"`
 		AltSpellings   []string                   `json:"altSpellings"`
 		Translations   map[string]TranslationLang `json:"translations"`
 		Languages      map[string]string          `json:"languages"`
@@ -155,7 +155,7 @@ func downloadFlagFromUrl(url string) ([]byte, error) {
 	return data.Bytes(), nil
 }
 
-// ProcessFlags - decode png image for 4 countries at once
+// ProcessFlags - decode png image for 5 countries at once
 func ProcessFlags() {
 	length := len(Cached) / 5
 	firstBatch := make(chan image.Image, length)
@@ -234,20 +234,6 @@ func fetchCountries(location string) ([]byte, error) {
 	return body, nil
 }
 
-func fileCount(path string) (int, error) {
-	i := 0
-	entry, err := ioutil.ReadDir(path)
-	if err != nil {
-		log.Fatalln(fmt.Sprintf("Error when reading directory %s", err))
-	}
-	for _, f := range entry {
-		if !f.IsDir() {
-			i++
-		}
-	}
-	return i, nil
-}
-
 // writeFlagToFile - needed for slower OSes to store the flags locally, for quicker retrieval on next app start
 func (c *Country) writeFlagToFile() error {
 	count, err := fileCount("output/geography/flags")
@@ -286,11 +272,25 @@ func (c *Country) writeFlagToFile() error {
 	return nil
 }
 
-// decodeNoFlagPng - Currently faster than ProcessFlagFromUrl, useful for slower OSes
-func decodeNoFlagPng() []byte {
-	file, err := ioutil.ReadFile("output/geography/flags/placeholder/no-flag.png")
+func fileCount(path string) (int, error) {
+	i := 0
+	entry, err := ioutil.ReadDir(path)
 	if err != nil {
-		log.Fatalln("Error opening no-flag.png path")
+		log.Fatalln(fmt.Sprintf("Error when reading directory %s", err))
+	}
+	for _, f := range entry {
+		if !f.IsDir() {
+			i++
+		}
+	}
+	return i, nil
+}
+
+// decodeNoFlagPng - used only in case the flag is saved locally
+func decodeNoFlagPng(path string) []byte {
+	file, err := ioutil.ReadFile(path)
+	if err != nil {
+		log.Fatalln(fmt.Sprintf("Error opening %s file", path))
 	}
 	return file
 }

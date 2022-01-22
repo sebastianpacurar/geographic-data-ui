@@ -36,7 +36,6 @@ type (
 		*apps.Router
 
 		DisableCPBtn widget.Clickable
-		btnStyle     material.ButtonStyle
 		isCPDisabled bool
 	}
 
@@ -221,6 +220,7 @@ func (app *Application) LayoutView(gtx C, th *material.Theme) D {
 		case nil:
 			dims = layout.Flex{Axis: layout.Vertical}.Layout(gtx,
 				layout.Rigid(func(gtx C) D {
+					//var searchArea D
 
 					// search field
 					search := layout.Flexed(1, func(gtx C) D {
@@ -415,8 +415,8 @@ func (d *Display) SearchByColumn(SearchBy string) {
 					res = data.Cached[i].Name.Common
 				case table.OFFICIAL_NAME:
 					res = data.Cached[i].Name.Official
-				case table.CAPITAL:
-					res = data.Cached[i].Capital[0]
+				case table.CAPITALS:
+					res = data.Cached[i].Capitals[0]
 				case table.TOP_LEVEL_DOMAINS:
 					res = data.Cached[i].TopLevelDomain[0]
 				case table.INDEPENDENT:
@@ -504,8 +504,8 @@ func (d *Display) saveDataToExcel() {
 						res = "No"
 					}
 				case "J":
-					if len(data.Cached[j].Capital) > 0 {
-						res = data.Cached[j].Capital[0]
+					if len(data.Cached[j].Capitals) > 0 {
+						res = data.Cached[j].Capitals[0]
 					} else {
 						res = "N/A"
 					}

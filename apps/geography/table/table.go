@@ -40,7 +40,7 @@ func (t *Table) Layout(gtx C, th *material.Theme, SearchBy string) D {
 			t.rows = append(t.rows, Row{
 				Name:            data.Cached[i].Name.Common,
 				OfficialName:    data.Cached[i].Name.Official,
-				Capital:         data.Cached[i].Capital,
+				Capitals:        data.Cached[i].Capitals,
 				Region:          data.Cached[i].Region,
 				Subregion:       data.Cached[i].Subregion,
 				Languages:       data.Cached[i].Languages,

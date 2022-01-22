@@ -3,7 +3,7 @@ package table
 const (
 	NAME                  = "Name"
 	OFFICIAL_NAME         = "Official Name"
-	CAPITAL               = "Capital"
+	CAPITALS              = "Capitals"
 	REGION                = "Region"
 	SUBREGION             = "Subregion"
 	LANGUAGES             = "Languages"
@@ -34,14 +34,14 @@ var (
 	SearchBy = NAME
 
 	ColNames = []string{
-		OFFICIAL_NAME, CAPITAL, REGION, SUBREGION, LANGUAGES, CONTINENTS, IDD_ROOT, IDD_SUFFIXES, TOP_LEVEL_DOMAINS,
+		OFFICIAL_NAME, CAPITALS, REGION, SUBREGION, LANGUAGES, CONTINENTS, IDD_ROOT, IDD_SUFFIXES, TOP_LEVEL_DOMAINS,
 		INDEPENDENT, STATUS, UNITED_NATIONS_MEMBER, LANDLOCKED, CCA2, CCA3, CCN3, CIOC, FIFA, AREA, POPULATION, LATITUDE,
 		LONGITUDE, START_OF_WEEK, CAR_SIGNS, CAR_SIDE,
 	}
 
 	// SearchByCols - used to Search By a specific column
 	SearchByCols = []string{
-		NAME, OFFICIAL_NAME, CAPITAL, TOP_LEVEL_DOMAINS, INDEPENDENT, UNITED_NATIONS_MEMBER, LANDLOCKED, CCA2, CCA3,
+		NAME, OFFICIAL_NAME, CAPITALS, TOP_LEVEL_DOMAINS, INDEPENDENT, UNITED_NATIONS_MEMBER, LANDLOCKED, CCA2, CCA3,
 		CCN3, LATITUDE, LONGITUDE, START_OF_WEEK, CAR_SIGNS, CAR_SIDE,
 	}
 
@@ -49,7 +49,7 @@ var (
 	ColState = map[string]bool{
 		NAME:                  true,
 		OFFICIAL_NAME:         false,
-		CAPITAL:               true,
+		CAPITALS:              true,
 		REGION:                true,
 		SUBREGION:             true,
 		LANGUAGES:             false,
