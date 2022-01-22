@@ -387,7 +387,7 @@ func (app *Application) LayoutView(gtx C, th *material.Theme) D {
 						case grid.Grid:
 							dims = app.Display.Grid.Layout(gtx, th)
 						case table.Table:
-							dims = app.Display.Table.Layout(gtx, th, table.SearchBy)
+							dims = app.Display.Table.Layout(gtx, th)
 						}
 						return dims
 					})
@@ -407,18 +407,22 @@ func (d *Display) SearchByColumn(SearchBy string) {
 	if d.CurrentStr != d.SearchField.Text() {
 		if d.SearchField.Len() > 0 {
 			for i := range data.Cached {
-				var res string
+				res := "-"
 
-				// TODO: fix different data handling
+				// Leaving this as verbose as is, for now
 				switch SearchBy {
 				case table.NAME:
 					res = data.Cached[i].Name.Common
 				case table.OFFICIAL_NAME:
 					res = data.Cached[i].Name.Official
 				case table.CAPITALS:
-					res = data.Cached[i].Capitals[0]
+					if len(data.Cached[i].Capitals) > 0 {
+						res = data.Cached[i].Capitals[0]
+					}
 				case table.TOP_LEVEL_DOMAINS:
-					res = data.Cached[i].TopLevelDomain[0]
+					if len(data.Cached[i].TopLevelDomain) > 0 {
+						res = data.Cached[i].TopLevelDomain[0]
+					}
 				case table.INDEPENDENT:
 					if data.Cached[i].Independent {
 						res = "yes"

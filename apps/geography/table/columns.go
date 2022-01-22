@@ -33,6 +33,7 @@ var (
 	// SearchBy - used to search countries and defaults to Country.Name.Common
 	SearchBy = NAME
 
+	// ColNames - the current columns used to display data (NAME is included by default as sticky column)
 	ColNames = []string{
 		OFFICIAL_NAME, CAPITALS, REGION, SUBREGION, LANGUAGES, CONTINENTS, IDD_ROOT, IDD_SUFFIXES, TOP_LEVEL_DOMAINS,
 		INDEPENDENT, STATUS, UNITED_NATIONS_MEMBER, LANDLOCKED, CCA2, CCA3, CCN3, CIOC, FIFA, AREA, POPULATION, LATITUDE,
@@ -47,7 +48,7 @@ var (
 
 	// ColState - used to show/hide columns from CP
 	ColState = map[string]bool{
-		NAME:                  true,
+		NAME:                  true, // should always be true since it refers to the sticky column
 		OFFICIAL_NAME:         false,
 		CAPITALS:              true,
 		REGION:                true,

@@ -28,7 +28,7 @@ type (
 	}
 )
 
-func (t *Table) Layout(gtx C, th *material.Theme, SearchBy string) D {
+func (t *Table) Layout(gtx C, th *material.Theme) D {
 	if !t.loaded {
 		t.rowList.Axis = layout.Vertical
 		t.rowList.Alignment = layout.Middle

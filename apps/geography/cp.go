@@ -17,8 +17,8 @@ type (
 		SCountries controllers2.SelectedCountries
 		SCState    component.DiscloserState
 
-		FTable  controllers2.FilterTable
-		FTState component.DiscloserState
+		CDSearch controllers2.ColDisplaySearch
+		CDSState component.DiscloserState
 	}
 
 	Controller struct {
@@ -61,14 +61,14 @@ func (cp *ControlPanel) Layout(gtx C, th *material.Theme) D {
 			},
 		},
 		{
-			name: "Filter Data",
+			name: "Displayed Columns / Search by",
 			layout: func(gtx C, c *Controller) D {
 				content := layout.Rigid(func(gtx C) D {
-					return component.SimpleDiscloser(th, &cp.FTState).Layout(gtx,
+					return component.SimpleDiscloser(th, &cp.CDSState).Layout(gtx,
 						material.Body1(th, c.name).Layout,
 						func(gtx C) D {
 							return controllerInset.Layout(gtx, func(gtx C) D {
-								return cp.FTable.Layout(gtx, th)
+								return cp.CDSearch.Layout(gtx, th)
 							})
 						})
 				})

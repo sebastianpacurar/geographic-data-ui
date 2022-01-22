@@ -56,16 +56,17 @@ type (
 		headerSizeY int
 		loaded      bool
 
-		Columns []Cell
+		Columns []cell
 	}
 
-	Cell struct {
+	cell struct {
 		HeadCell string
 		sizeX    int
 		content  interface{}
 	}
 )
 
+// parseCellContent - stringify the content country cell data
 func (r *Row) parseCellContent(headCell string, content interface{}) string {
 	res := "-"
 	if content == nil {
@@ -149,12 +150,13 @@ func (r *Row) parseCellContent(headCell string, content interface{}) string {
 	return res
 }
 
+// LayRow - Lay the row with all column cells parsed
 func (r *Row) LayRow(gtx C, th *material.Theme, isHeader bool) D {
 	rowColor := globals.Colours[colours.ANTIQUE_WHITE]
 
 	if !r.loaded {
 		r.colList.Alignment = layout.Middle
-		r.GenerateColumns()
+		r.generateColumns()
 		r.loaded = true
 	}
 
@@ -183,9 +185,6 @@ func (r *Row) LayRow(gtx C, th *material.Theme, isHeader bool) D {
 				return r.colList.Layout(gtx, len(ColNames), func(gtx C, i int) D {
 					var dim D
 					if ColState[r.Columns[i].HeadCell] {
-						if SearchBy == r.Columns[i].HeadCell && !r.Selected {
-							rowColor = globals.Colours[colours.LIGHT_YELLOW]
-						}
 						dim = layout.Stack{Alignment: layout.Center}.Layout(gtx,
 							layout.Expanded(func(gtx C) D {
 								return globals.ColoredArea(gtx, image.Pt(gtx.Px(unit.Dp(float32(r.Columns[i].sizeX))), r.sizeY), rowColor)
@@ -196,12 +195,13 @@ func (r *Row) LayRow(gtx C, th *material.Theme, isHeader bool) D {
 				})
 			})
 		} else {
-			rowColor = globals.Colours[colours.LAVENDERBLUSH]
 			return r.colList.Layout(gtx, len(ColNames), func(gtx C, i int) D {
 				var dim D
 				if ColState[r.Columns[i].HeadCell] {
-					if SearchBy == r.Columns[i].HeadCell && !r.Selected {
+					if SearchBy == r.Columns[i].HeadCell {
 						rowColor = globals.Colours[colours.LIGHT_YELLOW]
+					} else {
+						rowColor = globals.Colours[colours.LAVENDERBLUSH]
 					}
 					dim = layout.Stack{Alignment: layout.Center}.Layout(gtx,
 						layout.Expanded(func(gtx C) D {
@@ -215,7 +215,7 @@ func (r *Row) LayRow(gtx C, th *material.Theme, isHeader bool) D {
 	})
 }
 
-// LayNameColumn - Lay sticky country name Column - TODO: simplify!
+// LayNameColumn - Lay the sticky Name.Common column
 func (r *Row) LayNameColumn(gtx C, th *material.Theme, isHeader bool) D {
 	cellColor := globals.Colours[colours.ANTIQUE_WHITE]
 
@@ -268,34 +268,34 @@ func (r *Row) LayNameColumn(gtx C, th *material.Theme, isHeader bool) D {
 	})
 }
 
-func (r *Row) GenerateColumns() {
-	r.Columns = make([]Cell, 0, len(ColNames))
+func (r *Row) generateColumns() {
+	r.Columns = make([]cell, 0, len(ColNames))
 	for range ColNames {
 		r.Columns = append(r.Columns,
-			Cell{HeadCell: OFFICIAL_NAME, content: r.OfficialName, sizeX: 550},
-			Cell{HeadCell: CAPITALS, content: r.Capitals, sizeX: 250},
-			Cell{HeadCell: REGION, content: r.Region, sizeX: 175},
-			Cell{HeadCell: SUBREGION, content: r.Subregion, sizeX: 225},
-			Cell{HeadCell: CONTINENTS, content: r.Continents, sizeX: 175},
-			Cell{HeadCell: LANGUAGES, content: r.Languages, sizeX: 650},
-			Cell{HeadCell: IDD_ROOT, content: r.IddRoot, sizeX: 165},
-			Cell{HeadCell: IDD_SUFFIXES, content: r.IddSuffixes, sizeX: 200},
-			Cell{HeadCell: TOP_LEVEL_DOMAINS, content: r.TopLevelDomains, sizeX: 200},
-			Cell{HeadCell: INDEPENDENT, content: r.Independent, sizeX: 180},
-			Cell{HeadCell: STATUS, content: r.Status, sizeX: 175},
-			Cell{HeadCell: UNITED_NATIONS_MEMBER, content: r.UNMember, sizeX: 200},
-			Cell{HeadCell: LANDLOCKED, content: r.Landlocked, sizeX: 180},
-			Cell{HeadCell: CCA2, content: r.Cca2, sizeX: 85},
-			Cell{HeadCell: CCA3, content: r.Cca3, sizeX: 85},
-			Cell{HeadCell: CCN3, content: r.Ccn3, sizeX: 85},
-			Cell{HeadCell: CIOC, content: r.Cioc, sizeX: 95},
-			Cell{HeadCell: FIFA, content: r.Fifa, sizeX: 95},
-			Cell{HeadCell: AREA, content: r.Area, sizeX: 125},
-			Cell{HeadCell: POPULATION, content: r.Population, sizeX: 150},
-			Cell{HeadCell: LATITUDE, content: r.Latitude, sizeX: 150},
-			Cell{HeadCell: LONGITUDE, content: r.Longitude, sizeX: 150},
-			Cell{HeadCell: START_OF_WEEK, content: r.StartOfWeek, sizeX: 150},
-			Cell{HeadCell: CAR_SIGNS, content: r.CarSigns, sizeX: 150},
-			Cell{HeadCell: CAR_SIDE, content: r.CarSide, sizeX: 100})
+			cell{HeadCell: OFFICIAL_NAME, content: r.OfficialName, sizeX: 550},
+			cell{HeadCell: CAPITALS, content: r.Capitals, sizeX: 250},
+			cell{HeadCell: REGION, content: r.Region, sizeX: 175},
+			cell{HeadCell: SUBREGION, content: r.Subregion, sizeX: 225},
+			cell{HeadCell: CONTINENTS, content: r.Continents, sizeX: 175},
+			cell{HeadCell: LANGUAGES, content: r.Languages, sizeX: 650},
+			cell{HeadCell: IDD_ROOT, content: r.IddRoot, sizeX: 165},
+			cell{HeadCell: IDD_SUFFIXES, content: r.IddSuffixes, sizeX: 200},
+			cell{HeadCell: TOP_LEVEL_DOMAINS, content: r.TopLevelDomains, sizeX: 200},
+			cell{HeadCell: INDEPENDENT, content: r.Independent, sizeX: 180},
+			cell{HeadCell: STATUS, content: r.Status, sizeX: 175},
+			cell{HeadCell: UNITED_NATIONS_MEMBER, content: r.UNMember, sizeX: 200},
+			cell{HeadCell: LANDLOCKED, content: r.Landlocked, sizeX: 180},
+			cell{HeadCell: CCA2, content: r.Cca2, sizeX: 85},
+			cell{HeadCell: CCA3, content: r.Cca3, sizeX: 85},
+			cell{HeadCell: CCN3, content: r.Ccn3, sizeX: 85},
+			cell{HeadCell: CIOC, content: r.Cioc, sizeX: 95},
+			cell{HeadCell: FIFA, content: r.Fifa, sizeX: 95},
+			cell{HeadCell: AREA, content: r.Area, sizeX: 125},
+			cell{HeadCell: POPULATION, content: r.Population, sizeX: 150},
+			cell{HeadCell: LATITUDE, content: r.Latitude, sizeX: 150},
+			cell{HeadCell: LONGITUDE, content: r.Longitude, sizeX: 150},
+			cell{HeadCell: START_OF_WEEK, content: r.StartOfWeek, sizeX: 150},
+			cell{HeadCell: CAR_SIGNS, content: r.CarSigns, sizeX: 150},
+			cell{HeadCell: CAR_SIDE, content: r.CarSide, sizeX: 100})
 	}
 }
