@@ -34,17 +34,17 @@ func (gr *Grid) Layout(gtx C, th *material.Theme) D {
 
 		for i := range data.Cached {
 			gr.cards = append(gr.cards, Card{
-				Name:     data.Cached[i].Name.Common,
-				Active:   data.Cached[i].Active,
-				Selected: data.Cached[i].Selected,
-				Flag:     data.Cached[i].FlagImg,
+				Name:          data.Cached[i].Name.Common,
+				IsSearchedFor: data.Cached[i].IsSearchedFor,
+				Selected:      data.Cached[i].Selected,
+				Flag:          data.Cached[i].FlagImg,
 			})
 		}
 		gr.loaded = true
 	} else {
 		for i := range data.Cached {
-			gr.cards[i].Active = data.Cached[i].Active
-			gr.cards[i].ActiveContinent = data.Cached[i].ActiveContinent
+			gr.cards[i].IsSearchedFor = data.Cached[i].IsSearchedFor
+			gr.cards[i].IsActiveContinent = data.Cached[i].IsActiveContinent
 			gr.cards[i].Selected = data.Cached[i].Selected
 			gr.cards[i].Flag = data.Cached[i].FlagImg
 		}
@@ -77,7 +77,7 @@ func (gr *Grid) Layout(gtx C, th *material.Theme) D {
 				op.InvalidateOp{}.Add(gtx.Ops)
 			}
 
-			if gr.cards[i].Active && gr.cards[i].ActiveContinent {
+			if gr.cards[i].IsSearchedFor && gr.cards[i].IsActiveContinent {
 				content = layout.UniformInset(unit.Dp(15)).Layout(gtx, func(gtx C) D {
 					return gr.cards[i].LayCard(gtx, th)
 				})

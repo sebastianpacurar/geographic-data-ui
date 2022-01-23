@@ -22,9 +22,9 @@ type (
 		container component.SurfaceStyle
 		shadow    component.ShadowStyle
 
-		Active          bool
-		ActiveContinent bool
-		Selected        bool
+		IsSearchedFor     bool
+		IsActiveContinent bool
+		Selected          bool
 
 		menu            component.MenuState
 		ctxArea         component.ContextArea

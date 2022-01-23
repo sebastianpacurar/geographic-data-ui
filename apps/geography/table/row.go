@@ -46,9 +46,9 @@ type (
 		CarSigns        []string
 		CarSide         string
 
-		Active          bool
-		ActiveContinent bool
-		Selected        bool
+		IsSearchedFor     bool
+		IsActiveContinent bool
+		Selected          bool
 
 		btn         widget.Clickable
 		colList     layout.List
@@ -65,6 +65,39 @@ type (
 		content  interface{}
 	}
 )
+
+// generateColumns - holds the state of every column cell of every Row
+func (r *Row) generateColumns() {
+	r.Columns = make([]cell, 0, len(ColNames))
+	for range ColNames {
+		r.Columns = append(r.Columns,
+			cell{HeadCell: OFFICIAL_NAME, content: r.OfficialName, sizeX: 550},
+			cell{HeadCell: CAPITALS, content: r.Capitals, sizeX: 250},
+			cell{HeadCell: REGION, content: r.Region, sizeX: 175},
+			cell{HeadCell: SUBREGION, content: r.Subregion, sizeX: 225},
+			cell{HeadCell: CONTINENTS, content: r.Continents, sizeX: 175},
+			cell{HeadCell: LANGUAGES, content: r.Languages, sizeX: 650},
+			cell{HeadCell: IDD_ROOT, content: r.IddRoot, sizeX: 165},
+			cell{HeadCell: IDD_SUFFIXES, content: r.IddSuffixes, sizeX: 200},
+			cell{HeadCell: TOP_LEVEL_DOMAINS, content: r.TopLevelDomains, sizeX: 200},
+			cell{HeadCell: INDEPENDENT, content: r.Independent, sizeX: 180},
+			cell{HeadCell: STATUS, content: r.Status, sizeX: 175},
+			cell{HeadCell: UNITED_NATIONS_MEMBER, content: r.UNMember, sizeX: 200},
+			cell{HeadCell: LANDLOCKED, content: r.Landlocked, sizeX: 180},
+			cell{HeadCell: CCA2, content: r.Cca2, sizeX: 85},
+			cell{HeadCell: CCA3, content: r.Cca3, sizeX: 85},
+			cell{HeadCell: CCN3, content: r.Ccn3, sizeX: 85},
+			cell{HeadCell: CIOC, content: r.Cioc, sizeX: 95},
+			cell{HeadCell: FIFA, content: r.Fifa, sizeX: 95},
+			cell{HeadCell: AREA, content: r.Area, sizeX: 125},
+			cell{HeadCell: POPULATION, content: r.Population, sizeX: 150},
+			cell{HeadCell: LATITUDE, content: r.Latitude, sizeX: 150},
+			cell{HeadCell: LONGITUDE, content: r.Longitude, sizeX: 150},
+			cell{HeadCell: START_OF_WEEK, content: r.StartOfWeek, sizeX: 150},
+			cell{HeadCell: CAR_SIGNS, content: r.CarSigns, sizeX: 150},
+			cell{HeadCell: CAR_SIDE, content: r.CarSide, sizeX: 100})
+	}
+}
 
 // parseCellContent - stringify the content country cell data
 func (r *Row) parseCellContent(headCell string, content interface{}) string {
@@ -266,36 +299,4 @@ func (r *Row) LayNameColumn(gtx C, th *material.Theme, isHeader bool) D {
 			})
 		}
 	})
-}
-
-func (r *Row) generateColumns() {
-	r.Columns = make([]cell, 0, len(ColNames))
-	for range ColNames {
-		r.Columns = append(r.Columns,
-			cell{HeadCell: OFFICIAL_NAME, content: r.OfficialName, sizeX: 550},
-			cell{HeadCell: CAPITALS, content: r.Capitals, sizeX: 250},
-			cell{HeadCell: REGION, content: r.Region, sizeX: 175},
-			cell{HeadCell: SUBREGION, content: r.Subregion, sizeX: 225},
-			cell{HeadCell: CONTINENTS, content: r.Continents, sizeX: 175},
-			cell{HeadCell: LANGUAGES, content: r.Languages, sizeX: 650},
-			cell{HeadCell: IDD_ROOT, content: r.IddRoot, sizeX: 165},
-			cell{HeadCell: IDD_SUFFIXES, content: r.IddSuffixes, sizeX: 200},
-			cell{HeadCell: TOP_LEVEL_DOMAINS, content: r.TopLevelDomains, sizeX: 200},
-			cell{HeadCell: INDEPENDENT, content: r.Independent, sizeX: 180},
-			cell{HeadCell: STATUS, content: r.Status, sizeX: 175},
-			cell{HeadCell: UNITED_NATIONS_MEMBER, content: r.UNMember, sizeX: 200},
-			cell{HeadCell: LANDLOCKED, content: r.Landlocked, sizeX: 180},
-			cell{HeadCell: CCA2, content: r.Cca2, sizeX: 85},
-			cell{HeadCell: CCA3, content: r.Cca3, sizeX: 85},
-			cell{HeadCell: CCN3, content: r.Ccn3, sizeX: 85},
-			cell{HeadCell: CIOC, content: r.Cioc, sizeX: 95},
-			cell{HeadCell: FIFA, content: r.Fifa, sizeX: 95},
-			cell{HeadCell: AREA, content: r.Area, sizeX: 125},
-			cell{HeadCell: POPULATION, content: r.Population, sizeX: 150},
-			cell{HeadCell: LATITUDE, content: r.Latitude, sizeX: 150},
-			cell{HeadCell: LONGITUDE, content: r.Longitude, sizeX: 150},
-			cell{HeadCell: START_OF_WEEK, content: r.StartOfWeek, sizeX: 150},
-			cell{HeadCell: CAR_SIGNS, content: r.CarSigns, sizeX: 150},
-			cell{HeadCell: CAR_SIDE, content: r.CarSide, sizeX: 100})
-	}
 }

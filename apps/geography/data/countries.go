@@ -57,14 +57,14 @@ type (
 
 		// FlagImg - obtained after decoding the png
 		FlagImg image.Image
-		// Active - used for search rows/cards
-		Active bool
+		// IsSearchedFor - used for search rows/cards
+		IsSearchedFor bool
 		// Selected - used for CP selected pills
 		Selected bool
-		// for contextual view
+		// IsCtxtActive - for single country contextual view
 		IsCtxtActive bool
-		// for Continent Tab Selection
-		ActiveContinent bool
+		// IsActiveContinent - for Continent Tab Selection
+		IsActiveContinent bool
 	}
 
 	Name struct {
@@ -128,7 +128,7 @@ func GetSelectedCount() int {
 func GetDisplayedCount() int {
 	count := 0
 	for i := range Cached {
-		if Cached[i].Active && Cached[i].ActiveContinent {
+		if Cached[i].IsSearchedFor && Cached[i].IsActiveContinent {
 			count++
 		}
 	}

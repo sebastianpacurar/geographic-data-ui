@@ -68,8 +68,7 @@ func (sc *SelectedCountries) Layout(gtx C, th *material.Theme) D {
 						//}
 					}
 
-					var area D
-					area = layout.Inset{
+					return layout.Inset{
 						Top:    unit.Dp(4),
 						Right:  unit.Dp(2),
 						Bottom: unit.Dp(4),
@@ -102,7 +101,6 @@ func (sc *SelectedCountries) Layout(gtx C, th *material.Theme) D {
 								}))
 						})
 					})
-					return area
 				})
 			}))
 	} else {

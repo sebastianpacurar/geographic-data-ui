@@ -6,12 +6,12 @@ import (
 	"gioui-experiment/apps/geography/data"
 	"gioui-experiment/apps/geography/grid"
 	"gioui-experiment/apps/geography/table"
+	"gioui-experiment/apps/geography/views"
 	"gioui-experiment/globals"
 	"gioui-experiment/themes/colours"
 	"gioui.org/font/gofont"
 	"gioui.org/layout"
 	"gioui.org/op"
-	"gioui.org/op/paint"
 	"gioui.org/unit"
 	"gioui.org/widget"
 	"gioui.org/widget/material"
@@ -29,12 +29,14 @@ type (
 	D = layout.Dimensions
 
 	Application struct {
+		*apps.Router
 		th *material.Theme
+
 		ControlPanel
 		Display
-		pinBtn widget.Clickable
-		*apps.Router
+		cv views.CountryView
 
+		pinBtn       widget.Clickable
 		DisableCPBtn widget.Clickable
 		isCPDisabled bool
 	}
@@ -144,15 +146,15 @@ func (app *Application) LayoutView(gtx C, th *material.Theme) D {
 				if app.Continents[i].Name == "All" {
 					app.Continents[i].IsSelected = true
 					for j := range data.Cached {
-						data.Cached[j].ActiveContinent = true
+						data.Cached[j].IsActiveContinent = true
 					}
 					break
 				}
 			}
 
-			// set all countries to Active
+			// set all countries to IsSearchedFor = true
 			for i := range data.Cached {
-				data.Cached[i].Active = true
+				data.Cached[i].IsSearchedFor = true
 			}
 			app.initialSetup = true
 		}
@@ -202,25 +204,12 @@ func (app *Application) LayoutView(gtx C, th *material.Theme) D {
 				op.InvalidateOp{}.Add(gtx.Ops)
 			}
 
-			dims = layout.Flex{Axis: layout.Vertical}.Layout(gtx,
-				layout.Rigid(material.Body2(th, app.Display.ContextualCountry.Cca2).Layout),
-				layout.Rigid(material.Body2(th, app.Display.ContextualCountry.Cca3).Layout),
-				layout.Rigid(material.Body2(th, app.Display.ContextualCountry.Ccn3).Layout),
-				layout.Rigid(material.Body2(th, strconv.FormatFloat(app.Display.ContextualCountry.Area, 'f', -1, 32)).Layout),
-				layout.Rigid(func(gtx C) D {
-					return layout.Flex{}.Layout(gtx,
-						layout.Flexed(1, func(gtx C) D {
-							return widget.Image{
-								Src: paint.NewImageOp(app.Display.ContextualCountry.FlagImg),
-								Fit: widget.Contain,
-							}.Layout(gtx)
-						}))
-				}))
+			// layout Country View
+			dims = app.cv.Layout(gtx, th, app.ContextualCountry)
 
 		case nil:
 			dims = layout.Flex{Axis: layout.Vertical}.Layout(gtx,
 				layout.Rigid(func(gtx C) D {
-					//var searchArea D
 
 					// search field
 					search := layout.Flexed(1, func(gtx C) D {
@@ -323,16 +312,16 @@ func (app *Application) LayoutView(gtx C, th *material.Theme) D {
 											}
 										}
 
-										// update ActiveContinent state
+										// update IsActiveContinent state
 										for j := range data.Cached {
 											if name == "All" {
-												data.Cached[j].ActiveContinent = true
+												data.Cached[j].IsActiveContinent = true
 											} else {
 												continents := strings.Join(data.Cached[j].Continents, " ")
 												if strings.Contains(continents, app.Continents[i].Name) {
-													data.Cached[j].ActiveContinent = true
+													data.Cached[j].IsActiveContinent = true
 												} else {
-													data.Cached[j].ActiveContinent = false
+													data.Cached[j].IsActiveContinent = false
 												}
 											}
 										}
@@ -452,15 +441,15 @@ func (d *Display) SearchByColumn(SearchBy string) {
 				}
 
 				if strings.HasPrefix(strings.ToLower(res), strings.ToLower(d.SearchField.Text())) {
-					data.Cached[i].Active = true
+					data.Cached[i].IsSearchedFor = true
 				} else {
-					data.Cached[i].Active = false
+					data.Cached[i].IsSearchedFor = false
 				}
 			}
 			d.CurrentStr = d.SearchField.Text()
 		} else if d.SearchField.Len() == 0 {
 			for i := range data.Cached {
-				data.Cached[i].Active = true
+				data.Cached[i].IsSearchedFor = true
 			}
 			d.CurrentStr = d.SearchField.Text()
 		}
@@ -478,7 +467,7 @@ func (d *Display) saveDataToExcel() {
 		excelRow := 1
 		for j := range data.Cached {
 			// write only displayed rows/cards related countries
-			if data.Cached[j].Active {
+			if data.Cached[j].IsSearchedFor {
 				res := ""
 				switch columns[i] {
 				case "A":

@@ -65,15 +65,15 @@ func (t *Table) Layout(gtx C, th *material.Theme) D {
 				CarSigns:        data.Cached[i].Car.Signs,
 				CarSide:         data.Cached[i].Car.Side,
 
-				Active:          data.Cached[i].Active,
-				ActiveContinent: data.Cached[i].ActiveContinent,
+				IsSearchedFor:     data.Cached[i].IsSearchedFor,
+				IsActiveContinent: data.Cached[i].IsActiveContinent,
 			})
 		}
 		t.loaded = true
 	} else {
 		for i := range data.Cached {
-			t.rows[i].Active = data.Cached[i].Active
-			t.rows[i].ActiveContinent = data.Cached[i].ActiveContinent
+			t.rows[i].IsSearchedFor = data.Cached[i].IsSearchedFor
+			t.rows[i].IsActiveContinent = data.Cached[i].IsActiveContinent
 			t.rows[i].Selected = data.Cached[i].Selected
 		}
 	}
@@ -97,7 +97,7 @@ func (t *Table) Layout(gtx C, th *material.Theme) D {
 							return material.List(th, &t.rowList).Layout(gtx, len(data.Cached), func(gtx C, i int) D {
 								var dims D
 
-								if t.rows[i].Active && t.rows[i].ActiveContinent {
+								if t.rows[i].IsSearchedFor && t.rows[i].IsActiveContinent {
 									if t.rows[i].btn.Clicked() {
 										if t.rows[i].Selected {
 											data.Cached[i].Selected = false
@@ -128,7 +128,7 @@ func (t *Table) Layout(gtx C, th *material.Theme) D {
 							layout.Flexed(1, func(gtx C) D {
 								return material.List(th, &t.rowList).Layout(gtx, len(data.Cached), func(gtx C, i int) D {
 									var dims D
-									if t.rows[i].Active && t.rows[i].ActiveContinent {
+									if t.rows[i].IsSearchedFor && t.rows[i].IsActiveContinent {
 										if t.rows[i].btn.Clicked() {
 											if t.rows[i].Selected {
 												data.Cached[i].Selected = false
