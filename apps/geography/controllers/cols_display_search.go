@@ -17,8 +17,10 @@ type (
 	D = layout.Dimensions
 
 	ColDisplaySearch struct {
-		leftList   layout.List
-		checkboxes []checkBox
+		leftList         layout.List
+		checkboxes       []checkBox
+		selectAllBoxes   widget.Clickable
+		deselectAllBoxes widget.Clickable
 
 		rightList layout.List
 		radioBtns widget.Enum
@@ -28,7 +30,7 @@ type (
 
 	checkBox struct {
 		name string
-		box  widget.Bool
+		widget.Bool
 	}
 )
 
@@ -42,10 +44,16 @@ func (cds *ColDisplaySearch) Layout(gtx C, th *material.Theme) D {
 		for i := range cds.checkboxes {
 			cds.checkboxes[i] = checkBox{
 				name: table.ColNames[i],
-				box:  widget.Bool{Value: table.ColState[table.ColNames[i]]},
+				Bool: widget.Bool{Value: table.ColState[table.ColNames[i]]},
 			}
 		}
 		cds.loaded = true
+	}
+
+	txtSize := th.TextSize.Scale(12.0 / 15.0)
+	btnInset := layout.Inset{
+		Top: unit.Dp(5), Bottom: unit.Dp(5),
+		Left: unit.Dp(6), Right: unit.Dp(6),
 	}
 
 	return layout.Flex{WeightSum: 2}.Layout(gtx,
@@ -54,16 +62,77 @@ func (cds *ColDisplaySearch) Layout(gtx C, th *material.Theme) D {
 			return layout.Flex{Axis: layout.Vertical}.Layout(gtx,
 				layout.Rigid(func(gtx C) D {
 					return layout.Inset{Bottom: unit.Dp(10)}.Layout(gtx,
-						material.Body2(th, fmt.Sprintf("Columns (%d/%d)", cds.getCheckedColumns(), len(table.ColState))).Layout)
+						material.Body2(th, fmt.Sprintf("Columns (%d/%d)", cds.getCheckedColumns(), len(table.ColState)-1)).Layout)
+				}),
+
+				layout.Rigid(func(gtx C) D {
+					return layout.Inset{Top: unit.Dp(5), Bottom: unit.Dp(7.5)}.Layout(gtx, func(gtx C) D {
+						switch {
+
+						// check all unchecked checkboxes
+						case cds.selectAllBoxes.Clicked():
+							for i := range cds.checkboxes {
+								if !cds.checkboxes[i].Value {
+									cds.checkboxes[i].Value = true
+									table.ColState[cds.checkboxes[i].name] = cds.checkboxes[i].Value
+								}
+							}
+							op.InvalidateOp{}.Add(gtx.Ops)
+
+						// uncheck all checkboxes, except "Capitals" checkbox
+						case cds.deselectAllBoxes.Clicked():
+							for i := range cds.checkboxes {
+								if cds.checkboxes[i].name == table.CAPITALS {
+									cds.checkboxes[i].Value = true
+								} else {
+									cds.checkboxes[i].Value = false
+								}
+								table.ColState[cds.checkboxes[i].name] = cds.checkboxes[i].Value
+							}
+							op.InvalidateOp{}.Add(gtx.Ops)
+						}
+						return layout.Flex{}.Layout(gtx,
+							layout.Rigid(func(gtx C) D {
+								var btn material.ButtonStyle
+								btn = material.Button(th, &cds.selectAllBoxes, "Select All")
+								btn.TextSize = txtSize
+								btn.Inset = btnInset
+								btn.Background = globals.Colours[colours.LIGHT_SEA_GREEN]
+
+								if len(table.ColState)-1 == cds.getCheckedColumns() {
+									gtx.Queue = nil
+								}
+								return btn.Layout(gtx)
+							}),
+							globals.SpacerX,
+							layout.Rigid(func(gtx C) D {
+								var btn material.ButtonStyle
+								btn = material.Button(th, &cds.deselectAllBoxes, "Deselect All")
+								btn.TextSize = txtSize
+								btn.Inset = btnInset
+								btn.Background = globals.Colours[colours.FLAME_RED]
+
+								if cds.getCheckedColumns() == 1 {
+									gtx.Queue = nil
+								}
+								return btn.Layout(gtx)
+							}),
+						)
+					})
 				}),
 
 				layout.Rigid(func(gtx C) D {
 					return cds.leftList.Layout(gtx, len(table.ColNames), func(gtx C, i int) D {
 						var cb material.CheckBoxStyle
-						cb = material.CheckBox(th, &cds.checkboxes[i].box, cds.checkboxes[i].name)
+						cb = material.CheckBox(th, &cds.checkboxes[i].Bool, cds.checkboxes[i].name)
 						cb.Size = unit.Dp(18)
-						cb.TextSize = th.TextSize.Scale(12.0 / 15.0)
+						cb.TextSize = txtSize
 						cb.IconColor = globals.Colours[colours.LIGHT_SEA_GREEN]
+
+						// invalidate in case it's the last marked box, so there is at least one column displayed
+						if cds.getCheckedColumns() == 1 && cds.checkboxes[i].Value {
+							gtx.Queue = nil
+						}
 
 						if cb.CheckBox.Changed() {
 							table.ColState[cds.checkboxes[i].name] = cb.CheckBox.Value

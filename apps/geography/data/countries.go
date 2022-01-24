@@ -124,17 +124,6 @@ func GetSelectedCount() int {
 	return count
 }
 
-// GetDisplayedCount - returns the number of displayed countries as rows or cards
-func GetDisplayedCount() int {
-	count := 0
-	for i := range Cached {
-		if Cached[i].IsSearchedFor && Cached[i].IsActiveContinent {
-			count++
-		}
-	}
-	return count
-}
-
 // ProcessFlagFromUrl - decode image directly from url  (very slow)
 func downloadFlagFromUrl(url string) ([]byte, error) {
 	resp, e := http.Get(url)

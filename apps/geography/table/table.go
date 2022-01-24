@@ -85,14 +85,14 @@ func (t *Table) Layout(gtx C, th *material.Theme) D {
 				// the sticky Country Name column, which can be scrolled on the cross axis
 				func(gtx C) D {
 					return layout.Flex{Axis: layout.Vertical}.Layout(gtx,
-						// Lay Blank Area
+						// lay "Country" and count of displayed countries
 						layout.Rigid(func(gtx C) D {
 							return t.headerList.Layout(gtx, 1, func(gtx C, i int) D {
 								return t.rows[i].LayNameColumn(gtx, th, true)
 							})
 						}),
 
-						// Lay Country Name (Common)
+						// lay Country Name (Common)
 						layout.Rigid(func(gtx C) D {
 							return material.List(th, &t.rowList).Layout(gtx, len(data.Cached), func(gtx C, i int) D {
 								var dims D

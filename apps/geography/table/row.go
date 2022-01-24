@@ -162,12 +162,12 @@ func (r *Row) parseCellContent(headCell string, content interface{}) string {
 		}
 
 	case reflect.Map:
-		kvPair := reflect.ValueOf(content).MapKeys()
+		kvPair := reflect.ValueOf(content)
 		switch headCell {
 		case LANGUAGES:
 			parsed := make([]string, 0, len(r.Languages))
-			for _, el := range kvPair {
-				parsed = append(parsed, el.String())
+			for _, el := range kvPair.MapKeys() {
+				parsed = append(parsed, kvPair.MapIndex(el).String())
 			}
 			sort.Strings(parsed)
 			if len(parsed) <= 5 {
@@ -269,7 +269,7 @@ func (r *Row) LayNameColumn(gtx C, th *material.Theme, isHeader bool) D {
 						r.headerSizeY = gtx.Constraints.Min.Y
 						return globals.ColoredArea(gtx, image.Pt(gtx.Constraints.Max.X, gtx.Constraints.Min.Y), globals.Colours[colours.ELECTRIC_BLUE])
 					}),
-					layout.Stacked(material.Body1(th, fmt.Sprintf("Country (%d)", data.GetDisplayedCount())).Layout))
+					layout.Stacked(material.Body1(th, fmt.Sprintf("Country (%d)", GetDisplayedCount())).Layout))
 			})
 		} else {
 			return material.Clickable(gtx, &r.btn, func(gtx C) D {
@@ -299,4 +299,15 @@ func (r *Row) LayNameColumn(gtx C, th *material.Theme, isHeader bool) D {
 			})
 		}
 	})
+}
+
+// GetDisplayedCount - returns the number of displayed countries as rows or cards
+func GetDisplayedCount() int {
+	count := 0
+	for i := range data.Cached {
+		if data.Cached[i].IsSearchedFor && data.Cached[i].IsActiveContinent {
+			count++
+		}
+	}
+	return count
 }
