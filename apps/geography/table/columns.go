@@ -30,7 +30,7 @@ const (
 )
 
 var (
-	// SearchBy - used to search countries and defaults to Country.Name.Common
+	// SearchBy - used as widget.Bool Value to search countries by a column headcell, and defaults to Country.Name.Common
 	SearchBy = NAME
 
 	// ColNames - the current columns used to display data (NAME is included by default as sticky column)

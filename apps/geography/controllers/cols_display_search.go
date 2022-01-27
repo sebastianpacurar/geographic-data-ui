@@ -88,6 +88,13 @@ func (cds *ColDisplaySearch) Layout(gtx C, th *material.Theme) D {
 									cds.checkboxes[i].Value = false
 								}
 								table.ColState[cds.checkboxes[i].name] = cds.checkboxes[i].Value
+
+								// ignore if radioBtn Value is CAPITALS, since CAPITALS is the last default checked(true) checkbox
+								if table.SearchBy != table.CAPITALS {
+									// in case the column is unchecked, and the relative radioBtn Value is true, default it to NAME column
+									table.SearchBy = table.NAME
+									cds.radioBtns.Value = table.NAME
+								}
 							}
 							op.InvalidateOp{}.Add(gtx.Ops)
 						}
@@ -165,7 +172,14 @@ func (cds *ColDisplaySearch) Layout(gtx C, th *material.Theme) D {
 						rbtn.TextSize = th.TextSize.Scale(12.0 / 15.0)
 						rbtn.IconColor = globals.Colours[colours.LIGHT_SEA_GREEN]
 
+						// if the current column is unchecked then disable its radioBtn UI
 						if !table.ColState[table.SearchByCols[i]] {
+							// in case the column is unchecked, and the relative radioBtn Value is true, default it to NAME column
+							if cds.radioBtns.Value == table.SearchByCols[i] {
+								table.SearchBy = table.NAME
+								cds.radioBtns.Value = table.NAME
+								op.InvalidateOp{}.Add(gtx.Ops)
+							}
 							rbtn.Color = globals.Colours[colours.FLAME_RED]
 							gtx.Queue = nil
 						}
