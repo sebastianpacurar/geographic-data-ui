@@ -28,7 +28,7 @@ type (
 
 func (gr *Grid) Layout(gtx C, th *material.Theme) D {
 	if !gr.loaded {
-		gr.wrap.Alignment = layout.End
+		gr.wrap.Alignment = layout.Middle
 		gr.list.Axis = layout.Vertical
 		gr.list.Alignment = layout.Middle
 
@@ -51,38 +51,41 @@ func (gr *Grid) Layout(gtx C, th *material.Theme) D {
 	}
 
 	return material.List(th, &gr.list).Layout(gtx, 1, func(gtx C, _ int) D {
-		return gr.wrap.Layout(gtx, len(data.Cached), func(gtx C, i int) D {
-			var content D
+		return layout.Flex{Spacing: layout.SpaceSides}.Layout(gtx,
+			layout.Flexed(1, func(gtx C) D {
+				return gr.wrap.Layout(gtx, len(data.Cached), func(gtx C, i int) D {
+					var content D
 
-			// copy only this specific card
-			if gr.cards[i].copyToClipBtn.Clicked() {
-				res, _ := json.MarshalIndent(data.Cached[i], "", "\t")
-				clipboard.WriteOp{
-					Text: string(res),
-				}.Add(gtx.Ops)
-				globals.ClipBoardVal = string(res)
-			}
+					// copy only this specific card
+					if gr.cards[i].copyToClipBtn.Clicked() {
+						res, _ := json.MarshalIndent(data.Cached[i], "", "\t")
+						clipboard.WriteOp{
+							Text: string(res),
+						}.Add(gtx.Ops)
+						globals.ClipBoardVal = string(res)
+					}
 
-			if gr.cards[i].btn.Clicked() {
-				gr.Contextual = data.Cached[i] // interface to assert type when enabling ContextualAppBar
-				data.Cached[i].IsCtxtActive = true
-				op.InvalidateOp{}.Add(gtx.Ops)
-			}
+					if gr.cards[i].btn.Clicked() {
+						gr.Contextual = data.Cached[i] // interface to assert type when enabling ContextualAppBar
+						data.Cached[i].IsCtxtActive = true
+						op.InvalidateOp{}.Add(gtx.Ops)
+					}
 
-			if gr.cards[i].selectBtn.Clicked() {
-				data.Cached[i].Selected = true
-				op.InvalidateOp{}.Add(gtx.Ops)
-			} else if gr.cards[i].deselectBtn.Clicked() {
-				data.Cached[i].Selected = false
-				op.InvalidateOp{}.Add(gtx.Ops)
-			}
+					if gr.cards[i].selectBtn.Clicked() {
+						data.Cached[i].Selected = true
+						op.InvalidateOp{}.Add(gtx.Ops)
+					} else if gr.cards[i].deselectBtn.Clicked() {
+						data.Cached[i].Selected = false
+						op.InvalidateOp{}.Add(gtx.Ops)
+					}
 
-			if gr.cards[i].IsSearchedFor && gr.cards[i].IsActiveContinent {
-				content = layout.UniformInset(unit.Dp(15)).Layout(gtx, func(gtx C) D {
-					return gr.cards[i].LayCard(gtx, th)
+					if gr.cards[i].IsSearchedFor && gr.cards[i].IsActiveContinent {
+						content = layout.UniformInset(unit.Dp(15)).Layout(gtx, func(gtx C) D {
+							return gr.cards[i].LayCard(gtx, th)
+						})
+					}
+					return content
 				})
-			}
-			return content
-		})
+			}))
 	})
 }

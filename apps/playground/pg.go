@@ -2,7 +2,7 @@ package playground
 
 import (
 	"gioui-experiment/apps"
-	"gioui-experiment/apps/playground/data"
+	"gioui-experiment/apps/playground/tabs"
 	"gioui-experiment/globals"
 	"gioui-experiment/themes/colours"
 	"gioui.org/font/gofont"
@@ -14,7 +14,6 @@ import (
 	"gioui.org/x/component"
 	"image"
 	"image/color"
-	"strconv"
 )
 
 type (
@@ -28,6 +27,9 @@ type (
 
 		DisableCPBtn widget.Clickable
 		isCPDisabled bool
+
+		counterApp tabs.CounterTab
+		drawApp    tabs.DrawTab
 
 		Tabs
 	}
@@ -176,53 +178,21 @@ func (app *Application) initApps() {
 	if len(app.TabsList) == 0 {
 		app.TabsList = []Tab{
 
-			// Counters app
-			{
-				Name:       "Counters",
-				IsSelected: true,
-				Layout: func(gtx C, th *material.Theme) D {
-					pgv := data.PgVals
-
-					//TODO find a better way and location to handle the Cache population
-					if len(pgv.Cache[data.PRIMES]) == 0 {
-						pgv.GenPrimes(data.PLIMIT)
-					}
-					if len(pgv.Cache[data.FIBS]) == 0 {
-						pgv.GenFibs(data.FLIMIT)
-					}
-					seq := pgv.GetActiveSequence()
-
-					/// DISPLAYED NUMBER
-					return layout.UniformInset(unit.Dp(20)).Layout(gtx, func(gtx C) D {
-						var val string
-						switch seq {
-						case data.PRIMES:
-							val = strconv.FormatUint(pgv.Cache[seq][pgv.Primes.Index], 10)
-						case data.FIBS:
-							val = strconv.FormatUint(pgv.Cache[seq][pgv.Fibonacci.Index], 10)
-						case data.NATURALS:
-							val = strconv.FormatUint(pgv.Naturals.Displayed, 10)
-						case data.INTEGERS:
-							val = strconv.FormatUint(pgv.Integers.Displayed, 10)
-						}
-						return material.H5(th, val).Layout(gtx)
-					})
-				},
-			},
-
 			// Draw app
 			{
 				Name:       "Draw",
+				IsSelected: true,
+				Layout: func(gtx C, th *material.Theme) D {
+					return app.drawApp.Layout(gtx, th)
+				},
+			},
+
+			// Counters app
+			{
+				Name:       "Counters",
 				IsSelected: false,
 				Layout: func(gtx C, th *material.Theme) D {
-					return layout.Stack{}.Layout(gtx,
-						layout.Expanded(func(gtx C) D {
-							size := image.Pt(gtx.Constraints.Max.X, gtx.Constraints.Max.Y)
-							return globals.RColoredArea(gtx, size, 10, globals.Colours[colours.WHITE])
-						}),
-						layout.Stacked(func(gtx C) D {
-							return D{}
-						}))
+					return app.counterApp.Layout(gtx, th)
 				},
 			},
 		}

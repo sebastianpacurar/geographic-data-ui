@@ -56,11 +56,12 @@ type (
 		headerSizeY int
 		loaded      bool
 
-		Columns []cell
+		columns []cell
 	}
 
 	cell struct {
-		HeadCell string
+		headCell string
+		position int
 		sizeX    int
 		content  interface{}
 	}
@@ -68,35 +69,43 @@ type (
 
 // generateColumns - holds the state of every column cell of every Row
 func (r *Row) generateColumns() {
-	r.Columns = make([]cell, 0, len(ColNames))
-	for range ColNames {
-		r.Columns = append(r.Columns,
-			cell{HeadCell: OFFICIAL_NAME, content: r.OfficialName, sizeX: 550},
-			cell{HeadCell: CAPITALS, content: r.Capitals, sizeX: 250},
-			cell{HeadCell: REGION, content: r.Region, sizeX: 175},
-			cell{HeadCell: SUBREGION, content: r.Subregion, sizeX: 225},
-			cell{HeadCell: CONTINENTS, content: r.Continents, sizeX: 175},
-			cell{HeadCell: LANGUAGES, content: r.Languages, sizeX: 650},
-			cell{HeadCell: IDD_ROOT, content: r.IddRoot, sizeX: 165},
-			cell{HeadCell: IDD_SUFFIXES, content: r.IddSuffixes, sizeX: 200},
-			cell{HeadCell: TOP_LEVEL_DOMAINS, content: r.TopLevelDomains, sizeX: 200},
-			cell{HeadCell: INDEPENDENT, content: r.Independent, sizeX: 180},
-			cell{HeadCell: STATUS, content: r.Status, sizeX: 175},
-			cell{HeadCell: UNITED_NATIONS_MEMBER, content: r.UNMember, sizeX: 200},
-			cell{HeadCell: LANDLOCKED, content: r.Landlocked, sizeX: 180},
-			cell{HeadCell: CCA2, content: r.Cca2, sizeX: 85},
-			cell{HeadCell: CCA3, content: r.Cca3, sizeX: 85},
-			cell{HeadCell: CCN3, content: r.Ccn3, sizeX: 85},
-			cell{HeadCell: CIOC, content: r.Cioc, sizeX: 95},
-			cell{HeadCell: FIFA, content: r.Fifa, sizeX: 95},
-			cell{HeadCell: AREA, content: r.Area, sizeX: 125},
-			cell{HeadCell: POPULATION, content: r.Population, sizeX: 150},
-			cell{HeadCell: LATITUDE, content: r.Latitude, sizeX: 150},
-			cell{HeadCell: LONGITUDE, content: r.Longitude, sizeX: 150},
-			cell{HeadCell: START_OF_WEEK, content: r.StartOfWeek, sizeX: 150},
-			cell{HeadCell: CAR_SIGNS, content: r.CarSigns, sizeX: 150},
-			cell{HeadCell: CAR_SIDE, content: r.CarSide, sizeX: 100})
+	r.columns = make([]cell, 0, len(ColNames))
+	if len(r.columns) == 0 {
+		for i := range ColNames {
+			r.columns = append(r.columns,
+				cell{headCell: OFFICIAL_NAME, position: i, content: r.OfficialName, sizeX: 550},
+				cell{headCell: CAPITALS, position: i, content: r.Capitals, sizeX: 250},
+				cell{headCell: REGION, position: i, content: r.Region, sizeX: 175},
+				cell{headCell: SUBREGION, position: i, content: r.Subregion, sizeX: 225},
+				cell{headCell: CONTINENTS, position: i, content: r.Continents, sizeX: 175},
+				cell{headCell: LANGUAGES, position: i, content: r.Languages, sizeX: 650},
+				cell{headCell: IDD_ROOT, position: i, content: r.IddRoot, sizeX: 165},
+				cell{headCell: IDD_SUFFIXES, position: i, content: r.IddSuffixes, sizeX: 200},
+				cell{headCell: TOP_LEVEL_DOMAINS, position: i, content: r.TopLevelDomains, sizeX: 200},
+				cell{headCell: INDEPENDENT, position: i, content: r.Independent, sizeX: 180},
+				cell{headCell: STATUS, position: i, content: r.Status, sizeX: 175},
+				cell{headCell: UNITED_NATIONS_MEMBER, position: i, content: r.UNMember, sizeX: 200},
+				cell{headCell: LANDLOCKED, position: i, content: r.Landlocked, sizeX: 180},
+				cell{headCell: CCA2, position: i, content: r.Cca2, sizeX: 85},
+				cell{headCell: CCA3, position: i, content: r.Cca3, sizeX: 85},
+				cell{headCell: CCN3, position: i, content: r.Ccn3, sizeX: 85},
+				cell{headCell: CIOC, position: i, content: r.Cioc, sizeX: 95},
+				cell{headCell: FIFA, position: i, content: r.Fifa, sizeX: 95},
+				cell{headCell: AREA, position: i, content: r.Area, sizeX: 125},
+				cell{headCell: POPULATION, position: i, content: r.Population, sizeX: 150},
+				cell{headCell: LATITUDE, position: i, content: r.Latitude, sizeX: 150},
+				cell{headCell: LONGITUDE, position: i, content: r.Longitude, sizeX: 150},
+				cell{headCell: START_OF_WEEK, position: i, content: r.StartOfWeek, sizeX: 150},
+				cell{headCell: CAR_SIGNS, position: i, content: r.CarSigns, sizeX: 150},
+				cell{headCell: CAR_SIDE, position: i, content: r.CarSide, sizeX: 100})
+		}
 	}
+}
+
+func (r *Row) sortColsBasedOnPos() {
+	sort.Slice(r.columns, func(i, j int) bool {
+		return r.columns[i].position < r.columns[j].position
+	})
 }
 
 // parseCellContent - stringify the content country cell data
@@ -217,12 +226,12 @@ func (r *Row) LayRow(gtx C, th *material.Theme, isHeader bool) D {
 				}
 				return r.colList.Layout(gtx, len(ColNames), func(gtx C, i int) D {
 					var dim D
-					if ColState[r.Columns[i].HeadCell] {
+					if ColState[r.columns[i].headCell] {
 						dim = layout.Stack{Alignment: layout.Center}.Layout(gtx,
 							layout.Expanded(func(gtx C) D {
-								return globals.ColoredArea(gtx, image.Pt(gtx.Px(unit.Dp(float32(r.Columns[i].sizeX))), r.sizeY), rowColor)
+								return globals.ColoredArea(gtx, image.Pt(gtx.Px(unit.Dp(float32(r.columns[i].sizeX))), r.sizeY), rowColor)
 							}),
-							layout.Stacked(material.Body1(th, r.parseCellContent(r.Columns[i].HeadCell, r.Columns[i].content)).Layout))
+							layout.Stacked(material.Body1(th, r.parseCellContent(r.columns[i].headCell, r.columns[i].content)).Layout))
 					}
 					return dim
 				})
@@ -230,17 +239,17 @@ func (r *Row) LayRow(gtx C, th *material.Theme, isHeader bool) D {
 		} else {
 			return r.colList.Layout(gtx, len(ColNames), func(gtx C, i int) D {
 				var dim D
-				if ColState[r.Columns[i].HeadCell] {
-					if SearchBy == r.Columns[i].HeadCell {
+				if ColState[r.columns[i].headCell] {
+					if SearchBy == r.columns[i].headCell {
 						rowColor = globals.Colours[colours.LIGHT_YELLOW]
 					} else {
 						rowColor = globals.Colours[colours.LAVENDERBLUSH]
 					}
 					dim = layout.Stack{Alignment: layout.Center}.Layout(gtx,
 						layout.Expanded(func(gtx C) D {
-							return globals.ColoredArea(gtx, image.Pt(gtx.Px(unit.Dp(float32(r.Columns[i].sizeX))), r.headerSizeY), rowColor)
+							return globals.ColoredArea(gtx, image.Pt(gtx.Px(unit.Dp(float32(r.columns[i].sizeX))), r.headerSizeY), rowColor)
 						}),
-						layout.Stacked(material.Body1(th, r.Columns[i].HeadCell).Layout))
+						layout.Stacked(material.Body1(th, r.columns[i].headCell).Layout))
 				}
 				return dim
 			})
@@ -262,14 +271,18 @@ func (r *Row) LayNameColumn(gtx C, th *material.Theme, isHeader bool) D {
 			var btn widget.Clickable
 			return material.Clickable(gtx, &btn, func(gtx C) D {
 				gtx.Queue = nil
-				return layout.Stack{}.Layout(gtx,
+				return layout.Stack{Alignment: layout.W}.Layout(gtx,
 					layout.Expanded(func(gtx C) D {
 
 						// maintain header row at the same size on cross-axis, no matter the resize boundaries
-						r.headerSizeY = gtx.Constraints.Min.Y
-						return globals.ColoredArea(gtx, image.Pt(gtx.Constraints.Max.X, gtx.Constraints.Min.Y), globals.Colours[colours.ELECTRIC_BLUE])
+						r.headerSizeY = gtx.Constraints.Min.Y + gtx.Px(unit.Dp(float32(25)))
+						return globals.ColoredArea(gtx, image.Pt(gtx.Constraints.Max.X, r.headerSizeY), globals.Colours[colours.ELECTRIC_BLUE])
 					}),
-					layout.Stacked(material.Body1(th, fmt.Sprintf("Country (%d)", GetDisplayedCount())).Layout))
+					layout.Stacked(func(gtx C) D {
+						return layout.Inset{Left: unit.Dp(5)}.Layout(gtx, func(gtx C) D {
+							return material.Body1(th, fmt.Sprintf("Countries (%d)", GetDisplayedCount())).Layout(gtx)
+						})
+					}))
 			})
 		} else {
 			return material.Clickable(gtx, &r.btn, func(gtx C) D {
@@ -286,15 +299,17 @@ func (r *Row) LayNameColumn(gtx C, th *material.Theme, isHeader bool) D {
 						cellColor = globals.Colours[colours.NYANZA]
 					}
 				}
-				return layout.Stack{}.Layout(gtx,
+				return layout.Stack{Alignment: layout.W}.Layout(gtx,
 					layout.Expanded(func(gtx C) D {
 
 						// resize entire row based on sticky column cross-axis row size
-						r.sizeY = gtx.Constraints.Min.Y
-						return globals.ColoredArea(gtx, image.Pt(gtx.Constraints.Max.X, gtx.Constraints.Min.Y), cellColor)
+						r.sizeY = gtx.Constraints.Min.Y + gtx.Px(unit.Dp(float32(20)))
+						return globals.ColoredArea(gtx, image.Pt(gtx.Constraints.Max.X, r.sizeY), cellColor)
 					}),
 					layout.Stacked(func(gtx C) D {
-						return material.Body1(th, r.Name).Layout(gtx)
+						return layout.Inset{Left: unit.Dp(5)}.Layout(gtx, func(gtx C) D {
+							return material.Body1(th, r.Name).Layout(gtx)
+						})
 					}))
 			})
 		}
