@@ -289,6 +289,11 @@ func (app *Application) LayoutView(gtx C, th *material.Theme) D {
 					return layout.Inset{Bottom: unit.Dp(15)}.Layout(gtx, func(gtx C) D {
 						return layout.Flex{}.Layout(gtx,
 							layout.Rigid(func(gtx C) D {
+								return layout.Inset{Top: unit.Dp(10)}.Layout(gtx, func(gtx C) D {
+									return material.Body2(th, "Continents: ").Layout(gtx)
+								})
+							}),
+							layout.Rigid(func(gtx C) D {
 								return app.ContinentsList.Layout(gtx, len(app.AllContinents), func(gtx C, i int) D {
 									var (
 										dim D

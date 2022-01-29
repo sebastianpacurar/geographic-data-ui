@@ -62,7 +62,7 @@ func (cds *ColDisplaySearch) Layout(gtx C, th *material.Theme) D {
 			return layout.Flex{Axis: layout.Vertical}.Layout(gtx,
 				layout.Rigid(func(gtx C) D {
 					return layout.Inset{Bottom: unit.Dp(10)}.Layout(gtx,
-						material.Body2(th, fmt.Sprintf("Columns (%d/%d)", cds.getCheckedColumns(), len(table.ColState)-1)).Layout)
+						material.Body2(th, fmt.Sprintf("Columns (%d/%d)", getCheckedColumns(), len(table.ColState)-1)).Layout)
 				}),
 
 				layout.Rigid(func(gtx C) D {
@@ -106,7 +106,7 @@ func (cds *ColDisplaySearch) Layout(gtx C, th *material.Theme) D {
 								btn.Inset = btnInset
 								btn.Background = globals.Colours[colours.LIGHT_SEA_GREEN]
 
-								if len(table.ColState)-1 == cds.getCheckedColumns() {
+								if len(table.ColState)-1 == getCheckedColumns() {
 									gtx.Queue = nil
 								}
 								return btn.Layout(gtx)
@@ -119,7 +119,8 @@ func (cds *ColDisplaySearch) Layout(gtx C, th *material.Theme) D {
 								btn.Inset = btnInset
 								btn.Background = globals.Colours[colours.FLAME_RED]
 
-								if cds.getCheckedColumns() == 1 {
+								// disable if there is one checked box in the list (prevents having all columns hidden)
+								if getCheckedColumns() == 1 {
 									gtx.Queue = nil
 								}
 								return btn.Layout(gtx)
@@ -137,12 +138,13 @@ func (cds *ColDisplaySearch) Layout(gtx C, th *material.Theme) D {
 						cb.IconColor = globals.Colours[colours.LIGHT_SEA_GREEN]
 
 						// invalidate in case it's the last marked box, so there is at least one column displayed
-						if cds.getCheckedColumns() == 1 && cds.checkboxes[i].Value {
+						if getCheckedColumns() == 1 && cds.checkboxes[i].Value {
 							gtx.Queue = nil
 						}
 
 						if cb.CheckBox.Changed() {
 							table.ColState[cds.checkboxes[i].name] = cb.CheckBox.Value
+							//reorderColumns()
 							op.InvalidateOp{}.Add(gtx.Ops)
 						}
 						return cb.Layout(gtx)
@@ -192,8 +194,25 @@ func (cds *ColDisplaySearch) Layout(gtx C, th *material.Theme) D {
 	)
 }
 
+//func reorderColumns() {
+//	if table.SearchBy != table.NAME {
+//		currVal := table.ColPos[table.SearchBy]
+//
+//		table.ColPos[table.SearchBy] = 0
+//		for k, v := range table.ColPos {
+//			if k != table.SearchBy {
+//				if v < currVal {
+//					table.ColPos[k] += 1
+//				} else {
+//					break
+//				}
+//			}
+//		}
+//	}
+//}
+
 // getCheckedColumns - returns the count of the displayed checked columns
-func (cds *ColDisplaySearch) getCheckedColumns() int {
+func getCheckedColumns() int {
 	count := 0
 	for _, v := range table.ColState {
 		if v {

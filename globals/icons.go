@@ -34,3 +34,8 @@ var PinIcon = func() *widget.Icon {
 	icon, _ := widget.NewIcon(icons.MapsPinDrop)
 	return icon
 }()
+
+var VisibilityIcon = func() *widget.Icon {
+	icon, _ := widget.NewIcon(icons.ActionVisibility)
+	return icon
+}()

@@ -6,6 +6,7 @@ import (
 	"gioui-experiment/globals"
 	"gioui-experiment/themes/colours"
 	"gioui.org/layout"
+	"gioui.org/text"
 	"gioui.org/unit"
 	"gioui.org/widget"
 	"gioui.org/widget/material"
@@ -20,12 +21,10 @@ import (
 type (
 	Row struct {
 		Name            string
-		OfficialName    string
 		Capitals        []string
 		Region          string
 		Subregion       string
 		Continents      []string
-		Languages       map[string]string
 		IddRoot         string
 		IddSuffixes     []string
 		TopLevelDomains []string
@@ -45,6 +44,8 @@ type (
 		StartOfWeek     string
 		CarSigns        []string
 		CarSide         string
+		OfficialName    string
+		Languages       map[string]string
 
 		IsSearchedFor     bool
 		IsActiveContinent bool
@@ -61,7 +62,6 @@ type (
 
 	cell struct {
 		headCell string
-		position int
 		sizeX    int
 		content  interface{}
 	}
@@ -70,42 +70,34 @@ type (
 // generateColumns - holds the state of every column cell of every Row
 func (r *Row) generateColumns() {
 	r.columns = make([]cell, 0, len(ColNames))
-	if len(r.columns) == 0 {
-		for i := range ColNames {
-			r.columns = append(r.columns,
-				cell{headCell: OFFICIAL_NAME, position: i, content: r.OfficialName, sizeX: 550},
-				cell{headCell: CAPITALS, position: i, content: r.Capitals, sizeX: 250},
-				cell{headCell: REGION, position: i, content: r.Region, sizeX: 175},
-				cell{headCell: SUBREGION, position: i, content: r.Subregion, sizeX: 225},
-				cell{headCell: CONTINENTS, position: i, content: r.Continents, sizeX: 175},
-				cell{headCell: LANGUAGES, position: i, content: r.Languages, sizeX: 650},
-				cell{headCell: IDD_ROOT, position: i, content: r.IddRoot, sizeX: 165},
-				cell{headCell: IDD_SUFFIXES, position: i, content: r.IddSuffixes, sizeX: 200},
-				cell{headCell: TOP_LEVEL_DOMAINS, position: i, content: r.TopLevelDomains, sizeX: 200},
-				cell{headCell: INDEPENDENT, position: i, content: r.Independent, sizeX: 180},
-				cell{headCell: STATUS, position: i, content: r.Status, sizeX: 175},
-				cell{headCell: UNITED_NATIONS_MEMBER, position: i, content: r.UNMember, sizeX: 200},
-				cell{headCell: LANDLOCKED, position: i, content: r.Landlocked, sizeX: 180},
-				cell{headCell: CCA2, position: i, content: r.Cca2, sizeX: 85},
-				cell{headCell: CCA3, position: i, content: r.Cca3, sizeX: 85},
-				cell{headCell: CCN3, position: i, content: r.Ccn3, sizeX: 85},
-				cell{headCell: CIOC, position: i, content: r.Cioc, sizeX: 95},
-				cell{headCell: FIFA, position: i, content: r.Fifa, sizeX: 95},
-				cell{headCell: AREA, position: i, content: r.Area, sizeX: 125},
-				cell{headCell: POPULATION, position: i, content: r.Population, sizeX: 150},
-				cell{headCell: LATITUDE, position: i, content: r.Latitude, sizeX: 150},
-				cell{headCell: LONGITUDE, position: i, content: r.Longitude, sizeX: 150},
-				cell{headCell: START_OF_WEEK, position: i, content: r.StartOfWeek, sizeX: 150},
-				cell{headCell: CAR_SIGNS, position: i, content: r.CarSigns, sizeX: 150},
-				cell{headCell: CAR_SIDE, position: i, content: r.CarSide, sizeX: 100})
-		}
+	for range ColNames {
+		r.columns = append(r.columns,
+			cell{headCell: CAPITALS, content: r.Capitals, sizeX: 265},
+			cell{headCell: REGION, content: r.Region, sizeX: 175},
+			cell{headCell: SUBREGION, content: r.Subregion, sizeX: 225},
+			cell{headCell: CONTINENTS, content: r.Continents, sizeX: 175},
+			cell{headCell: IDD_ROOT, content: r.IddRoot, sizeX: 165},
+			cell{headCell: IDD_SUFFIXES, content: r.IddSuffixes, sizeX: 200},
+			cell{headCell: TOP_LEVEL_DOMAINS, content: r.TopLevelDomains, sizeX: 200},
+			cell{headCell: INDEPENDENT, content: r.Independent, sizeX: 150},
+			cell{headCell: STATUS, content: r.Status, sizeX: 175},
+			cell{headCell: UNITED_NATIONS_MEMBER, content: r.UNMember, sizeX: 150},
+			cell{headCell: LANDLOCKED, content: r.Landlocked, sizeX: 180},
+			cell{headCell: CCA2, content: r.Cca2, sizeX: 85},
+			cell{headCell: CCA3, content: r.Cca3, sizeX: 85},
+			cell{headCell: CCN3, content: r.Ccn3, sizeX: 85},
+			cell{headCell: CIOC, content: r.Cioc, sizeX: 95},
+			cell{headCell: FIFA, content: r.Fifa, sizeX: 95},
+			cell{headCell: AREA, content: r.Area, sizeX: 125},
+			cell{headCell: POPULATION, content: r.Population, sizeX: 150},
+			cell{headCell: LATITUDE, content: r.Latitude, sizeX: 150},
+			cell{headCell: LONGITUDE, content: r.Longitude, sizeX: 150},
+			cell{headCell: START_OF_WEEK, content: r.StartOfWeek, sizeX: 150},
+			cell{headCell: CAR_SIGNS, content: r.CarSigns, sizeX: 150},
+			cell{headCell: CAR_SIDE, content: r.CarSide, sizeX: 100},
+			cell{headCell: OFFICIAL_NAME, content: r.OfficialName, sizeX: 600},
+			cell{headCell: LANGUAGES, content: r.Languages, sizeX: 650})
 	}
-}
-
-func (r *Row) sortColsBasedOnPos() {
-	sort.Slice(r.columns, func(i, j int) bool {
-		return r.columns[i].position < r.columns[j].position
-	})
 }
 
 // parseCellContent - stringify the content country cell data
@@ -174,18 +166,22 @@ func (r *Row) parseCellContent(headCell string, content interface{}) string {
 		kvPair := reflect.ValueOf(content)
 		switch headCell {
 		case LANGUAGES:
-			parsed := make([]string, 0, len(r.Languages))
-			for _, el := range kvPair.MapKeys() {
-				parsed = append(parsed, kvPair.MapIndex(el).String())
-			}
-			sort.Strings(parsed)
-			if len(parsed) <= 5 {
-				res = strings.Join(parsed, ", ")
+			if r.Name == "Antarctica" {
+				res = "-"
 			} else {
+				parsed := make([]string, 0, len(r.Languages))
+				for _, el := range kvPair.MapKeys() {
+					parsed = append(parsed, kvPair.MapIndex(el).String())
+				}
+				sort.Strings(parsed)
+				if len(parsed) <= 5 {
+					res = strings.Join(parsed, ", ")
+				} else {
 
-				// first 5 + (all - 5) more
-				res = strings.Join(parsed[:5], ", ")
-				res += fmt.Sprintf(" + %d more", len(parsed[5:]))
+					// first 5 + (all - 5) more
+					res = strings.Join(parsed[:5], ", ")
+					res += fmt.Sprintf(" + %d more", len(parsed[5:]))
+				}
 			}
 		}
 	}
@@ -195,10 +191,10 @@ func (r *Row) parseCellContent(headCell string, content interface{}) string {
 // LayRow - Lay the row with all column cells parsed
 func (r *Row) LayRow(gtx C, th *material.Theme, isHeader bool) D {
 	rowColor := globals.Colours[colours.ANTIQUE_WHITE]
+	r.generateColumns()
 
 	if !r.loaded {
 		r.colList.Alignment = layout.Middle
-		r.generateColumns()
 		r.loaded = true
 	}
 
@@ -231,7 +227,19 @@ func (r *Row) LayRow(gtx C, th *material.Theme, isHeader bool) D {
 							layout.Expanded(func(gtx C) D {
 								return globals.ColoredArea(gtx, image.Pt(gtx.Px(unit.Dp(float32(r.columns[i].sizeX))), r.sizeY), rowColor)
 							}),
-							layout.Stacked(material.Body1(th, r.parseCellContent(r.columns[i].headCell, r.columns[i].content)).Layout))
+							layout.Stacked(func(gtx C) D {
+								var txt material.LabelStyle
+								txt = material.Body1(th, r.parseCellContent(r.columns[i].headCell, r.columns[i].content))
+								txt.Font.Variant = "Mono"
+								txt.TextSize = th.TextSize.Scale(14.0 / 16.0)
+
+								// if part of the searched column, use italic semi-bold
+								if SearchBy == r.columns[i].headCell {
+									txt.Font.Style = text.Italic
+									txt.Font.Weight = text.SemiBold
+								}
+								return txt.Layout(gtx)
+							}))
 					}
 					return dim
 				})
@@ -249,7 +257,13 @@ func (r *Row) LayRow(gtx C, th *material.Theme, isHeader bool) D {
 						layout.Expanded(func(gtx C) D {
 							return globals.ColoredArea(gtx, image.Pt(gtx.Px(unit.Dp(float32(r.columns[i].sizeX))), r.headerSizeY), rowColor)
 						}),
-						layout.Stacked(material.Body1(th, r.columns[i].headCell).Layout))
+						layout.Stacked(func(gtx C) D {
+							var txt material.LabelStyle
+							txt = material.Body1(th, r.columns[i].headCell)
+							txt.Font.Weight = text.Bold
+							txt.TextSize = th.TextSize.Scale(16.0 / 16.0)
+							return txt.Layout(gtx)
+						}))
 				}
 				return dim
 			})
@@ -271,24 +285,31 @@ func (r *Row) LayNameColumn(gtx C, th *material.Theme, isHeader bool) D {
 			var btn widget.Clickable
 			return material.Clickable(gtx, &btn, func(gtx C) D {
 				gtx.Queue = nil
+
 				return layout.Stack{Alignment: layout.W}.Layout(gtx,
 					layout.Expanded(func(gtx C) D {
+						rowColor := globals.Colours[colours.ELECTRIC_BLUE]
+						if SearchBy == "Name" {
+							rowColor = globals.Colours[colours.LIGHT_YELLOW]
+						}
 
 						// maintain header row at the same size on cross-axis, no matter the resize boundaries
 						r.headerSizeY = gtx.Constraints.Min.Y + gtx.Px(unit.Dp(float32(25)))
-						return globals.ColoredArea(gtx, image.Pt(gtx.Constraints.Max.X, r.headerSizeY), globals.Colours[colours.ELECTRIC_BLUE])
+						return globals.ColoredArea(gtx, image.Pt(gtx.Constraints.Max.X, r.headerSizeY), rowColor)
 					}),
 					layout.Stacked(func(gtx C) D {
 						return layout.Inset{Left: unit.Dp(5)}.Layout(gtx, func(gtx C) D {
-							return material.Body1(th, fmt.Sprintf("Countries (%d)", GetDisplayedCount())).Layout(gtx)
+							var txt material.LabelStyle
+							txt = material.Body1(th, fmt.Sprintf("Countries (%d)", GetDisplayedCount()))
+							txt.Font.Weight = text.Bold
+							txt.TextSize = th.TextSize.Scale(16.0 / 16.0)
+							return txt.Layout(gtx)
 						})
 					}))
 			})
 		} else {
 			return material.Clickable(gtx, &r.btn, func(gtx C) D {
-				if SearchBy == "Name" {
-					cellColor = globals.Colours[colours.LIGHT_YELLOW]
-				}
+				cellColor = globals.Colours[colours.CARD_COLOR]
 				if r.Selected {
 					cellColor = globals.Colours[colours.AERO_BLUE]
 				}
@@ -308,7 +329,17 @@ func (r *Row) LayNameColumn(gtx C, th *material.Theme, isHeader bool) D {
 					}),
 					layout.Stacked(func(gtx C) D {
 						return layout.Inset{Left: unit.Dp(5)}.Layout(gtx, func(gtx C) D {
-							return material.Body1(th, r.Name).Layout(gtx)
+							var txt material.LabelStyle
+							txt = material.Body1(th, r.Name)
+							txt.Font.Style = text.Regular
+							txt.Font.Weight = text.Bold
+							txt.TextSize = th.TextSize.Scale(14.0 / 16.0)
+
+							// if search by NAME is active (usually defaults to NAME), make text italic
+							if SearchBy == "Name" {
+								txt.Font.Style = text.Italic
+							}
+							return txt.Layout(gtx)
 						})
 					}))
 			})

@@ -39,7 +39,6 @@ func (t *Table) Layout(gtx C, th *material.Theme) D {
 		for i := range data.Cached {
 			t.rows = append(t.rows, Row{
 				Name:            data.Cached[i].Name.Common,
-				OfficialName:    data.Cached[i].Name.Official,
 				Capitals:        data.Cached[i].Capitals,
 				Region:          data.Cached[i].Region,
 				Subregion:       data.Cached[i].Subregion,
@@ -64,6 +63,7 @@ func (t *Table) Layout(gtx C, th *material.Theme) D {
 				StartOfWeek:     data.Cached[i].StartOfWeek,
 				CarSigns:        data.Cached[i].Car.Signs,
 				CarSide:         data.Cached[i].Car.Side,
+				OfficialName:    data.Cached[i].Name.Official,
 
 				IsSearchedFor:     data.Cached[i].IsSearchedFor,
 				IsActiveContinent: data.Cached[i].IsActiveContinent,
