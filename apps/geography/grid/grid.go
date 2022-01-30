@@ -80,7 +80,12 @@ func (gr *Grid) Layout(gtx C, th *material.Theme) D {
 					}
 
 					if gr.cards[i].IsSearchedFor && gr.cards[i].IsActiveContinent {
-						content = layout.UniformInset(unit.Dp(15)).Layout(gtx, func(gtx C) D {
+						content = layout.Inset{
+							Top:    unit.Dp(15),
+							Bottom: unit.Dp(15),
+							Left:   unit.Dp(25),
+							Right:  unit.Dp(25),
+						}.Layout(gtx, func(gtx C) D {
 							return gr.cards[i].LayCard(gtx, th)
 						})
 					}

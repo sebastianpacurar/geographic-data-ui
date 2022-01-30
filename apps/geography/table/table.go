@@ -42,7 +42,6 @@ func (t *Table) Layout(gtx C, th *material.Theme) D {
 				Capitals:        data.Cached[i].Capitals,
 				Region:          data.Cached[i].Region,
 				Subregion:       data.Cached[i].Subregion,
-				Languages:       data.Cached[i].Languages,
 				IddRoot:         data.Cached[i].Idd.Root,
 				IddSuffixes:     data.Cached[i].Idd.Suffixes,
 				TopLevelDomains: data.Cached[i].TopLevelDomain,
@@ -64,6 +63,7 @@ func (t *Table) Layout(gtx C, th *material.Theme) D {
 				CarSigns:        data.Cached[i].Car.Signs,
 				CarSide:         data.Cached[i].Car.Side,
 				OfficialName:    data.Cached[i].Name.Official,
+				Languages:       data.Cached[i].Languages,
 
 				IsSearchedFor:     data.Cached[i].IsSearchedFor,
 				IsActiveContinent: data.Cached[i].IsActiveContinent,

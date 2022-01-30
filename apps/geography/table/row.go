@@ -331,7 +331,6 @@ func (r *Row) LayNameColumn(gtx C, th *material.Theme, isHeader bool) D {
 						return layout.Inset{Left: unit.Dp(5)}.Layout(gtx, func(gtx C) D {
 							var txt material.LabelStyle
 							txt = material.Body1(th, r.Name)
-							txt.Font.Style = text.Regular
 							txt.Font.Weight = text.Bold
 							txt.TextSize = th.TextSize.Scale(14.0 / 16.0)
 

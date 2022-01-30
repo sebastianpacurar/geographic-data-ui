@@ -111,7 +111,7 @@ func (cds *ColDisplaySearch) Layout(gtx C, th *material.Theme) D {
 								}
 								return btn.Layout(gtx)
 							}),
-							globals.SpacerX,
+							layout.Rigid(layout.Spacer{Width: unit.Dp(10)}.Layout),
 							layout.Rigid(func(gtx C) D {
 								var btn material.ButtonStyle
 								btn = material.Button(th, &cds.deselectAllBoxes, "Deselect All")

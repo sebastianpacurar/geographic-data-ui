@@ -1,8 +1,6 @@
 package globals
 
 import (
-	"gioui.org/layout"
-	"gioui.org/unit"
 	"image/color"
 )
 
@@ -37,5 +35,4 @@ var (
 		"card_color":     {R: 237, G: 237, B: 237, A: 255},
 		"cp_resizer":     {R: 40, G: 70, B: 70, A: 175},
 	}
-	SpacerX = layout.Rigid(layout.Spacer{Width: unit.Dp(10)}.Layout)
 )
