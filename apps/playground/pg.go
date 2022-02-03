@@ -2,18 +2,40 @@ package playground
 
 import (
 	"gioui-experiment/apps"
-	"gioui-experiment/apps/playground/tabs"
 	"gioui-experiment/globals"
 	"gioui-experiment/themes/colours"
 	"gioui.org/font/gofont"
+	"gioui.org/gesture"
+	"gioui.org/io/pointer"
 	"gioui.org/layout"
 	"gioui.org/op"
+	"gioui.org/op/clip"
+	"gioui.org/op/paint"
 	"gioui.org/unit"
 	"gioui.org/widget"
 	"gioui.org/widget/material"
 	"gioui.org/x/component"
 	"image"
 	"image/color"
+	"time"
+)
+
+var (
+	startTime       = time.Now()
+	duration        = 2 * time.Second
+	controllerInset = layout.Inset{
+		Top:    unit.Dp(10),
+		Right:  unit.Dp(25),
+		Bottom: unit.Dp(10),
+	}
+	sqColors = map[string]color.NRGBA{
+		"left":     globals.Colours[colours.LIGHT_SEA_GREEN],
+		"right":    globals.Colours[colours.FLAME_RED],
+		"middle":   globals.Colours[colours.BLACK],
+		"dragged":  globals.Colours[colours.GREY],
+		"inactive": globals.Colours[colours.ELECTRIC_BLUE],
+	}
+	bg color.NRGBA
 )
 
 type (
@@ -28,22 +50,16 @@ type (
 		DisableCPBtn widget.Clickable
 		isCPDisabled bool
 
-		counterApp tabs.CounterTab
-		drawApp    tabs.DrawTab
-
-		Tabs
+		Draw
+	}
+	Draw struct {
+		active bool
+		sq     Square
 	}
 
-	Tabs struct {
-		TabsList []Tab
-		list     widget.List
-	}
-
-	Tab struct {
-		Name       string
-		Btn        widget.Clickable
-		IsSelected bool
-		Layout     func(C, *material.Theme) D
+	Square struct {
+		pos  int
+		drag gesture.Drag
 	}
 )
 
@@ -96,77 +112,9 @@ func (app *Application) IsCPDisabled() bool {
 }
 
 func (app *Application) LayoutView(gtx C, th *material.Theme) D {
-	app.initApps()
-
-	return layout.Flex{Axis: layout.Vertical}.Layout(gtx,
+	return layout.Flex{}.Layout(gtx,
 		layout.Rigid(func(gtx C) D {
-			return material.List(th, &app.Tabs.list).Layout(gtx, len(app.TabsList), func(gtx C, i int) D {
-				var (
-					dims D
-					btn  material.ButtonStyle
-				)
-				btn = material.Button(th, &app.TabsList[i].Btn, app.TabsList[i].Name)
-				btn.CornerRadius = unit.Dp(1)
-				btn.Inset = layout.UniformInset(unit.Dp(10))
-				btn.Background = globals.Colours[colours.WHITE]
-				btn.Color = globals.Colours[colours.BLACK]
-				dims = btn.Layout(gtx)
-
-				if app.TabsList[i].Btn.Clicked() {
-					name := app.TabsList[i].Name
-					app.TabsList[i].IsSelected = true
-					for i := range app.TabsList {
-						if name != app.TabsList[i].Name {
-							app.TabsList[i].IsSelected = false
-						}
-					}
-					op.InvalidateOp{}.Add(gtx.Ops)
-				}
-
-				if app.TabsList[i].IsSelected {
-					dims = widget.Border{
-						Width:        unit.Dp(1),
-						CornerRadius: btn.CornerRadius,
-					}.Layout(gtx, func(gtx C) D {
-						size := image.Pt(dims.Size.X, dims.Size.Y)
-						gtx.Constraints = layout.Exact(gtx.Constraints.Constrain(size))
-
-						return layout.Stack{Alignment: layout.S}.Layout(gtx,
-							layout.Expanded(func(gtx C) D {
-								return globals.ColoredArea(gtx, size, globals.Colours[colours.AERO_BLUE])
-							}),
-							layout.Stacked(func(gtx C) D {
-								return layout.Flex{Axis: layout.Vertical}.Layout(gtx,
-									layout.Flexed(1, func(gtx C) D {
-										var lbl material.LabelStyle
-										lbl = material.Body1(th, app.TabsList[i].Name)
-										lbl.TextSize = btn.TextSize
-
-										return layout.Flex{}.Layout(gtx,
-											layout.Flexed(1, func(gtx C) D {
-												return layout.Center.Layout(gtx, lbl.Layout)
-											}))
-									}),
-									layout.Rigid(func(gtx C) D {
-										return layout.Stack{}.Layout(gtx,
-											layout.Expanded(func(gtx C) D {
-												return globals.ColoredArea(gtx, image.Pt(gtx.Constraints.Max.X, 3), globals.Colours[colours.SEA_GREEN])
-											}))
-									}))
-							}))
-					})
-				}
-				return dims
-			})
-		}),
-		layout.Flexed(1, func(gtx C) D {
-			var dims D
-			for i := range app.TabsList {
-				if app.TabsList[i].IsSelected {
-					dims = app.TabsList[i].Layout(gtx, th)
-				}
-			}
-			return dims
+			return app.Draw.Layout(gtx, th)
 		}))
 }
 
@@ -174,27 +122,126 @@ func (app *Application) LayoutController(gtx C, th *material.Theme) D {
 	return app.ControlPanel.Layout(gtx, th)
 }
 
-func (app *Application) initApps() {
-	if len(app.TabsList) == 0 {
-		app.TabsList = []Tab{
+func (d *Draw) Layout(gtx C, th *material.Theme) D {
+	return layout.Stack{}.Layout(gtx,
+		layout.Expanded(func(gtx C) D {
+			size := image.Pt(gtx.Constraints.Max.X, gtx.Constraints.Max.Y)
+			return globals.RColoredArea(gtx, size, 10, globals.Colours[colours.WHITE])
+		}),
+		layout.Stacked(func(gtx C) D {
+			return layout.UniformInset(unit.Dp(5)).Layout(gtx, func(gtx C) D {
+				return layout.Flex{Axis: layout.Vertical, WeightSum: 3}.Layout(gtx,
+					layout.Flexed(1, func(gtx C) D {
+						return d.drawInteractiveRect(gtx)
+					}),
 
-			// Draw app
-			{
-				Name:       "Draw",
-				IsSelected: true,
-				Layout: func(gtx C, th *material.Theme) D {
-					return app.drawApp.Layout(gtx, th)
-				},
-			},
+					layout.Rigid(func(gtx C) D {
+						return layout.Inset{Top: unit.Dp(5), Bottom: unit.Dp(5)}.Layout(gtx, func(gtx C) D {
+							return d.drawDelimiter(gtx)
+						})
+					}),
 
-			// Counters app
-			{
-				Name:       "Counters",
-				IsSelected: false,
-				Layout: func(gtx C, th *material.Theme) D {
-					return app.counterApp.Layout(gtx, th)
-				},
-			},
+					layout.Flexed(1, func(gtx C) D {
+						return d.fillGradually(gtx, gtx.Now)
+					}),
+
+					layout.Rigid(func(gtx C) D {
+						return layout.Inset{Top: unit.Dp(5), Bottom: unit.Dp(5)}.Layout(gtx, func(gtx C) D {
+							return d.drawDelimiter(gtx)
+						})
+					}),
+
+					// does nothing
+					layout.Flexed(1, func(gtx C) D {
+						return d.sq.drawDraggableSquare(gtx)
+					}),
+				)
+			})
+		}))
+}
+
+func (sq *Square) drawDraggableSquare(gtx C) D {
+	dims := image.Point{X: 100, Y: 100}
+
+	var de *pointer.Event
+	for _, e := range sq.drag.Events(gtx.Metric, gtx, gesture.Axis(layout.Horizontal)) {
+		if e.Type == pointer.Drag {
+			de = &e
 		}
 	}
+	if de != nil {
+		xy := de.Position.X
+		sq.pos += int(xy)
+	}
+	sq.drag.Add(gtx.Ops)
+	rect := clip.Rect{Max: dims}
+	paint.FillShape(gtx.Ops, sqColors["inactive"], rect.Op())
+	return D{Size: rect.Max}
+}
+
+func (d *Draw) drawInteractiveRect(gtx C) D {
+	for _, ev := range gtx.Events(&d.active) {
+		switch ev := ev.(type) {
+		case pointer.Event:
+			switch ev.Type {
+			case pointer.Press:
+				d.active = true
+				switch ev.Buttons {
+				case pointer.ButtonPrimary:
+					bg = sqColors["left"]
+				case pointer.ButtonSecondary:
+					bg = sqColors["right"]
+				case pointer.ButtonTertiary:
+					bg = sqColors["middle"]
+				}
+			case pointer.Drag:
+				bg = sqColors["dragged"]
+
+			case pointer.Release, pointer.Cancel:
+				d.active = false
+				bg = sqColors["inactive"]
+			}
+		}
+	}
+
+	area := clip.Rect(image.Rect(0, 0, 100, 100)).Push(gtx.Ops)
+	pointer.CursorNameOp{Name: pointer.CursorGrab}.Add(gtx.Ops)
+	pointer.InputOp{
+		Tag:   &d.active,
+		Types: pointer.Press | pointer.Release | pointer.Cancel | pointer.Drag,
+		Grab:  true,
+	}.Add(gtx.Ops)
+	area.Pop()
+
+	rect := clip.Rect{Max: image.Pt(100, 100)}
+	paint.FillShape(gtx.Ops, bg, rect.Op())
+
+	return D{Size: rect.Max}
+}
+
+func (d *Draw) fillGradually(gtx C, now time.Time) D {
+	elapsed := now.Sub(startTime)
+	progress := elapsed.Seconds() / duration.Seconds()
+	if progress < 1 {
+		op.InvalidateOp{}.Add(gtx.Ops)
+	} else {
+		progress = 0
+	}
+
+	width := float32(gtx.Constraints.Max.X) * float32(progress)
+	height := float32(gtx.Constraints.Max.Y) * float32(progress)
+	rect := clip.Rect{Max: image.Pt(int(width), int(height))}
+
+	paint.FillShape(gtx.Ops, globals.Colours[colours.AERO_BLUE], rect.Op())
+	return D{Size: rect.Max}
+}
+
+func (d *Draw) drawDelimiter(gtx C) D {
+	rect := clip.Rect{Max: image.Pt(gtx.Constraints.Max.X, 10)}
+	paint.FillShape(gtx.Ops, globals.Colours[colours.ANTIQUE_WHITE], rect.Op())
+	return D{Size: rect.Max}
+}
+
+func (d *Draw) dragArea(gtx C) D {
+	return D{}
 }
