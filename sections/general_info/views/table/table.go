@@ -1,7 +1,7 @@
 package table
 
 import (
-	"gioui-experiment/apps/general_info/data"
+	"gioui-experiment/sections/general_info/data"
 	"gioui.org/layout"
 	"gioui.org/op/clip"
 	"gioui.org/op/paint"

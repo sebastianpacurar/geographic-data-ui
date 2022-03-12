@@ -1,10 +1,10 @@
-package views
+package country
 
 import (
 	"fmt"
-	"gioui-experiment/apps/general_info/data"
-	"gioui-experiment/apps/general_info/table"
 	"gioui-experiment/globals"
+	"gioui-experiment/sections/general_info/data"
+	"gioui-experiment/sections/general_info/views/table"
 	"gioui.org/layout"
 	"gioui.org/op/paint"
 	"gioui.org/text"

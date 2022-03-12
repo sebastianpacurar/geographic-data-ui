@@ -1,7 +1,7 @@
 package general_info
 
 import (
-	controllers "gioui-experiment/apps/general_info/controllers"
+	"gioui-experiment/sections/general_info/controllers"
 	"gioui.org/layout"
 	"gioui.org/unit"
 	"gioui.org/widget"

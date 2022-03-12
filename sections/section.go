@@ -1,4 +1,4 @@
-package apps
+package sections
 
 import (
 	"gioui-experiment/globals"
@@ -17,7 +17,7 @@ type (
 	C = layout.Context
 	D = layout.Dimensions
 
-	Application interface {
+	Section interface {
 		LayoutView(gtx C, th *material.Theme) D
 		LayoutController(gtx C, th *material.Theme) D
 		Actions() []component.AppBarAction
@@ -27,7 +27,7 @@ type (
 	}
 
 	Router struct {
-		pages   map[interface{}]Application
+		pages   map[interface{}]Section
 		current interface{}
 		*component.ModalNavDrawer
 		NavAnim component.VisibilityAnimation
@@ -40,7 +40,7 @@ type (
 func NewRouter() Router {
 	modal := component.NewModal()
 
-	nav := component.NewNav("Gioui Experiment", "Click or Tap on any of the below apps")
+	nav := component.NewNav("Gioui Experiment", "Available Sections")
 	modalNav := component.ModalNavFrom(&nav, modal)
 
 	bar := component.NewAppBar(modal)
@@ -51,7 +51,7 @@ func NewRouter() Router {
 		Duration: time.Millisecond * 250,
 	}
 	return Router{
-		pages:          make(map[interface{}]Application),
+		pages:          make(map[interface{}]Section),
 		ModalLayer:     modal,
 		ModalNavDrawer: modalNav,
 		AppBar:         bar,
@@ -60,7 +60,7 @@ func NewRouter() Router {
 	}
 }
 
-func (r *Router) Register(tag interface{}, app Application) {
+func (r *Router) Register(tag interface{}, app Section) {
 	r.pages[tag] = app
 	navItem := app.NavItem()
 	navItem.Tag = tag

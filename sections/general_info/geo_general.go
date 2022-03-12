@@ -2,12 +2,12 @@ package general_info
 
 import (
 	"fmt"
-	"gioui-experiment/apps"
-	"gioui-experiment/apps/general_info/data"
-	"gioui-experiment/apps/general_info/grid"
-	"gioui-experiment/apps/general_info/table"
-	"gioui-experiment/apps/general_info/views"
 	"gioui-experiment/globals"
+	"gioui-experiment/sections"
+	"gioui-experiment/sections/general_info/data"
+	"gioui-experiment/sections/general_info/views/country"
+	"gioui-experiment/sections/general_info/views/grid"
+	"gioui-experiment/sections/general_info/views/table"
 	"gioui.org/font/gofont"
 	"gioui.org/layout"
 	"gioui.org/op"
@@ -27,13 +27,13 @@ type (
 	C = layout.Context
 	D = layout.Dimensions
 
-	Application struct {
-		*apps.Router
+	Section struct {
+		*sections.Router
 		th *material.Theme
 
 		ControlPanel
 		Display
-		cv views.CountryView
+		cv country.CountryView
 
 		pinBtn       widget.Clickable
 		DisableCPBtn widget.Clickable
@@ -78,72 +78,72 @@ type (
 	}
 )
 
-func New(router *apps.Router) *Application {
-	return &Application{
+func New(router *sections.Router) *Section {
+	return &Section{
 		Router: router,
 		th:     material.NewTheme(gofont.Collection()),
 	}
 }
 
-func (app *Application) Actions() []component.AppBarAction {
+func (s *Section) Actions() []component.AppBarAction {
 	return []component.AppBarAction{
 		{
 			OverflowAction: component.OverflowAction{
-				Tag: &app.DisableCPBtn,
+				Tag: &s.DisableCPBtn,
 			},
 			Layout: func(gtx C, bg, fg color.NRGBA) D {
 				var lbl string
-				if app.DisableCPBtn.Clicked() {
-					app.isCPDisabled = !app.isCPDisabled
+				if s.DisableCPBtn.Clicked() {
+					s.isCPDisabled = !s.isCPDisabled
 				}
-				if !app.isCPDisabled {
+				if !s.isCPDisabled {
 					lbl = "Disable CP"
 				} else {
 					lbl = "Enable CP"
 				}
-				return material.Button(app.th, &app.DisableCPBtn, lbl).Layout(gtx)
+				return material.Button(s.th, &s.DisableCPBtn, lbl).Layout(gtx)
 			},
 		},
 	}
 }
 
-func (app *Application) Overflow() []component.OverflowAction {
+func (s *Section) Overflow() []component.OverflowAction {
 	return []component.OverflowAction{}
 }
 
-func (app *Application) NavItem() component.NavItem {
+func (s *Section) NavItem() component.NavItem {
 	return component.NavItem{
-		Name: "Geography - countries, states, statistics",
+		Name: "General Information",
 	}
 }
 
-func (app *Application) IsCPDisabled() bool {
-	return app.isCPDisabled
+func (s *Section) IsCPDisabled() bool {
+	return s.isCPDisabled
 }
 
-func (app *Application) LayoutView(gtx C, th *material.Theme) D {
-	err := app.Api.InitCountries()
+func (s *Section) LayoutView(gtx C, th *material.Theme) D {
+	err := s.Api.InitCountries()
 	if err != nil {
 		// in case of no internet connection, or if the main request fails
 		return material.H6(th, fmt.Sprintf("Error when fetching countries: %s", err)).Layout(gtx)
 	} else {
-		app.SearchByColumn(table.SearchBy)
+		s.SearchByColumn(table.SearchBy)
 
 		// run only once at start
-		if !app.initialSetup {
-			app.SearchField.SingleLine = true
+		if !s.initialSetup {
+			s.SearchField.SingleLine = true
 
 			// initialize all flags
 			data.ProcessFlags()
 
 			// initialize Table View at start
-			app.Selected = app.Display.Table
+			s.Selected = s.Display.Table
 
 			// initialize continents to "All" as Selected
-			app.initContinents()
-			for i := range app.Continents {
-				if app.Continents[i].Name == "All" {
-					app.Continents[i].IsSelected = true
+			s.initContinents()
+			for i := range s.Continents {
+				if s.Continents[i].Name == "All" {
+					s.Continents[i].IsSelected = true
 					for j := range data.Cached {
 						data.Cached[j].IsActiveContinent = true
 					}
@@ -155,14 +155,14 @@ func (app *Application) LayoutView(gtx C, th *material.Theme) D {
 			for i := range data.Cached {
 				data.Cached[i].IsSearchedFor = true
 			}
-			app.initialSetup = true
+			s.initialSetup = true
 		}
 
-		for _, e := range app.AppBar.Events(gtx) {
+		for _, e := range s.AppBar.Events(gtx) {
 			switch e.(type) {
 			case component.AppBarContextMenuDismissed:
-				app.Display.ContextualSet = false
-				app.Display.Grid.Contextual = nil
+				s.Display.ContextualSet = false
+				s.Display.Grid.Contextual = nil
 				for i := range data.Cached {
 					if data.Cached[i].IsCtxtActive {
 						data.Cached[i].IsCtxtActive = false
@@ -171,22 +171,22 @@ func (app *Application) LayoutView(gtx C, th *material.Theme) D {
 				op.InvalidateOp{}.Add(gtx.Ops)
 
 			case component.AppBarNavigationClicked:
-				app.ModalNavDrawer.Appear(gtx.Now)
-				app.NavAnim.Disappear(gtx.Now)
+				s.ModalNavDrawer.Appear(gtx.Now)
+				s.NavAnim.Disappear(gtx.Now)
 			}
 		}
 
 		var dims D
 
-		switch app.Grid.Contextual.(type) {
+		switch s.Grid.Contextual.(type) {
 		case data.Country:
-			if !app.ContextualSet {
-				app.Router.AppBar.SetContextualActions(
+			if !s.ContextualSet {
+				s.Router.AppBar.SetContextualActions(
 					[]component.AppBarAction{
-						component.SimpleIconAction(&app.pinBtn, globals.PinIcon,
+						component.SimpleIconAction(&s.pinBtn, globals.PinIcon,
 							component.OverflowAction{
 								Name: "Pin Country",
-								Tag:  &app.pinBtn,
+								Tag:  &s.pinBtn,
 							},
 						),
 					},
@@ -195,16 +195,16 @@ func (app *Application) LayoutView(gtx C, th *material.Theme) D {
 
 				for i := range data.Cached {
 					if data.Cached[i].IsCtxtActive {
-						app.Display.ContextualCountry = data.Cached[i]
+						s.Display.ContextualCountry = data.Cached[i]
 					}
 				}
-				app.Router.AppBar.ToggleContextual(gtx.Now, app.Display.ContextualCountry.Name.Common)
-				app.ContextualSet = true
+				s.Router.AppBar.ToggleContextual(gtx.Now, s.Display.ContextualCountry.Name.Common)
+				s.ContextualSet = true
 				op.InvalidateOp{}.Add(gtx.Ops)
 			}
 
 			// layout Country View
-			dims = app.cv.Layout(gtx, th, app.ContextualCountry)
+			dims = s.cv.Layout(gtx, th, s.ContextualCountry)
 
 		case nil:
 			dims = layout.Flex{Axis: layout.Vertical}.Layout(gtx,
@@ -212,16 +212,16 @@ func (app *Application) LayoutView(gtx C, th *material.Theme) D {
 
 					// search field
 					search := layout.Flexed(1, func(gtx C) D {
-						return app.Display.SearchField.Layout(gtx, th, fmt.Sprintf("Search by %s", table.SearchBy))
+						return s.Display.SearchField.Layout(gtx, th, fmt.Sprintf("Search by %s", table.SearchBy))
 					})
 
 					// Table button
 					tblBtn := layout.Rigid(func(gtx C) D {
-						if app.Display.TableBtn.Clicked() {
-							app.Display.Selected = app.Display.Table
-							app.Display.slider.PushRight()
+						if s.Display.TableBtn.Clicked() {
+							s.Display.Selected = s.Display.Table
+							s.Display.slider.PushRight()
 						}
-						switch app.Display.Selected.(type) {
+						switch s.Display.Selected.(type) {
 						case table.Table:
 							gtx = gtx.Disabled()
 						}
@@ -230,16 +230,16 @@ func (app *Application) LayoutView(gtx C, th *material.Theme) D {
 							Right:  unit.Dp(8),
 							Bottom: unit.Dp(8),
 							Left:   unit.Dp(8),
-						}.Layout(gtx, material.Button(th, &app.Display.TableBtn, "Table").Layout)
+						}.Layout(gtx, material.Button(th, &s.Display.TableBtn, "Table").Layout)
 					})
 
 					// grid button
 					grdBtn := layout.Rigid(func(gtx C) D {
-						if app.Display.GridBtn.Clicked() {
-							app.Display.Selected = app.Display.Grid
-							app.Display.slider.PushLeft()
+						if s.Display.GridBtn.Clicked() {
+							s.Display.Selected = s.Display.Grid
+							s.Display.slider.PushLeft()
 						}
-						switch app.Display.Selected.(type) {
+						switch s.Display.Selected.(type) {
 						case grid.Grid:
 							gtx = gtx.Disabled()
 						}
@@ -248,12 +248,12 @@ func (app *Application) LayoutView(gtx C, th *material.Theme) D {
 							Right:  unit.Dp(8),
 							Bottom: unit.Dp(8),
 							Left:   unit.Dp(8),
-						}.Layout(gtx, material.Button(th, &app.Display.GridBtn, "Grid").Layout)
+						}.Layout(gtx, material.Button(th, &s.Display.GridBtn, "Grid").Layout)
 					})
 
 					//Export to excel button
 					exportBtn := layout.Rigid(func(gtx C) D {
-						if app.Display.SaveAsXlsx.Clicked() {
+						if s.Display.SaveAsXlsx.Clicked() {
 
 						}
 						return layout.Inset{
@@ -263,7 +263,7 @@ func (app *Application) LayoutView(gtx C, th *material.Theme) D {
 							Left:   unit.Dp(8),
 						}.Layout(gtx, func(gtx C) D {
 							var btn material.IconButtonStyle
-							btn = material.IconButton(th, &app.Display.SaveAsXlsx, globals.ExcelExportIcon, "Export to Excel")
+							btn = material.IconButton(th, &s.Display.SaveAsXlsx, globals.ExcelExportIcon, "Export to Excel")
 							btn.Size = unit.Dp(20)
 							btn.Inset = layout.UniformInset(unit.Dp(8))
 							return btn.Layout(gtx)
@@ -293,26 +293,26 @@ func (app *Application) LayoutView(gtx C, th *material.Theme) D {
 								})
 							}),
 							layout.Rigid(func(gtx C) D {
-								return app.ContinentsList.Layout(gtx, len(app.AllContinents), func(gtx C, i int) D {
+								return s.ContinentsList.Layout(gtx, len(s.AllContinents), func(gtx C, i int) D {
 									var (
 										dim D
 										btn material.ButtonStyle
 									)
-									btn = material.Button(th, &app.Continents[i].Btn, app.Continents[i].Name)
+									btn = material.Button(th, &s.Continents[i].Btn, s.Continents[i].Name)
 									btn.CornerRadius = unit.Dp(1)
 									btn.Inset = layout.UniformInset(unit.Dp(10))
 									btn.Background = globals.Colours[globals.WHITE]
 									btn.Color = globals.Colours[globals.BLACK]
 									dim = btn.Layout(gtx)
 
-									if app.Continents[i].Btn.Clicked() {
-										name := app.Continents[i].Name
-										app.Continents[i].IsSelected = true
+									if s.Continents[i].Btn.Clicked() {
+										name := s.Continents[i].Name
+										s.Continents[i].IsSelected = true
 
 										// update the tab ui
-										for j := range app.Continents {
-											if name != app.Continents[j].Name {
-												app.Continents[j].IsSelected = false
+										for j := range s.Continents {
+											if name != s.Continents[j].Name {
+												s.Continents[j].IsSelected = false
 											}
 										}
 
@@ -322,7 +322,7 @@ func (app *Application) LayoutView(gtx C, th *material.Theme) D {
 												data.Cached[j].IsActiveContinent = true
 											} else {
 												continents := strings.Join(data.Cached[j].Continents, " ")
-												if strings.Contains(continents, app.Continents[i].Name) {
+												if strings.Contains(continents, s.Continents[i].Name) {
 													data.Cached[j].IsActiveContinent = true
 												} else {
 													data.Cached[j].IsActiveContinent = false
@@ -332,7 +332,7 @@ func (app *Application) LayoutView(gtx C, th *material.Theme) D {
 										op.InvalidateOp{}.Add(gtx.Ops)
 									}
 
-									if app.Continents[i].IsSelected {
+									if s.Continents[i].IsSelected {
 										dim = widget.Border{
 											Width:        unit.Dp(1),
 											CornerRadius: btn.CornerRadius,
@@ -348,7 +348,7 @@ func (app *Application) LayoutView(gtx C, th *material.Theme) D {
 													return layout.Flex{Axis: layout.Vertical}.Layout(gtx,
 														layout.Flexed(1, func(gtx C) D {
 															var lbl material.LabelStyle
-															lbl = material.Body1(th, app.Continents[i].Name)
+															lbl = material.Body1(th, s.Continents[i].Name)
 															lbl.TextSize = btn.TextSize
 
 															return layout.Flex{}.Layout(gtx,
@@ -374,13 +374,13 @@ func (app *Application) LayoutView(gtx C, th *material.Theme) D {
 
 				// Selected display
 				layout.Rigid(func(gtx C) D {
-					return app.Display.slider.Layout(gtx, layout.Horizontal, func(gtx C) D {
+					return s.Display.slider.Layout(gtx, layout.Horizontal, func(gtx C) D {
 						var dims D
-						switch app.Display.Selected.(type) {
+						switch s.Display.Selected.(type) {
 						case grid.Grid:
-							dims = app.Display.Grid.Layout(gtx, th)
+							dims = s.Display.Grid.Layout(gtx, th)
 						case table.Table:
-							dims = app.Display.Table.Layout(gtx, th)
+							dims = s.Display.Table.Layout(gtx, th)
 						}
 						return dims
 					})
@@ -391,8 +391,8 @@ func (app *Application) LayoutView(gtx C, th *material.Theme) D {
 	}
 }
 
-func (app *Application) LayoutController(gtx C, th *material.Theme) D {
-	return app.ControlPanel.Layout(gtx, th)
+func (s *Section) LayoutController(gtx C, th *material.Theme) D {
+	return s.ControlPanel.Layout(gtx, th)
 }
 
 // SearchByColumn - filter countries based on data.Cached and data.Cached manipulation

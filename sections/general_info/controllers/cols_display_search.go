@@ -2,8 +2,8 @@ package controllers
 
 import (
 	"fmt"
-	"gioui-experiment/apps/general_info/table"
 	"gioui-experiment/globals"
+	"gioui-experiment/sections/general_info/views/table"
 	"gioui.org/layout"
 	"gioui.org/op"
 	"gioui.org/unit"

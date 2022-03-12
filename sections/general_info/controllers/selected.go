@@ -1,8 +1,8 @@
 package controllers
 
 import (
-	"gioui-experiment/apps/general_info/data"
 	"gioui-experiment/globals"
+	"gioui-experiment/sections/general_info/data"
 	"gioui.org/layout"
 	"gioui.org/unit"
 	"gioui.org/widget"

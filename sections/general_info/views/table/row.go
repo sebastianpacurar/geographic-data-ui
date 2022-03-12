@@ -2,8 +2,8 @@ package table
 
 import (
 	"fmt"
-	"gioui-experiment/apps/general_info/data"
 	"gioui-experiment/globals"
+	"gioui-experiment/sections/general_info/data"
 	"gioui.org/layout"
 	"gioui.org/text"
 	"gioui.org/unit"
