@@ -2,10 +2,9 @@ package views
 
 import (
 	"fmt"
-	"gioui-experiment/apps/geography/data"
-	"gioui-experiment/apps/geography/table"
+	"gioui-experiment/apps/general_info/data"
+	"gioui-experiment/apps/general_info/table"
 	"gioui-experiment/globals"
-	"gioui-experiment/themes/colours"
 	"gioui.org/layout"
 	"gioui.org/op/paint"
 	"gioui.org/text"
@@ -103,10 +102,10 @@ func (tw *txtWrap) LayTextWrap(gtx C, th *material.Theme, country data.Country) 
 	div.Subheading = material.Body2(th, tw.prop)
 
 	div.Right = unit.Dp(15)
-	div.Fill = globals.Colours[colours.LIGHT_SEA_GREEN]
+	div.Fill = globals.Colours[globals.LIGHT_SEA_GREEN]
 	div.Subheading.TextSize = th.TextSize.Scale(15.0 / 16.0)
 	div.Subheading.Font.Weight = text.SemiBold
-	div.Subheading.Color = globals.Colours[colours.SEA_GREEN]
+	div.Subheading.Color = globals.Colours[globals.SEA_GREEN]
 
 	return layout.Flex{Axis: layout.Vertical}.Layout(gtx,
 		layout.Rigid(div.Layout),

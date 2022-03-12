@@ -2,9 +2,8 @@ package table
 
 import (
 	"fmt"
-	"gioui-experiment/apps/geography/data"
+	"gioui-experiment/apps/general_info/data"
 	"gioui-experiment/globals"
-	"gioui-experiment/themes/colours"
 	"gioui.org/layout"
 	"gioui.org/text"
 	"gioui.org/unit"
@@ -190,7 +189,7 @@ func (r *Row) parseCellContent(headCell string, content interface{}) string {
 
 // LayRow - Lay the row with all column cells parsed
 func (r *Row) LayRow(gtx C, th *material.Theme, isHeader bool) D {
-	rowColor := globals.Colours[colours.ANTIQUE_WHITE]
+	rowColor := globals.Colours[globals.ANTIQUE_WHITE]
 	r.generateColumns()
 
 	if !r.loaded {
@@ -199,25 +198,25 @@ func (r *Row) LayRow(gtx C, th *material.Theme, isHeader bool) D {
 	}
 
 	border := widget.Border{
-		Color: globals.Colours[colours.GREY],
+		Color: globals.Colours[globals.GREY],
 		Width: unit.Dp(1),
 	}
 	if isHeader {
 		border.Width = unit.Dp(1.5)
-		border.Color = globals.Colours[colours.GREY]
+		border.Color = globals.Colours[globals.GREY]
 	}
 
 	return border.Layout(gtx, func(gtx C) D {
 		if !isHeader {
 			return material.Clickable(gtx, &r.btn, func(gtx C) D {
 				if r.Selected {
-					rowColor = globals.Colours[colours.AERO_BLUE]
+					rowColor = globals.Colours[globals.AERO_BLUE]
 				}
 				if r.btn.Hovered() {
 					if r.Selected {
-						rowColor = globals.Colours[colours.LIGHT_SALMON]
+						rowColor = globals.Colours[globals.LIGHT_SALMON]
 					} else {
-						rowColor = globals.Colours[colours.NYANZA]
+						rowColor = globals.Colours[globals.NYANZA]
 					}
 				}
 				return r.colList.Layout(gtx, len(ColNames), func(gtx C, i int) D {
@@ -249,9 +248,9 @@ func (r *Row) LayRow(gtx C, th *material.Theme, isHeader bool) D {
 				var dim D
 				if ColState[r.columns[i].headCell] {
 					if SearchBy == r.columns[i].headCell {
-						rowColor = globals.Colours[colours.LIGHT_YELLOW]
+						rowColor = globals.Colours[globals.LIGHT_YELLOW]
 					} else {
-						rowColor = globals.Colours[colours.LAVENDERBLUSH]
+						rowColor = globals.Colours[globals.LAVENDERBLUSH]
 					}
 					dim = layout.Stack{Alignment: layout.Center}.Layout(gtx,
 						layout.Expanded(func(gtx C) D {
@@ -273,10 +272,10 @@ func (r *Row) LayRow(gtx C, th *material.Theme, isHeader bool) D {
 
 // LayNameColumn - Lay the sticky Name.Common column
 func (r *Row) LayNameColumn(gtx C, th *material.Theme, isHeader bool) D {
-	cellColor := globals.Colours[colours.ANTIQUE_WHITE]
+	cellColor := globals.Colours[globals.ANTIQUE_WHITE]
 
 	border := widget.Border{
-		Color: globals.Colours[colours.GREY],
+		Color: globals.Colours[globals.GREY],
 		Width: unit.Dp(1),
 	}
 
@@ -288,9 +287,9 @@ func (r *Row) LayNameColumn(gtx C, th *material.Theme, isHeader bool) D {
 
 				return layout.Stack{Alignment: layout.W}.Layout(gtx,
 					layout.Expanded(func(gtx C) D {
-						rowColor := globals.Colours[colours.ELECTRIC_BLUE]
+						rowColor := globals.Colours[globals.ELECTRIC_BLUE]
 						if SearchBy == "Name" {
-							rowColor = globals.Colours[colours.LIGHT_YELLOW]
+							rowColor = globals.Colours[globals.LIGHT_YELLOW]
 						}
 
 						// maintain header row at the same size on cross-axis, no matter the resize boundaries
@@ -309,15 +308,15 @@ func (r *Row) LayNameColumn(gtx C, th *material.Theme, isHeader bool) D {
 			})
 		} else {
 			return material.Clickable(gtx, &r.btn, func(gtx C) D {
-				cellColor = globals.Colours[colours.CARD_COLOR]
+				cellColor = globals.Colours[globals.CARD_COLOR]
 				if r.Selected {
-					cellColor = globals.Colours[colours.AERO_BLUE]
+					cellColor = globals.Colours[globals.AERO_BLUE]
 				}
 				if r.btn.Hovered() {
 					if r.Selected {
-						cellColor = globals.Colours[colours.LIGHT_SALMON]
+						cellColor = globals.Colours[globals.LIGHT_SALMON]
 					} else {
-						cellColor = globals.Colours[colours.NYANZA]
+						cellColor = globals.Colours[globals.NYANZA]
 					}
 				}
 				return layout.Stack{Alignment: layout.W}.Layout(gtx,

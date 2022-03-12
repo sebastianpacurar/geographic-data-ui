@@ -1,14 +1,13 @@
-package geography
+package general_info
 
 import (
 	"fmt"
 	"gioui-experiment/apps"
-	"gioui-experiment/apps/geography/data"
-	"gioui-experiment/apps/geography/grid"
-	"gioui-experiment/apps/geography/table"
-	"gioui-experiment/apps/geography/views"
+	"gioui-experiment/apps/general_info/data"
+	"gioui-experiment/apps/general_info/grid"
+	"gioui-experiment/apps/general_info/table"
+	"gioui-experiment/apps/general_info/views"
 	"gioui-experiment/globals"
-	"gioui-experiment/themes/colours"
 	"gioui.org/font/gofont"
 	"gioui.org/layout"
 	"gioui.org/op"
@@ -69,7 +68,7 @@ type (
 		ContextualCountry data.Country
 
 		initialSetup bool
-		slider       Slider
+		slider       globals.Slider
 	}
 
 	Continent struct {
@@ -302,8 +301,8 @@ func (app *Application) LayoutView(gtx C, th *material.Theme) D {
 									btn = material.Button(th, &app.Continents[i].Btn, app.Continents[i].Name)
 									btn.CornerRadius = unit.Dp(1)
 									btn.Inset = layout.UniformInset(unit.Dp(10))
-									btn.Background = globals.Colours[colours.WHITE]
-									btn.Color = globals.Colours[colours.BLACK]
+									btn.Background = globals.Colours[globals.WHITE]
+									btn.Color = globals.Colours[globals.BLACK]
 									dim = btn.Layout(gtx)
 
 									if app.Continents[i].Btn.Clicked() {
@@ -343,7 +342,7 @@ func (app *Application) LayoutView(gtx C, th *material.Theme) D {
 
 											return layout.Stack{Alignment: layout.S}.Layout(gtx,
 												layout.Expanded(func(gtx C) D {
-													return globals.ColoredArea(gtx, size, globals.Colours[colours.AERO_BLUE])
+													return globals.ColoredArea(gtx, size, globals.Colours[globals.AERO_BLUE])
 												}),
 												layout.Stacked(func(gtx C) D {
 													return layout.Flex{Axis: layout.Vertical}.Layout(gtx,
@@ -360,7 +359,7 @@ func (app *Application) LayoutView(gtx C, th *material.Theme) D {
 														layout.Rigid(func(gtx C) D {
 															return layout.Stack{}.Layout(gtx,
 																layout.Expanded(func(gtx C) D {
-																	return globals.ColoredArea(gtx, image.Pt(gtx.Constraints.Max.X, 3), globals.Colours[colours.SEA_GREEN])
+																	return globals.ColoredArea(gtx, image.Pt(gtx.Constraints.Max.X, 3), globals.Colours[globals.SEA_GREEN])
 																}))
 														}))
 												}))
@@ -519,7 +518,7 @@ func (d *Display) saveDataToExcel() {
 			excelRow += 1
 		}
 	}
-	if err := xlsx.SaveAs("output/geography/excel/Countries.xlsx"); err != nil {
+	if err := xlsx.SaveAs("output/general_info/excel/Countries.xlsx"); err != nil {
 		log.Fatalln("error at excel save: ", err.Error())
 	}
 }

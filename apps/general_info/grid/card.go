@@ -2,7 +2,6 @@ package grid
 
 import (
 	"gioui-experiment/globals"
-	"gioui-experiment/themes/colours"
 	"gioui.org/font/gofont"
 	"gioui.org/layout"
 	"gioui.org/op/paint"
@@ -41,7 +40,7 @@ func (c *Card) LayCard(gtx C, th *material.Theme) D {
 	size := image.Pt(gtx.Px(unit.Dp(float32(200))), gtx.Px(unit.Dp(float32(250))))
 
 	c.container.Theme = material.NewTheme(gofont.Collection())
-	c.container.Theme.Bg = globals.Colours[colours.CARD_COLOR]
+	c.container.Theme.Bg = globals.Colours[globals.CARD_COLOR]
 	c.container.Elevation = unit.Dp(5)
 	c.shadow.CornerRadius = unit.Dp(5)
 	c.shadow.Elevation = unit.Dp(8)

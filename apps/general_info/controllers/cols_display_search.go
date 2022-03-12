@@ -2,9 +2,8 @@ package controllers
 
 import (
 	"fmt"
-	"gioui-experiment/apps/geography/table"
+	"gioui-experiment/apps/general_info/table"
 	"gioui-experiment/globals"
-	"gioui-experiment/themes/colours"
 	"gioui.org/layout"
 	"gioui.org/op"
 	"gioui.org/unit"
@@ -104,7 +103,7 @@ func (cds *ColDisplaySearch) Layout(gtx C, th *material.Theme) D {
 								btn = material.Button(th, &cds.selectAllBoxes, "Select All")
 								btn.TextSize = txtSize
 								btn.Inset = btnInset
-								btn.Background = globals.Colours[colours.LIGHT_SEA_GREEN]
+								btn.Background = globals.Colours[globals.LIGHT_SEA_GREEN]
 
 								if len(table.ColState)-1 == getCheckedColumns() {
 									gtx.Queue = nil
@@ -117,7 +116,7 @@ func (cds *ColDisplaySearch) Layout(gtx C, th *material.Theme) D {
 								btn = material.Button(th, &cds.deselectAllBoxes, "Deselect All")
 								btn.TextSize = txtSize
 								btn.Inset = btnInset
-								btn.Background = globals.Colours[colours.FLAME_RED]
+								btn.Background = globals.Colours[globals.FLAME_RED]
 
 								// disable if there is one checked box in the list (prevents having all columns hidden)
 								if getCheckedColumns() == 1 {
@@ -135,7 +134,7 @@ func (cds *ColDisplaySearch) Layout(gtx C, th *material.Theme) D {
 						cb = material.CheckBox(th, &cds.checkboxes[i].Bool, cds.checkboxes[i].name)
 						cb.Size = unit.Dp(18)
 						cb.TextSize = txtSize
-						cb.IconColor = globals.Colours[colours.LIGHT_SEA_GREEN]
+						cb.IconColor = globals.Colours[globals.LIGHT_SEA_GREEN]
 
 						// invalidate in case it's the last marked box, so there is at least one column displayed
 						if getCheckedColumns() == 1 && cds.checkboxes[i].Value {
@@ -172,7 +171,7 @@ func (cds *ColDisplaySearch) Layout(gtx C, th *material.Theme) D {
 
 						rbtn.Size = unit.Dp(18)
 						rbtn.TextSize = th.TextSize.Scale(12.0 / 15.0)
-						rbtn.IconColor = globals.Colours[colours.LIGHT_SEA_GREEN]
+						rbtn.IconColor = globals.Colours[globals.LIGHT_SEA_GREEN]
 
 						// if the current column is unchecked then disable its radioBtn UI
 						if !table.ColState[table.SearchByCols[i]] {
@@ -182,7 +181,7 @@ func (cds *ColDisplaySearch) Layout(gtx C, th *material.Theme) D {
 								cds.radioBtns.Value = table.NAME
 								op.InvalidateOp{}.Add(gtx.Ops)
 							}
-							rbtn.Color = globals.Colours[colours.FLAME_RED]
+							rbtn.Color = globals.Colours[globals.FLAME_RED]
 							gtx.Queue = nil
 						}
 

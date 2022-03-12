@@ -2,9 +2,7 @@ package main
 
 import (
 	application "gioui-experiment/apps"
-	"gioui-experiment/apps/editor"
-	"gioui-experiment/apps/geography"
-	"gioui-experiment/apps/playground"
+	"gioui-experiment/apps/general_info"
 	"gioui.org/app"
 	"gioui.org/font/gofont"
 	"gioui.org/io/system"
@@ -19,7 +17,7 @@ import (
 func main() {
 	go func() {
 		w := app.NewWindow(
-			app.Title("Gio UI Experiment"),
+			app.Title("Geography Application"),
 			app.Size(unit.Dp(1400), unit.Dp(900)),
 		)
 		if err := Run(w); err != nil {
@@ -35,9 +33,7 @@ func Run(w *app.Window) error {
 	th := material.NewTheme(gofont.Collection())
 
 	router := application.NewRouter()
-	router.Register("pg", playground.New(&router))
-	router.Register(1, geography.New(&router))
-	router.Register(2, editor.New(&router))
+	router.Register(1, general_info.New(&router))
 
 	for {
 		select {

@@ -2,7 +2,7 @@ package grid
 
 import (
 	"encoding/json"
-	"gioui-experiment/apps/geography/data"
+	"gioui-experiment/apps/general_info/data"
 	"gioui-experiment/globals"
 	"gioui.org/io/clipboard"
 	"gioui.org/layout"

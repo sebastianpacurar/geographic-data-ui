@@ -225,9 +225,9 @@ func fetchCountries(location string) ([]byte, error) {
 
 // writeFlagToFile - needed for slower OSes to store the flags locally, for quicker retrieval on next app start
 func (c *Country) writeFlagToFile() error {
-	count, err := fileCount("output/geography/flags")
+	count, err := fileCount("output/general_info/flags")
 	if err != nil {
-		log.Fatalln(fmt.Sprintf("Error at counting files in output/geography/flags: %s", err))
+		log.Fatalln(fmt.Sprintf("Error at counting files in output/general_info/flags: %s", err))
 	}
 
 	if count < 250 {
@@ -242,7 +242,7 @@ func (c *Country) writeFlagToFile() error {
 			}
 		}(resp.Body)
 
-		file, err := os.Create(fmt.Sprintf("output/geography/flags/%s.png", c.Name.Common))
+		file, err := os.Create(fmt.Sprintf("output/general_info/flags/%s.png", c.Name.Common))
 		if err != nil {
 			log.Fatal(err)
 		}

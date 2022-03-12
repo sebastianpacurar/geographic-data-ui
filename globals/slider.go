@@ -1,4 +1,4 @@
-package geography
+package globals
 
 import (
 	"gioui.org/f32"

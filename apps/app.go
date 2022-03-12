@@ -2,7 +2,6 @@ package apps
 
 import (
 	"gioui-experiment/globals"
-	"gioui-experiment/themes/colours"
 	"gioui.org/layout"
 	"gioui.org/op/clip"
 	"gioui.org/op/paint"
@@ -111,7 +110,7 @@ func (r *Router) Layout(gtx C, th *material.Theme) D {
 							container := globals.ColoredArea(
 								gtx,
 								image.Pt(gtx.Constraints.Max.X, gtx.Constraints.Max.Y),
-								globals.Colours[colours.ANTIQUE_WHITE],
+								globals.Colours[globals.ANTIQUE_WHITE],
 							)
 							return container
 						}),
@@ -137,7 +136,7 @@ func (r *Router) Layout(gtx C, th *material.Theme) D {
 									container := globals.ColoredArea(
 										gtx,
 										gtx.Constraints.Max,
-										globals.Colours[colours.ANTIQUE_WHITE],
+										globals.Colours[globals.ANTIQUE_WHITE],
 									)
 									return container
 								}),
@@ -159,14 +158,14 @@ func (r *Router) Layout(gtx C, th *material.Theme) D {
 									return globals.ColoredArea(
 										gtx,
 										gtx.Constraints.Max,
-										globals.Colours[colours.AERO_BLUE],
+										globals.Colours[globals.AERO_BLUE],
 									)
 								}),
 								layout.Stacked(func(gtx C) D {
 									containerSize := image.Pt(gtx.Constraints.Max.X, gtx.Constraints.Max.Y)
 									gtx.Constraints = layout.Exact(gtx.Constraints.Constrain(containerSize))
 									border := widget.Border{
-										Color: globals.Colours[colours.SEA_GREEN],
+										Color: globals.Colours[globals.SEA_GREEN],
 										Width: unit.Dp(1),
 									}
 									return border.Layout(gtx, func(gtx C) D {
@@ -186,7 +185,7 @@ func (r *Router) Layout(gtx C, th *material.Theme) D {
 									Y: gtx.Constraints.Max.Y,
 								},
 							}
-							paint.FillShape(gtx.Ops, globals.Colours[colours.CP_RESIZER], clip.Rect(rect).Op())
+							paint.FillShape(gtx.Ops, globals.Colours[globals.CP_RESIZER], clip.Rect(rect).Op())
 							return D{Size: rect.Max}
 						})
 				}

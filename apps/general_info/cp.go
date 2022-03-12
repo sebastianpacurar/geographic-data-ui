@@ -1,7 +1,7 @@
-package editor
+package general_info
 
 import (
-	"gioui-experiment/apps/editor/controllers"
+	controllers "gioui-experiment/apps/general_info/controllers"
 	"gioui.org/layout"
 	"gioui.org/unit"
 	"gioui.org/widget"
@@ -14,8 +14,11 @@ type (
 		controllers []Controller
 		list        widget.List
 
-		test      controllers.TestController
-		testState component.DiscloserState
+		SCountries controllers.SelectedCountries
+		SCState    component.DiscloserState
+
+		CDSearch controllers.ColDisplaySearch
+		CDSState component.DiscloserState
 	}
 
 	Controller struct {
@@ -43,14 +46,29 @@ func (cp *ControlPanel) Layout(gtx C, th *material.Theme) D {
 	// every controller is a vertical flex which contains 2 rigids - discloser and the divider
 	cp.controllers = []Controller{
 		{
-			name: "Test 1 - editor control",
+			name: "Selected Countries",
 			layout: func(gtx C, c *Controller) D {
 				content := layout.Rigid(func(gtx C) D {
-					return component.SimpleDiscloser(th, &cp.testState).Layout(gtx,
+					return component.SimpleDiscloser(th, &cp.SCState).Layout(gtx,
 						material.Body1(th, c.name).Layout,
 						func(gtx C) D {
 							return controllerInset.Layout(gtx, func(gtx C) D {
-								return cp.test.Layout(gtx, th)
+								return cp.SCountries.Layout(gtx, th)
+							})
+						})
+				})
+				return cp.LayOutset(gtx, content, divider)
+			},
+		},
+		{
+			name: "Displayed Columns / Search by",
+			layout: func(gtx C, c *Controller) D {
+				content := layout.Rigid(func(gtx C) D {
+					return component.SimpleDiscloser(th, &cp.CDSState).Layout(gtx,
+						material.Body1(th, c.name).Layout,
+						func(gtx C) D {
+							return controllerInset.Layout(gtx, func(gtx C) D {
+								return cp.CDSearch.Layout(gtx, th)
 							})
 						})
 				})
