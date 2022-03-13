@@ -124,7 +124,7 @@ func GetSelectedCount() int {
 	return count
 }
 
-// ProcessFlagFromUrl - decode image directly from url  (very slow)
+// ProcessFlagFromUrl - decode image directly from url
 func downloadFlagFromUrl(url string) ([]byte, error) {
 	resp, e := http.Get(url)
 	if e != nil {

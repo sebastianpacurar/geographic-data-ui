@@ -105,6 +105,7 @@ func (r *Router) Layout(gtx C, th *material.Theme) D {
 			layout.Flexed(1, func(gtx C) D {
 				var dims D
 				if r.pages[r.current].IsCPDisabled() {
+
 					dims = layout.Stack{}.Layout(gtx,
 						layout.Expanded(func(gtx C) D {
 							container := globals.ColoredArea(
@@ -141,8 +142,6 @@ func (r *Router) Layout(gtx C, th *material.Theme) D {
 									return container
 								}),
 								layout.Stacked(func(gtx C) D {
-									containerSize := image.Pt(gtx.Constraints.Max.X, gtx.Constraints.Max.Y)
-									gtx.Constraints = layout.Exact(gtx.Constraints.Constrain(containerSize))
 									return layout.Inset{
 										Right:  unit.Dp(10),
 										Bottom: unit.Dp(5),
