@@ -11,8 +11,8 @@ import (
 )
 
 var (
-	covData    = &CovidStats{}
-	CachedDay  = covData.Day
+	covStats   = &CovidStats{}
+	CachedDay  = covStats.Day
 	CachedDays = make(map[string][]CovidData)
 )
 
@@ -23,13 +23,15 @@ type (
 	}
 
 	CovidData struct {
-		Country    string `json:"countryRegion"`
-		State      string `json:"provinceState"`
-		LastUpdate string `json:"lastUpdate"`
-		Lat        string `json:"lat"`
-		Lng        string `json:"lng"`
-		Confirmed  string `json:"confirmed"`
-		Deaths     string `json:"deaths"`
+		Country     string `json:"countryRegion"`
+		AdminArea   string `json:"admin2"`
+		State       string `json:"provinceState"`
+		CombinedKey string `json:"combinedKey"`
+		LastUpdate  string `json:"lastUpdate"`
+		Lat         string `json:"lat"`
+		Lng         string `json:"lng"`
+		Confirmed   string `json:"confirmed"`
+		Deaths      string `json:"deaths"`
 	}
 )
 
@@ -65,7 +67,7 @@ func fetchDates(date string) ([]byte, error) {
 	return body, nil
 }
 
-/// TODO: not working - problematic for continuous recalls
+// TODO: not working - problematic for continuous recalls
 // InitDayData - parse the data and store it in a map[date]CovidData, where date is the day as string
 func InitDayData(day string) error {
 	// if the specific day is not already cached, then add it to collection with its relevant data
